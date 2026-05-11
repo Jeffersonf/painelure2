@@ -225,10 +225,12 @@
             <p>${school.city} | CIE ${school.cie}</p>
           </div>
         </div>
-        <div></div>
+        <div class="school-meta">
+          <span>${school.fiche}% ficha</span>
+          <span>${school.items} item(ns)</span>
+        </div>
         <div class="school-foot">
           <span class="status-pill ${statusClass(school.status)}">${school.status === "warn" ? "Atenção" : "OK"}</span>
-          <span>${school.items} item(ns)</span>
           <div class="progress" aria-label="Ficha ${school.fiche}%"><i style="width:${school.fiche}%"></i></div>
         </div>
       </button>
@@ -255,7 +257,8 @@
     const networkStatus = network ? "Mapeada" : "Pendente";
     detail.innerHTML = `
       <article class="box">
-        <div class="box-head">
+        <div class="box-head school-detail-head">
+          <div class="school-avatar large">${school.initials}</div>
           <div>
             <strong>${school.name}</strong>
             <small>${school.city} • CIE ${school.cie}</small>

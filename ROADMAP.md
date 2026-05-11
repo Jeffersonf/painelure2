@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.39
+
+- Cards de escolas foram refinados com menos área vazia e mais informação útil.
+- Removido filler estrutural dos cards de escola.
+- Cards agora exibem ficha e total de itens como chips compactos.
+- Cabeçalho do detalhe da escola ganhou avatar maior e alinhamento mais consistente.
+
 ### 2.0.0-dev.38
 
 - Dashboard foi enxugado para reduzir redundância visual na primeira dobra.
