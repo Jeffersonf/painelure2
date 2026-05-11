@@ -23,6 +23,48 @@
     return P.getAppData().schools.find(school => P.normalize(school.name) === target) || null;
   }
 
+  function schoolProfile(name) {
+    const target = P.normalize(name);
+    return (P.getAppData().schoolProfiles || []).find(profile => P.normalize(profile.school) === target) || null;
+  }
+
+  function schoolProfileCompletion(name) {
+    const profile = schoolProfile(name);
+    if (!profile) return 0;
+    const fields = ["director", "viceDirector", "proati", "goe", "phone", "mobile", "email", "address", "notes"];
+    const filled = fields.filter(field => String(profile[field] || "").trim()).length;
+    return Math.round((filled / fields.length) * 100);
+  }
+
+  function schoolMissingProfileFields(name) {
+    const labels = {
+      director: "direção",
+      viceDirector: "vice-direção",
+      proati: "PROATI",
+      goe: "GOE",
+      phone: "telefone",
+      mobile: "celular",
+      email: "email",
+      address: "endereço",
+      notes: "observações"
+    };
+    const profile = schoolProfile(name);
+    if (!profile) return Object.values(labels);
+    return Object.entries(labels)
+      .filter(([field]) => !String(profile[field] || "").trim())
+      .map(([, label]) => label);
+  }
+
+  function profileStatusFromPct(percent) {
+    if (percent >= 65) return "ok";
+    if (percent >= 35) return "warn";
+    return "danger";
+  }
+
+  function firstNote(text) {
+    return String(text || "").split(".").map(item => item.trim()).find(Boolean) || "";
+  }
+
   function supervisorForSchool(name) {
     const target = P.normalize(name);
     return P.getAppData().supervisors.find(supervisor =>
@@ -277,25 +319,35 @@
       grid.innerHTML = `<div class="empty-state">Nenhuma escola carregada ainda.</div>`;
       return;
     }
-    grid.innerHTML = schools.map(school => `
-      <button class="school-card" type="button" data-school-name="${school.name}" data-school-key="${P.searchText([school.name])}" data-search="${P.searchText([school.name, school.city, school.cie, school.initials])}">
-        <div class="school-top">
-          <div class="school-avatar">${school.initials}</div>
-          <div>
-            <h2>${school.name}</h2>
-            <p>${school.city} | CIE ${school.cie}</p>
+    const data = P.getAppData();
+    grid.innerHTML = schools.map(school => {
+      const profile = schoolProfile(school.name);
+      const profilePct = schoolProfileCompletion(school.name);
+      const missing = schoolMissingProfileFields(school.name);
+      const metrics = data.schoolInventoryMetrics?.[school.name] || { items: school.items || 0, alerts: school.alerts || 0 };
+      const note = missing.length ? `pendente: ${missing.slice(0, 2).join(", ")}` : firstNote(profile?.notes) || "ficha escolar completa";
+      return `
+        <button class="school-card" type="button" data-school-name="${school.name}" data-school-key="${P.searchText([school.name])}" data-search="${P.searchText([school.name, school.city, school.cie, school.initials, profile?.director, profile?.email, profile?.phone])}">
+          <div class="school-top">
+            <div class="school-avatar">${school.initials}</div>
+            <div>
+              <h2>${school.name}</h2>
+              <p>${school.city} | CIE ${school.cie}</p>
+            </div>
           </div>
-        </div>
-        <div class="school-meta">
-          <span>${school.fiche}% ficha</span>
-          <span>${school.items} item(ns)</span>
-        </div>
-        <div class="school-foot">
-          <span class="status-pill ${statusClass(school.status)}">${school.status === "warn" ? "Atenção" : "OK"}</span>
-          <div class="progress" aria-label="Ficha ${school.fiche}%"><i style="width:${school.fiche}%"></i></div>
-        </div>
-      </button>
-    `).join("");
+          <div class="school-meta">
+            <span>${profilePct}% ficha</span>
+            <span>${metrics.items || 0} item(ns)</span>
+            <span>${profile?.phone || "telefone pendente"}</span>
+          </div>
+          <p class="school-note">${note}</p>
+          <div class="school-foot">
+            <span class="status-pill ${profileStatusFromPct(profilePct)}">ficha</span>
+            <div class="progress" aria-label="Ficha ${profilePct}%"><i style="width:${profilePct}%"></i></div>
+          </div>
+        </button>
+      `;
+    }).join("");
     grid.querySelectorAll("[data-school-name]").forEach(button => {
       button.addEventListener("click", () => {
         openSchoolPage(button.dataset.schoolName);
@@ -310,11 +362,15 @@
     const assets = schoolAssets(school.name);
     const totals = inventoryTotals(assets);
     const metrics = data.schoolInventoryMetrics?.[school.name] || { items: school.items || 0, alerts: school.alerts || 0 };
+    const profile = schoolProfile(school.name);
+    const profilePct = schoolProfileCompletion(school.name);
+    const missingProfile = schoolMissingProfileFields(school.name);
     const network = data.networkData?.[school.name];
     const supervisor = supervisorForSchool(school.name);
     const calls = (data.calls || []).filter(call => P.normalize(call.school) === P.normalize(school.name));
     const contacts = (data.contacts || []).filter(contact => ["Tecnologia", "Supervisão", "Gabinete"].includes(contact.sector)).slice(0, 3);
     const networkStatus = network ? "Mapeada" : "Pendente";
+    const profileNote = missingProfile.length ? `Pendências: ${missingProfile.slice(0, 4).join(", ")}.` : firstNote(profile?.notes) || "Dados principais da escola preenchidos.";
     detail.innerHTML = `
       <article class="box">
         <div class="box-head school-detail-head">
@@ -323,9 +379,33 @@
             <strong>${school.name}</strong>
             <small>${school.city} • CIE ${school.cie}</small>
           </div>
-          <span class="status-pill ${statusClass(school.status)}">${school.status === "warn" ? "Atenção" : "OK"}</span>
+          <span class="status-pill ${profileStatusFromPct(profilePct)}">${profilePct}% ficha</span>
         </div>
         <div class="network-layout">
+          <article class="detail-widget profile-wide">
+            <div>
+              <small>Ficha escolar</small>
+              <strong>${profilePct}% preenchida</strong>
+              <p>${profileNote}</p>
+            </div>
+            <span class="status-pill ${profileStatusFromPct(profilePct)}">cadastro</span>
+          </article>
+          <article class="detail-widget">
+            <div>
+              <small>Direção</small>
+              <strong>${profile?.director || "Não informada"}</strong>
+              <p>${[profile?.viceDirector && `Vice: ${profile.viceDirector}`, profile?.goe && `GOE: ${profile.goe}`].filter(Boolean).join(" • ") || "Equipe gestora pendente na ficha."}</p>
+            </div>
+            <span class="status-pill ${profile?.director ? "ok" : "warn"}">gestão</span>
+          </article>
+          <article class="detail-widget">
+            <div>
+              <small>Contato da escola</small>
+              <strong>${profile?.phone || "Telefone pendente"}</strong>
+              <p>${[profile?.email, profile?.address].filter(Boolean).join(" • ") || "Email e endereço ainda não informados."}</p>
+            </div>
+            <span class="status-pill ${profile?.phone || profile?.email ? "info" : "warn"}">contato</span>
+          </article>
           <article class="detail-widget">
             <div>
               <small>Inventário</small>
@@ -368,6 +448,8 @@
           </article>
         </div>
         <div class="detail-actions">
+          ${profile?.email ? `<a class="ghost-btn" href="mailto:${profile.email}">Enviar email</a>` : ""}
+          ${profile?.phone ? `<a class="ghost-btn" href="tel:${profile.phone.replace(/[^0-9+]/g, "")}">Ligar</a>` : ""}
           <button class="ghost-btn" type="button" data-open-network="${school.name}" ${network ? "" : "disabled"}>Abrir redes</button>
           <button class="ghost-btn" type="button" data-open-inventory="${school.name}">Abrir inventário</button>
           <button class="ghost-btn" type="button" data-open-supervisor="${supervisor?.name || ""}" ${supervisor ? "" : "disabled"}>Abrir supervisor</button>
@@ -813,6 +895,11 @@
       { label: "Inventário carregado", status: data.schoolAssets.length ? "ok" : "warn", note: `${data.schoolAssets.length} linha(s)` },
       { label: "Supervisão carregada", status: data.supervisors.length === 6 ? "ok" : "warn", note: `${data.supervisors.length}/6 supervisor(es)` },
       { label: "Contatos carregados", status: data.contacts.length ? "ok" : "warn", note: `${data.contacts.length} contato(s)` },
+      {
+        label: "Fichas escolares",
+        status: data.schoolProfiles.length ? "ok" : "warn",
+        note: `${data.schoolProfiles.length}/${data.schools.length || 21} ficha(s) herdada(s) da v1`
+      },
       {
         label: "Usuários importados da v1",
         status: data.users.length ? "ok" : "warn",

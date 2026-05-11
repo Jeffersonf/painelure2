@@ -476,6 +476,9 @@ select:focus-visible {
 .sidebar-card-head button,
 .ghost-btn {
   min-height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0 10px;
   border: 1px solid var(--bd);
   border-radius: 999px;
@@ -484,6 +487,7 @@ select:focus-visible {
   cursor: pointer;
   font-size: 11px;
   font-weight: 700;
+  text-decoration: none;
 }
 
 .sidebar-shortcuts {
@@ -1189,6 +1193,14 @@ select:focus-visible {
   font-size: 12px;
 }
 
+.school-note {
+  min-height: 16px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+}
+
 .school-meta {
   display: flex;
   flex-wrap: wrap;
@@ -1333,6 +1345,10 @@ select:focus-visible {
     var(--sf);
   transition: border-color .15s, background .15s;
   contain: layout paint;
+}
+
+.detail-widget.profile-wide {
+  grid-column: 1 / -1;
 }
 
 .detail-widget small {

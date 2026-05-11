@@ -2,20 +2,6 @@
   const P = window.PainelURE = window.PainelURE || {};
   P.seedData = P.seedData || {};
 
-  const photos = {
-    dirigente: "https://midiasstoragesec.blob.core.windows.net/001/2025/09/dsc02935-5.jpg",
-    setec: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-15-54-28.jpeg",
-    seintec: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-58.jpeg",
-    seom: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-57.jpeg",
-    eec: "https://midiasstoragesec.blob.core.windows.net/001/2026/02/whatsapp-image-2026-02-24-at-11-55-32.jpeg",
-    ese1: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-04-1.jpeg",
-    ese2: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-19-at-15-41-59.jpeg",
-    ese3: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-59-03.jpeg",
-    ese4: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-28-at-13-43-36.jpeg",
-    ese5: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-14-10-29.jpeg",
-    ese6: "https://midiasstoragesec.blob.core.windows.net/001/2025/08/whatsapp-image-2025-08-05-at-13-55-56.jpeg"
-  };
-
   function normalize(value) {
     return String(value || "")
       .normalize("NFD")
@@ -52,29 +38,10 @@
     };
   }
 
-  const contactPhotos = {
-    "Andre Dias de Oliveira|Dirigente Regional de Ensino": photos.dirigente,
-    "Jefferson Felipe|Problemas no site": photos.setec,
-    "Jefferson Felipe|Chefe de Seção": photos.setec,
-    "Elcio Renato Bonifacio de Azevedo|Chefe de Serviço": photos.seintec,
-    "Jeffeson do Espirito Santo Moreira|Técnico Prodesp": photos.setec,
-    "Gustavo|CTC": photos.setec,
-    "Nelio Celso Fernandes Junior|Chefe de Serviço": photos.seom,
-    "Jaqueline de Oliveira Cunha Borelli|PEC - Arte": photos.eec,
-    "Jose do Amaral Netto|PEC - Projetos Especiais": photos.eec,
-    "Paula|Especialista em Currículo": photos.eec,
-    "Marcio Nunes da Cruz|Supervisor Educacional": photos.ese1,
-    "Maria Luiza Brizolla de Queiroz|Supervisor Educacional": photos.ese2,
-    "Edilene da Silva Almeida Oliveira|Supervisor Educacional": photos.ese3,
-    "Adilson Fogaça|Supervisor Educacional": photos.ese4,
-    "Daiane Aparecida de Oliveira Ribeiro|Supervisor Educacional": photos.ese5,
-    "Magda Gisele Silva de Oliveira|Supervisor Educacional": photos.ese6
-  };
-
   P.seedData.contacts = (P.seedData.contacts || []).map(contact => ({
     ...contact,
     id: contact.id || contactId(contact),
-    photo: contact.photo || contactPhotos[`${contact.name}|${contact.role}`] || ""
+    photo: contact.photo || ""
   }));
 
   function ensureContact(contact) {
@@ -94,11 +61,11 @@
   }
 
   [
-    { name: "Bruno", role: "CTC", sector: "Tecnologia", email: "itv.setec@educacao.sp.gov.br", phone: "6235", photo: photos.setec },
-    { name: "Danilo", role: "CTC", sector: "Tecnologia", email: "itv.setec@educacao.sp.gov.br", phone: "6235", photo: photos.setec },
-    { name: "Eline Fernanda Teobaldo Batagin", role: "PEC - Quimica", sector: "Pedagógico", email: "deitvnpe@educacao.sp.gov.br", phone: "6212", photo: photos.eec },
-    { name: "Elysane Rodrigues Cardoso Maciel", role: "PEC - Historia", sector: "Pedagógico", email: "deitvnpe@educacao.sp.gov.br", phone: "6218", photo: photos.eec },
-    { name: "Tatiane Ryden de Mello Graciliano", role: "PEC - Educacao Inclusiva", sector: "Pedagógico", email: "deitvnpe@educacao.sp.gov.br", phone: "6218", photo: photos.eec }
+    { name: "Bruno", role: "CTC", sector: "Tecnologia", email: "itv.setec@educacao.sp.gov.br", phone: "6235" },
+    { name: "Danilo", role: "CTC", sector: "Tecnologia", email: "itv.setec@educacao.sp.gov.br", phone: "6235" },
+    { name: "Eline Fernanda Teobaldo Batagin", role: "PEC - Quimica", sector: "Pedagógico", email: "deitvnpe@educacao.sp.gov.br", phone: "6212" },
+    { name: "Elysane Rodrigues Cardoso Maciel", role: "PEC - Historia", sector: "Pedagógico", email: "deitvnpe@educacao.sp.gov.br", phone: "6218" },
+    { name: "Tatiane Ryden de Mello Graciliano", role: "PEC - Educacao Inclusiva", sector: "Pedagógico", email: "deitvnpe@educacao.sp.gov.br", phone: "6218" }
   ].forEach(ensureContact);
 
   const supervisorUsers = (P.seedData.supervisors || []).map((supervisor, index) => mapUser({

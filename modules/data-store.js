@@ -5,6 +5,7 @@
     schools: [],
     networkData: {},
     schoolInventoryMetrics: {},
+    schoolProfiles: [],
     schoolAssets: [],
     inventory: [],
     supervisors: [],
@@ -21,15 +22,25 @@
   const STORAGE_VERSION = 2;
   const STORAGE_KEY = "painelure2_state_v2";
 
+  function cleanContactPhoto(photo) {
+    const value = String(photo || "").trim();
+    if (value.startsWith("data:image/") || value.startsWith("blob:")) return value;
+    return "";
+  }
+
   function normalizeAppData(source = {}) {
     return {
       schools: Array.isArray(source.schools) ? source.schools : [],
       networkData: source.networkData && typeof source.networkData === "object" ? source.networkData : {},
       schoolInventoryMetrics: source.schoolInventoryMetrics && typeof source.schoolInventoryMetrics === "object" ? source.schoolInventoryMetrics : {},
+      schoolProfiles: Array.isArray(source.schoolProfiles) ? source.schoolProfiles : [],
       schoolAssets: Array.isArray(source.schoolAssets) ? source.schoolAssets : [],
       inventory: Array.isArray(source.inventory) ? source.inventory : [],
       supervisors: Array.isArray(source.supervisors) ? source.supervisors : [],
-      contacts: Array.isArray(source.contacts) ? source.contacts : [],
+      contacts: Array.isArray(source.contacts) ? source.contacts.map(contact => ({
+        ...contact,
+        photo: cleanContactPhoto(contact.photo)
+      })) : [],
       calendar: Array.isArray(source.calendar) ? source.calendar : [],
       profiles: Array.isArray(source.profiles) ? source.profiles : [],
       quality: Array.isArray(source.quality) ? source.quality : [],
@@ -51,7 +62,11 @@
       try {
         const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
         if (saved?.version === STORAGE_VERSION && saved?.appData) {
-          return setAppData({ ...(P.mockData || EMPTY_DATA), ...(P.seedData || {}), ...saved.appData });
+          const merged = { ...(P.mockData || EMPTY_DATA), ...(P.seedData || {}), ...saved.appData };
+          if (!saved.appData.schoolProfiles?.length && P.seedData?.schoolProfiles?.length) {
+            merged.schoolProfiles = P.seedData.schoolProfiles;
+          }
+          return setAppData(merged);
         }
       } catch (error) {
         console.warn("[PainelURE] Estado local ignorado:", error);

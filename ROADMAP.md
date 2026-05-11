@@ -502,6 +502,15 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.52
+
+- Fotos de contatos deixaram de vir seedadas de sites externos.
+- Avatar enviado no perfil continua sincronizando com o contato vinculado.
+- Fotos antigas de contatos salvas com URL externa passam a ser ignoradas na normalizacao local.
+- Criado `data/school-profiles.js` com fichas escolares herdadas da v1.
+- Cards e detalhe de escola passaram a exibir telefone, direcao, contato, ficha escolar e pendencias uteis no padrao visual da v2.
+- Admin ganhou diagnostico de fichas escolares carregadas.
+
 ### 2.0.0-dev.51
 
 - Usuarios padrao da v1 foram importados para a v2 como seed de identidade.
