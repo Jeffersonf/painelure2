@@ -56,6 +56,18 @@
   }
 
   function normalizeInventoryRows(rows) {
+    if (rows.some(row => firstValue(row, ["escola", "school", "unidade"], ""))) {
+      return rows.map(row => {
+        const statusText = firstValue(row, ["status", "situacao", "estado"], "ok").toLowerCase();
+        return {
+          school: firstValue(row, ["escola", "school", "unidade"], "Escola sem nome"),
+          name: firstValue(row, ["tipo", "equipamento", "item", "nome"], "Item"),
+          sourceName: firstValue(row, ["nome_original", "descricao", "patrimonio", "modelo"], ""),
+          notes: firstValue(row, ["observacao", "observacoes", "nota", "quantidade", "qtd"], ""),
+          status: statusText.includes("defeito") ? "defeito" : statusText.includes("manut") ? "manutencao" : "ok"
+        };
+      });
+    }
     return rows.map(row => ({
       label: firstValue(row, ["tipo", "equipamento", "item", "nome"], "Item"),
       value: firstValue(row, ["quantidade", "qtd", "total"], "0"),

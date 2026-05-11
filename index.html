@@ -206,6 +206,19 @@
           <span>Escola</span>
           <select id="inventorySelect"></select>
         </label>
+        <label>
+          <span>Filtro</span>
+          <input id="inventoryFilterInput" type="search" placeholder="Equipamento, status ou observação">
+        </label>
+        <label>
+          <span>Status</span>
+          <select id="inventoryStatusSelect">
+            <option value="">Todos</option>
+            <option value="ok">OK</option>
+            <option value="manutencao">Manutenção</option>
+            <option value="defeito">Defeito</option>
+          </select>
+        </label>
       </div>
       <div class="box">
         <div class="box-head"><div><strong>Equipamentos em acompanhamento</strong><small>Status resumido para triagem</small></div></div>
@@ -312,6 +325,30 @@
           <label class="check-row"><input type="checkbox" data-pref-widget="shortcuts" checked><span>Atalhos do painel</span></label>
           <label class="check-row"><input type="checkbox" data-pref-widget="metrics" checked><span>Indicadores</span></label>
           <label class="check-row"><input type="checkbox" data-pref-widget="operations" checked><span>Decisões e agenda</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-shortcut="network" checked><span>Redes</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-shortcut="inventory" checked><span>Inventário</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-shortcut="ctc" checked><span>CTC</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-shortcut="calls" checked><span>Chamados</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-shortcut="calendar" checked><span>Calendário</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-shortcut="reports" checked><span>Relatórios</span></label>
+          <label>
+            <span>Importar CSV para</span>
+            <select id="importTargetSelect">
+              <option value="schools">Escolas</option>
+              <option value="contacts">Contatos</option>
+              <option value="network">Redes e câmeras</option>
+              <option value="calendar">Calendário</option>
+              <option value="supervision">Supervisão</option>
+            </select>
+          </label>
+          <label class="ghost-btn file-btn" for="csvImportInput">Importar CSV</label>
+          <input id="csvImportInput" type="file" accept=".csv,text/csv" hidden>
+          <label>
+            <span>URL calendário CSV</span>
+            <input id="calendarSourceInput" type="url" placeholder="https://.../pub?output=csv">
+          </label>
+          <button class="ghost-btn" type="button" id="saveCalendarSourceBtn">Salvar calendário</button>
+          <button class="ghost-btn" type="button" id="presentationModeBtn">Modo apresentação</button>
           <button class="ghost-btn" type="button" id="resetLocalBtn">Limpar estado local</button>
           <button class="ghost-btn" type="button" id="savePrefsBtn">Salvar preferências</button>
           <button class="ghost-btn" type="button" id="reloadSourcesBtn">Atualizar fontes</button>

@@ -2,6 +2,7 @@
   const P = window.PainelURE;
   const ROLE_KEY = "painelure2_role";
   const PREF_KEY = "painelure2_prefs";
+  const SOURCE_KEY = "painelure2_source_overrides";
 
   const ROLE_ACCESS = {
     Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
@@ -36,6 +37,7 @@
     if (roleSelect) roleSelect.value = role;
     const accountRole = P.$("#accountRoleLabel");
     if (accountRole) accountRole.textContent = role;
+    if (typeof applyPrefs === "function") applyPrefs();
   }
 
   function downloadJson(filename, data) {
@@ -49,6 +51,7 @@
   }
 
   function bindAdminTools() {
+    applySourceOverrides();
     const roleSelect = P.$("#activeRoleSelect");
     if (roleSelect && !roleSelect.dataset.bound) {
       roleSelect.dataset.bound = "true";
@@ -77,6 +80,36 @@
         } catch (error) {
           const meta = P.$("#adminBackupMeta");
           if (meta) meta.textContent = `Falha ao importar backup: ${error.message}`;
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    P.$("#csvImportInput")?.addEventListener("change", event => {
+      const file = event.target.files?.[0];
+      const target = P.$("#importTargetSelect")?.value;
+      if (!file || !target) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const rows = P.parseCsv(reader.result);
+          const normalizer = P.normalizers?.[target];
+          if (!normalizer) throw new Error("Normalizador não encontrado.");
+          const appData = { ...P.getAppData() };
+          const normalized = normalizer(rows);
+          if (target === "network") appData.networkData = normalized;
+          else if (target === "supervision") appData.supervisors = normalized;
+          else if (target === "inventory" && normalized.some?.(item => item.school)) appData.schoolAssets = normalized;
+          else appData[target] = normalized;
+          P.setAppData(appData);
+          P.saveAppData();
+          P.renderApp?.();
+          renderSourceStatus();
+          const meta = P.$("#adminBackupMeta");
+          if (meta) meta.textContent = `${file.name} importado em ${target}.`;
+        } catch (error) {
+          const meta = P.$("#adminBackupMeta");
+          if (meta) meta.textContent = `Falha ao importar CSV: ${error.message}`;
         }
       };
       reader.readAsText(file);
@@ -116,13 +149,36 @@
         });
     });
 
+    const calendarInput = P.$("#calendarSourceInput");
+    if (calendarInput) calendarInput.value = loadSourceOverrides().calendar || P.sources?.calendar?.url || "";
+    P.$("#saveCalendarSourceBtn")?.addEventListener("click", () => {
+      const overrides = loadSourceOverrides();
+      overrides.calendar = calendarInput?.value || "";
+      saveSourceOverrides(overrides);
+      applySourceOverrides();
+      renderSourceStatus();
+      const meta = P.$("#adminBackupMeta");
+      if (meta) meta.textContent = "Fonte do calendário salva.";
+    });
+
+    P.$("#presentationModeBtn")?.addEventListener("click", () => {
+      const active = document.documentElement.dataset.presentation === "true";
+      document.documentElement.dataset.presentation = active ? "false" : "true";
+      if (!active) P.setPage?.("dashboard");
+      const meta = P.$("#adminBackupMeta");
+      if (meta) meta.textContent = active ? "Modo apresentação desativado." : "Modo apresentação ativado.";
+    });
+
     applyRole();
     applyPrefs();
     renderSourceStatus();
   }
 
   function defaultPrefs() {
-    return { widgets: { shortcuts: true, metrics: true, operations: true } };
+    return {
+      widgets: { shortcuts: true, metrics: true, operations: true },
+      shortcuts: { network: true, inventory: true, ctc: true, calls: true, calendar: true, reports: true }
+    };
   }
 
   function loadPrefs() {
@@ -145,6 +201,9 @@
     P.$all("[data-pref-widget]").forEach(input => {
       prefs.widgets[input.dataset.prefWidget] = input.checked;
     });
+    P.$all("[data-pref-shortcut]").forEach(input => {
+      prefs.shortcuts[input.dataset.prefShortcut] = input.checked;
+    });
     return prefs;
   }
 
@@ -152,8 +211,35 @@
     P.$all("[data-pref-widget]").forEach(input => {
       input.checked = prefs.widgets?.[input.dataset.prefWidget] !== false;
     });
+    P.$all("[data-pref-shortcut]").forEach(input => {
+      input.checked = prefs.shortcuts?.[input.dataset.prefShortcut] !== false;
+    });
     P.$all("[data-widget-area]").forEach(area => {
       area.hidden = prefs.widgets?.[area.dataset.widgetArea] === false;
+    });
+    P.$all(".sidebar-shortcuts [data-jump]").forEach(button => {
+      button.hidden = prefs.shortcuts?.[button.dataset.jump] === false || (P.canAccess && !P.canAccess(button.dataset.jump));
+    });
+  }
+
+  function loadSourceOverrides() {
+    try {
+      return JSON.parse(localStorage.getItem(SOURCE_KEY) || "{}") || {};
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function saveSourceOverrides(overrides) {
+    try {
+      localStorage.setItem(SOURCE_KEY, JSON.stringify(overrides));
+    } catch (error) {}
+  }
+
+  function applySourceOverrides() {
+    const overrides = loadSourceOverrides();
+    Object.entries(overrides).forEach(([key, url]) => {
+      if (P.sources?.[key]) P.sources[key].url = url;
     });
   }
 

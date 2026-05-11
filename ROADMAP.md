@@ -502,6 +502,18 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.43
+
+- Implementado pacote dos 10 passos de paridade v1/Finanza no limite do frontend estático.
+- Admin ganhou importação CSV por tipo: escolas, contatos, redes, calendário, supervisão e inventário detalhado.
+- Tela de escola passou a reunir inventário, redes, supervisão, chamados e contatos úteis.
+- Inventário ganhou busca textual e filtro de status por escola.
+- Supervisão passou a classificar pendências em verde, amarelo e vermelho.
+- Atalhos laterais agora podem ser personalizados nas preferências locais.
+- Modo apresentação foi adicionado para ocultar áreas administrativas locais.
+- Fonte CSV do calendário pode ser configurada pela Central de dados.
+- Checklist de qualidade passou a registrar modo apresentação e QA visual.
+
 ### 2.0.0-dev.42
 
 - Busca global estilo Finanza adicionada ao campo lateral.

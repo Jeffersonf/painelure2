@@ -27,6 +27,8 @@
     { label: "Inventário por escola", status: "ok", note: "107 linhas sanitizadas importadas da base 1.0." },
     { label: "Calendário oficial", status: "ok", note: "Página, seed e normalizador CSV prontos; URL oficial pode ser plugada em sources.js." },
     { label: "Perfis de acesso", status: "ok", note: "Matriz e filtro local por perfil implementados no MVP." },
-    { label: "Publicação", status: "ok", note: "2.0 publicado em repositório próprio e preservado fora da 1.0 oficial." }
+    { label: "Publicação", status: "ok", note: "2.0 publicado em repositório próprio e preservado fora da 1.0 oficial." },
+    { label: "Modo apresentação", status: "ok", note: "Interface pode ocultar áreas administrativas locais para reunião." },
+    { label: "QA visual", status: "ok", note: "Checklist cobre desktop, mobile, tema claro/escuro e dados vazios." }
   ];
 })();

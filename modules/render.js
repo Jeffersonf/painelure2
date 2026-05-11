@@ -254,6 +254,8 @@
     const metrics = data.schoolInventoryMetrics?.[school.name] || { items: school.items || 0, alerts: school.alerts || 0 };
     const network = data.networkData?.[school.name];
     const supervisor = supervisorForSchool(school.name);
+    const calls = (data.calls || []).filter(call => P.normalize(call.school) === P.normalize(school.name));
+    const contacts = (data.contacts || []).filter(contact => ["Tecnologia", "Supervisão", "Gabinete"].includes(contact.sector)).slice(0, 3);
     const networkStatus = network ? "Mapeada" : "Pendente";
     detail.innerHTML = `
       <article class="box">
@@ -289,6 +291,22 @@
               <p>${supervisor ? `${supervisor.week} na semana • ${supervisor.month} no mês.` : "Aguardando vínculo oficial."}</p>
             </div>
             <span class="status-pill info">oficial</span>
+          </article>
+          <article class="detail-widget">
+            <div>
+              <small>Chamados</small>
+              <strong>${calls.length}</strong>
+              <p>${calls.length ? calls.map(call => call.title).slice(0, 2).join(" • ") : "Sem chamado vinculado na base atual."}</p>
+            </div>
+            <span class="status-pill ${calls.length ? "warn" : "ok"}">${calls.length ? "fila" : "ok"}</span>
+          </article>
+          <article class="detail-widget">
+            <div>
+              <small>Contatos úteis</small>
+              <strong>${contacts.length}</strong>
+              <p>${contacts.map(contact => `${contact.sector}: ${contact.name}`).join(" • ")}</p>
+            </div>
+            <span class="status-pill info">URE</span>
           </article>
         </div>
         <div class="detail-actions">
@@ -395,8 +413,25 @@
       select.innerHTML = schools.map(name => `<option value="${name}">${name}</option>`).join("");
       select.onchange = () => renderInventory(P.getAppData());
     }
+    const filterInput = P.$("#inventoryFilterInput");
+    const statusSelect = P.$("#inventoryStatusSelect");
+    if (filterInput && !filterInput.dataset.bound) {
+      filterInput.dataset.bound = "true";
+      filterInput.addEventListener("input", () => renderInventory(P.getAppData()));
+    }
+    if (statusSelect && !statusSelect.dataset.bound) {
+      statusSelect.dataset.bound = "true";
+      statusSelect.addEventListener("change", () => renderInventory(P.getAppData()));
+    }
     const selectedSchool = select?.value || assets[0].school;
-    const selectedAssets = assets.filter(asset => asset.school === selectedSchool);
+    const query = P.normalize(filterInput?.value || "");
+    const statusFilter = statusSelect?.value || "";
+    const selectedAssets = assets.filter(asset => {
+      if (asset.school !== selectedSchool) return false;
+      if (statusFilter && asset.status !== statusFilter) return false;
+      if (!query) return true;
+      return P.searchText([asset.name, asset.sourceName, asset.notes, asset.status]).includes(query);
+    });
     const totals = inventoryTotals(selectedAssets);
     const network = data.networkData?.[selectedSchool];
     const supervisor = supervisorForSchool(selectedSchool);
@@ -482,7 +517,9 @@
       return;
     }
     const sorted = [...supervisors].sort((a, b) => a.name.localeCompare(b.name));
-    host.innerHTML = sorted.map((item, index) => `
+    host.innerHTML = sorted.map((item, index) => {
+      const tone = item.pending > 6 ? "danger" : item.pending > 0 ? "warn" : "ok";
+      return `
       <button class="supervisor-row" type="button" data-supervisor-index="${index}" data-supervisor-key="${P.searchText([item.name])}" data-search="${P.searchText([item.name, item.email, item.phone, item.schools, item.week, item.month, item.pending])}">
         <div class="supervisor-person">
           <div class="school-avatar">${initials(item.name)}</div>
@@ -503,9 +540,9 @@
             <i></i>
           </div>
         </div>
-        <span class="status-pill ${item.pending ? "warn" : "ok"}">${item.pending ? `${item.pending} faltam` : "Verde"}</span>
+        <span class="status-pill ${tone}">${item.pending ? `${item.pending} faltam` : "Verde"}</span>
       </button>
-    `).join("");
+    `; }).join("");
     host.querySelectorAll("[data-supervisor-index]").forEach(button => {
       button.addEventListener("click", () => {
         host.querySelectorAll("[data-supervisor-index]").forEach(item => item.classList.toggle("active", item === button));
