@@ -21,7 +21,7 @@
     <div class="brand">
       <span class="brand-word"><span>Painel</span><strong>URE</strong></span>
       <div class="brand-actions">
-        <button class="icon-btn" id="themeBtn" type="button" aria-label="Usar tema claro" aria-pressed="false">&#9790;</button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Usar tema claro" aria-pressed="false">☀️</button>
       </div>
     </div>
 
@@ -55,14 +55,14 @@
 
     <div class="account">
       <div class="account-meta">feito por jeffef.dev</div>
-      <div class="account-row">
+      <button class="account-row" type="button" data-page="user">
         <div class="avatar">JE</div>
         <div>
           <strong>Jefferson</strong>
           <span>🛡️ <span id="accountRoleLabel">Administrador</span></span>
         </div>
         <small>▲</small>
-      </div>
+      </button>
     </div>
   </aside>
 
@@ -124,33 +124,6 @@
         </div>
       </section>
 
-      <section class="metric-grid" data-widget-area="metrics">
-        <article class="metric-card glow-lime">
-          <span>🏫</span>
-          <small>Escolas</small>
-          <strong id="metricSchools">0</strong>
-          <em id="metricSchoolsNote">base regional</em>
-        </article>
-        <article class="metric-card glow-teal">
-          <span>🌐</span>
-          <small>Redes mapeadas</small>
-          <strong id="metricNetwork">0</strong>
-          <em id="metricNetworkNote">com dados de infraestrutura</em>
-        </article>
-        <article class="metric-card glow-amber">
-          <span>💻</span>
-          <small>Inventário</small>
-          <strong id="metricInventory">0</strong>
-          <em id="metricInventoryNote">linhas consolidadas</em>
-        </article>
-        <article class="metric-card glow-purple">
-          <span>🧭</span>
-          <small>Supervisão</small>
-          <strong id="metricSupervision">0</strong>
-          <em id="metricSupervisionNote">responsáveis ativos</em>
-        </article>
-      </section>
-
       <section class="content-grid" data-widget-area="operations">
         <article class="box">
           <div class="box-head">
@@ -180,7 +153,14 @@
         <div><h1>Escolas</h1><p>Consulta rápida das unidades, fichas e vínculos.</p></div>
       </header>
       <div class="school-grid" id="schoolGrid"></div>
-      <div class="school-detail" id="schoolDetail"></div>
+    </section>
+
+    <section class="page" id="page-school-detail">
+      <header class="page-header compact detail-page-header">
+        <button class="back-btn" type="button" data-back>‹</button>
+        <div><h1 id="schoolDetailTitle">Escola</h1><p id="schoolDetailSubtitle">Ficha operacional da unidade.</p></div>
+      </header>
+      <div class="school-detail" id="schoolDetailPageBody"></div>
     </section>
 
     <section class="page" id="page-network">
@@ -233,7 +213,14 @@
         <div class="table-head"><strong>Supervisores</strong><span>ordem alfabética</span></div>
         <div id="supervisorRows"></div>
       </div>
-      <div class="supervisor-detail" id="supervisorDetail"></div>
+    </section>
+
+    <section class="page" id="page-supervisor-detail">
+      <header class="page-header compact detail-page-header">
+        <button class="back-btn" type="button" data-back>‹</button>
+        <div><h1 id="supervisorDetailTitle">Supervisor</h1><p id="supervisorDetailSubtitle">Metas, vínculos e acompanhamento.</p></div>
+      </header>
+      <div class="supervisor-detail" id="supervisorDetailPageBody"></div>
     </section>
 
     <section class="page" id="page-ctc">
@@ -283,6 +270,41 @@
       <div class="box">
         <div class="box-head"><div><strong>Resumo operacional</strong><small>Indicadores derivados da base carregada</small></div></div>
         <div class="row-list" id="reportsList"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-user">
+      <header class="page-header compact detail-page-header">
+        <button class="back-btn" type="button" data-back>‹</button>
+        <div><h1>Conta</h1><p>Perfil ativo, acessos e preferências locais.</p></div>
+      </header>
+      <div class="settings-shell">
+        <section class="settings-section account-panel">
+          <div class="account-hero">
+            <div class="avatar large">JE</div>
+            <div>
+              <small>Usuário local</small>
+              <strong>Jefferson</strong>
+              <span id="userRoleSummary">Administrador</span>
+            </div>
+          </div>
+          <div class="settings-row">
+            <div><strong>Perfil ativo</strong><small id="userAccessSummary">Acesso completo ao PainelURE.</small></div>
+            <span class="status-pill ok" id="userRolePill">Administrador</span>
+          </div>
+          <div class="settings-row">
+            <div><strong>Tema</strong><small>Alternância visual salva neste navegador.</small></div>
+            <button class="ghost-btn" type="button" id="userThemeBtn">Alternar tema</button>
+          </div>
+          <div class="settings-row">
+            <div><strong>Administração</strong><small>Backups, fontes oficiais, importações e modo apresentação.</small></div>
+            <button class="ghost-btn" type="button" data-jump="admin">Abrir admin</button>
+          </div>
+        </section>
+        <section class="settings-section">
+          <div class="settings-title">Acessos deste perfil</div>
+          <div class="settings-list" id="userAccessList"></div>
+        </section>
       </div>
     </section>
 

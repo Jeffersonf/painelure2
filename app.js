@@ -7,6 +7,11 @@
     dashboard(data) {
       P.renderDashboard(data);
     },
+    user(data) {
+      P.renderUser?.(data);
+    },
+    "school-detail"() {},
+    "supervisor-detail"() {},
     schools(data) {
       P.renderSchools(data.schools);
     },
@@ -115,7 +120,7 @@
     const button = document.getElementById("themeBtn");
     if (button) {
       const light = selectedTheme === "light";
-      button.innerHTML = light ? "&#9728;" : "&#9790;";
+      button.textContent = light ? "🌙" : "☀️";
       button.setAttribute("aria-label", light ? "Usar tema escuro" : "Usar tema claro");
       button.setAttribute("aria-pressed", String(light));
     }

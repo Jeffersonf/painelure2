@@ -5,8 +5,13 @@
     return `page-${id}`;
   }
 
+  let previousPage = "dashboard";
+
   function setPage(id) {
     if (P.canAccess && !P.canAccess(id)) id = "dashboard";
+    const active = P.$(".page.active");
+    const activeId = active?.id?.replace("page-", "");
+    if (activeId && activeId !== id) previousPage = activeId;
     P.renderPage?.(id);
     P.$all(".page").forEach(page => page.classList.toggle("active", page.id === pageId(id)));
     P.$all("[data-page]").forEach(btn => btn.classList.toggle("active", btn.dataset.page === id));
@@ -20,6 +25,12 @@
       const pageButton = event.target.closest("[data-page]");
       if (pageButton) {
         setPage(pageButton.dataset.page);
+        return;
+      }
+
+      const backButton = event.target.closest("[data-back]");
+      if (backButton) {
+        setPage(previousPage || "dashboard");
         return;
       }
 

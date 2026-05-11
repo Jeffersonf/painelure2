@@ -509,6 +509,8 @@ Não fazer:
 - Pesos principais foram preloaded para evitar refresh com tela sem texto.
 - Mantido o visual no padrao Finanza sem adicionar nova camada de CSS corretiva.
 - Sidebar, busca, titulo de pagina e filtros de contatos foram realinhados ao ritmo visual do Finanza.
+- Dashboard ficou mais enxuto com a remocao do bloco de metricas grandes.
+- Criadas paginas dedicadas para escola, supervisor e conta de usuario, com botao voltar no padrao do app.
 
 ### 2.0.0-dev.45
 

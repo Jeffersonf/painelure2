@@ -80,6 +80,21 @@
   }
 
   function focusSchool(name) {
+    openSchoolPage(name);
+  }
+
+  function openSchoolPage(name) {
+    const school = findSchool(name);
+    if (!school) return;
+    const title = P.$("#schoolDetailTitle");
+    const subtitle = P.$("#schoolDetailSubtitle");
+    if (title) title.textContent = school.name;
+    if (subtitle) subtitle.textContent = `${school.city} | CIE ${school.cie}`;
+    renderSchoolDetail(school, "#schoolDetailPageBody");
+    P.setPage?.("school-detail");
+  }
+
+  function focusSchoolInList(name) {
     P.setPage?.("schools");
     requestAnimationFrame(() => {
       const target = P.$(`[data-school-key="${P.searchText([name])}"]`);
@@ -88,7 +103,6 @@
       P.$all(".school-card.active").forEach(card => card.classList.remove("active"));
       target.classList.add("active");
       target.classList.add("focused");
-      renderSchoolDetail(findSchool(name));
       target.scrollIntoView({ behavior: "smooth", block: "center" });
       window.setTimeout(() => target.classList.remove("focused"), 1800);
     });
@@ -106,6 +120,21 @@
   }
 
   function focusSupervisor(name) {
+    openSupervisorPage(name);
+  }
+
+  function openSupervisorPage(name) {
+    const supervisor = (P.getAppData().supervisors || []).find(item => P.normalize(item.name) === P.normalize(name));
+    if (!supervisor) return;
+    const title = P.$("#supervisorDetailTitle");
+    const subtitle = P.$("#supervisorDetailSubtitle");
+    if (title) title.textContent = supervisor.name;
+    if (subtitle) subtitle.textContent = supervisor.email || supervisor.phone || "Acompanhamento de metas e vínculos.";
+    renderSupervisorDetail(supervisor, "#supervisorDetailPageBody");
+    P.setPage?.("supervisor-detail");
+  }
+
+  function focusSupervisorInList(name) {
     P.setPage?.("supervision");
     requestAnimationFrame(() => {
       const target = P.$(`[data-supervisor-key="${P.searchText([name])}"]`);
@@ -158,14 +187,6 @@
       ? `${officialSources} fonte(s) atualizada(s)`
       : "base local pronta para consulta";
 
-    setText("#metricSchools", data.schools.length);
-    setText("#metricSchoolsNote", "base regional");
-    setText("#metricNetwork", networkCount);
-    setText("#metricNetworkNote", networkCount ? "com dados de infraestrutura" : "fonte pendente");
-    setText("#metricInventory", data.schoolAssets.length);
-    setText("#metricInventoryNote", data.schoolAssets.length ? "linhas consolidadas" : "aguardando inventário");
-    setText("#metricSupervision", data.supervisors.length);
-    setText("#metricSupervisionNote", data.supervisors.length ? "responsáveis ativos" : "fonte pendente");
     setText("#dashboardSummary", `consulta rápida • ${data.schools.length} escolas • ${sourceNote}`);
     setText("#dashboardNoticeTitle", calendarCount ? "Base operacional atualizada" : "Base operacional pronta");
     setText("#dashboardNoticeNote", calendarCount
@@ -207,13 +228,51 @@
     if (agendaRows) agendaRows.innerHTML = agenda.map(item => dashboardRow(item, true)).join("");
   }
 
+  function renderUser(data) {
+    const role = P.currentRole?.() || "Administrador";
+    const profile = (data.profiles || []).find(item => P.normalize(item.name) === P.normalize(role));
+    setText("#userRoleSummary", role);
+    setText("#userRolePill", role);
+    setText("#userAccessSummary", profile?.note || "Perfil local de acesso ao painel.");
+
+    const list = P.$("#userAccessList");
+    if (list) {
+      const pages = (P.ROLE_ACCESS?.[role] || P.ROLE_ACCESS?.Consulta || []).filter(page => !["profiles", "quality", "admin"].includes(page));
+      const labels = {
+        dashboard: ["📊", "Painel", "Visão inicial e atalhos"],
+        schools: ["🏫", "Escolas", "Unidades e detalhes"],
+        network: ["🌐", "Redes e câmeras", "Infraestrutura por escola"],
+        inventory: ["💻", "Inventário", "Equipamentos e alertas"],
+        ctc: ["🛠️", "Técnicos CTC", "Agenda técnica"],
+        calls: ["📥", "Chamados", "Fila operacional"],
+        supervision: ["🧭", "Supervisão", "Metas e vínculos"],
+        contacts: ["☎️", "Contatos", "Setores e ramais"],
+        calendar: ["📅", "Calendário URE", "Agenda institucional"],
+        reports: ["📈", "Relatórios", "Resumo operacional"]
+      };
+      list.innerHTML = pages.map(page => {
+        const item = labels[page] || ["•", page, "Disponível para este perfil"];
+        return `
+          <button class="settings-row compact" type="button" data-jump="${page}">
+            <div><strong>${item[0]} ${item[1]}</strong><small>${item[2]}</small></div>
+            <span class="status-pill info">Abrir</span>
+          </button>
+        `;
+      }).join("");
+    }
+
+    const themeButton = P.$("#userThemeBtn");
+    if (themeButton && !themeButton.dataset.bound) {
+      themeButton.dataset.bound = "true";
+      themeButton.addEventListener("click", () => P.$("#themeBtn")?.click());
+    }
+  }
+
   function renderSchools(schools) {
     const grid = P.$("#schoolGrid");
-    const detail = P.$("#schoolDetail");
     if (!grid) return;
     if (!schools.length) {
       grid.innerHTML = `<div class="empty-state">Nenhuma escola carregada ainda.</div>`;
-      if (detail) detail.innerHTML = "";
       return;
     }
     grid.innerHTML = schools.map(school => `
@@ -237,16 +296,13 @@
     `).join("");
     grid.querySelectorAll("[data-school-name]").forEach(button => {
       button.addEventListener("click", () => {
-        grid.querySelectorAll("[data-school-name]").forEach(item => item.classList.toggle("active", item === button));
-        renderSchoolDetail(findSchool(button.dataset.schoolName));
+        openSchoolPage(button.dataset.schoolName);
       });
     });
-    grid.querySelector("[data-school-name]")?.classList.add("active");
-    renderSchoolDetail(schools[0]);
   }
 
-  function renderSchoolDetail(school) {
-    const detail = P.$("#schoolDetail");
+  function renderSchoolDetail(school, target = "#schoolDetailPageBody") {
+    const detail = P.$(target);
     if (!detail || !school) return;
     const data = P.getAppData();
     const assets = schoolAssets(school.name);
@@ -509,11 +565,9 @@
 
   function renderSupervisors(supervisors) {
     const host = P.$("#supervisorRows");
-    const detail = P.$("#supervisorDetail");
     if (!host) return;
     if (!supervisors.length) {
       host.innerHTML = `<div class="empty-state">Nenhum supervisor carregado ainda.</div>`;
-      if (detail) detail.innerHTML = "";
       return;
     }
     const sorted = [...supervisors].sort((a, b) => a.name.localeCompare(b.name));
@@ -545,16 +599,13 @@
     `; }).join("");
     host.querySelectorAll("[data-supervisor-index]").forEach(button => {
       button.addEventListener("click", () => {
-        host.querySelectorAll("[data-supervisor-index]").forEach(item => item.classList.toggle("active", item === button));
-        renderSupervisorDetail(sorted[Number(button.dataset.supervisorIndex)]);
+        openSupervisorPage(sorted[Number(button.dataset.supervisorIndex)].name);
       });
     });
-    host.querySelector("[data-supervisor-index]")?.classList.add("active");
-    renderSupervisorDetail(sorted[0]);
   }
 
-  function renderSupervisorDetail(supervisor) {
-    const detail = P.$("#supervisorDetail");
+  function renderSupervisorDetail(supervisor, target = "#supervisorDetailPageBody") {
+    const detail = P.$(target);
     if (!detail || !supervisor) return;
     const schools = supervisor.assignedSchools || [];
     const schoolCards = schools.map(name => {
@@ -776,10 +827,13 @@
   }
 
   P.renderDashboard = renderDashboard;
+  P.renderUser = renderUser;
   P.focusSchool = focusSchool;
+  P.focusSchoolInList = focusSchoolInList;
   P.focusNetworkSchool = focusNetworkSchool;
   P.focusInventorySchool = focusInventorySchool;
   P.focusSupervisor = focusSupervisor;
+  P.focusSupervisorInList = focusSupervisorInList;
   P.renderSchools = renderSchools;
   P.renderNetworkOptions = renderNetworkOptions;
   P.renderInventory = renderInventory;

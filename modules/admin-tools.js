@@ -20,6 +20,7 @@
   }
 
   function canAccess(page, role = currentRole()) {
+    if (["user", "school-detail", "supervisor-detail"].includes(page)) return true;
     return (ROLE_ACCESS[role] || ROLE_ACCESS.Consulta).includes(page);
   }
 
