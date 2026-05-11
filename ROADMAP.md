@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.41
+
+- Fluxo entre Redes, Inventário, Escola e Supervisão ficou conectado por ações diretas.
+- Navegação mobile foi alinhada ao menu principal enxuto.
+- Contatos foram refinados com tabs roláveis e cards mais compactos.
+- Cards de contato agora destacam o setor como pílula em vez de repetir uma linha de dado.
+- Textos administrativos foram ajustados para a versão publicada.
+
 ### 2.0.0-dev.40
 
 - Lista de supervisão deixou de usar a linha genérica de tabela.

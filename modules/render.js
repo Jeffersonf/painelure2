@@ -122,7 +122,7 @@
         <div>
           <small>${contact.role}</small>
           <h2>${contact.name}</h2>
-          <div class="contact-line"><span>Setor</span><strong>${contact.sector}</strong></div>
+          <em class="status-pill info">${contact.sector}</em>
           <div class="contact-line"><span>Email</span><strong>${contact.email}</strong></div>
           <div class="contact-line"><span>Ramal</span><strong>${contact.phone}</strong></div>
         </div>
@@ -356,6 +356,7 @@
         </div>
         <div class="detail-actions">
           <button class="ghost-btn" type="button" data-open-school="${selectedName}">Abrir escola</button>
+          <button class="ghost-btn" type="button" data-open-inventory="${selectedName}">Abrir inventário</button>
           <button class="ghost-btn" type="button" data-open-supervisor="${supervisor?.name || ""}" ${supervisor ? "" : "disabled"}>Abrir supervisor</button>
         </div>
       </article>
@@ -371,6 +372,9 @@
     `).join("")}`;
     layout.querySelector("[data-open-school]")?.addEventListener("click", event => {
       focusSchool(event.currentTarget.dataset.openSchool);
+    });
+    layout.querySelector("[data-open-inventory]")?.addEventListener("click", event => {
+      focusInventorySchool(event.currentTarget.dataset.openInventory);
     });
     layout.querySelector("[data-open-supervisor]")?.addEventListener("click", event => {
       focusSupervisor(event.currentTarget.dataset.openSupervisor);
@@ -394,6 +398,8 @@
     const selectedSchool = select?.value || assets[0].school;
     const selectedAssets = assets.filter(asset => asset.school === selectedSchool);
     const totals = inventoryTotals(selectedAssets);
+    const network = data.networkData?.[selectedSchool];
+    const supervisor = supervisorForSchool(selectedSchool);
     const categories = Object.entries(selectedAssets.reduce((acc, asset) => {
       const category = assetCategory(asset);
       const units = assetUnits(asset);
@@ -413,6 +419,8 @@
         </div>
         <div class="detail-actions">
           <button class="ghost-btn" type="button" data-open-school="${selectedSchool}">Abrir escola</button>
+          <button class="ghost-btn" type="button" data-open-network="${selectedSchool}" ${network ? "" : "disabled"}>Abrir redes</button>
+          <button class="ghost-btn" type="button" data-open-supervisor="${supervisor?.name || ""}" ${supervisor ? "" : "disabled"}>Abrir supervisor</button>
         </div>
       </article>
       ${categories.map(item => `
@@ -440,6 +448,12 @@
     `;
     grid.querySelector("[data-open-school]")?.addEventListener("click", event => {
       focusSchool(event.currentTarget.dataset.openSchool);
+    });
+    grid.querySelector("[data-open-network]")?.addEventListener("click", event => {
+      focusNetworkSchool(event.currentTarget.dataset.openNetwork);
+    });
+    grid.querySelector("[data-open-supervisor]")?.addEventListener("click", event => {
+      focusSupervisor(event.currentTarget.dataset.openSupervisor);
     });
   }
 
