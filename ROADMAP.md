@@ -504,7 +504,7 @@ Não fazer:
 
 ### 2.0.0-dev.45
 
-- Carregamento visual corrigido para preservar a fonte oficial antes de exibir texto.
+- Carregamento visual corrigido para evitar tela sem texto durante a busca da fonte oficial.
 - Primeiro render voltou a acontecer imediatamente, sem aguardar backend ou fontes oficiais.
 - Backend continua disponivel, mas carrega em segundo plano e nao interfere na sensacao visual.
 - Controles visiveis de envio ao backend foram removidos do Admin para manter o painel limpo.
