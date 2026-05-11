@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.37
+
+- Barra lateral foi enxugada no padrão Finanza.
+- Menu principal ficou restrito a Painel, Escolas, Supervisão e Contatos.
+- Redes, Inventário, CTC, Chamados, Calendário e Relatórios foram movidos para atalhos fixos.
+- Atalhos laterais agora respeitam a matriz de acesso do perfil ativo.
+- Sidebar recebeu ajustes de espaçamento e detalhes visuais mais próximos do Finanza.
+
 ### 2.0.0-dev.36
 
 - Estado local foi versionado para impedir que dados antigos escondam atualizações novas.

@@ -24,8 +24,8 @@
   function applyRole(role = currentRole()) {
     localStorage.setItem(ROLE_KEY, role);
     document.documentElement.dataset.role = role;
-    P.$all("[data-page]").forEach(button => {
-      const page = button.dataset.page;
+    P.$all("[data-page], [data-jump]").forEach(button => {
+      const page = button.dataset.page || button.dataset.jump;
       button.hidden = !canAccess(page, role);
     });
     const active = P.$(".page.active");
