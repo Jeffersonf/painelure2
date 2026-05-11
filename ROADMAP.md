@@ -502,6 +502,15 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.49
+
+- Backend ganhou tabela/camada de usuarios com fallback em `server/storage/users.json`.
+- Login por usuario e senha foi adicionado em `/api/auth/login`, mantendo a chave admin como recuperacao.
+- Criados endpoints `/api/auth/me`, `/api/users`, `/api/users/me` para preparar perfis reais.
+- Primeiro administrador pode ser criado automaticamente por `PAINELURE_ADMIN_USER` e `PAINELURE_ADMIN_PASSWORD`.
+- Client JS ganhou funcoes para login, leitura do usuario atual e atualizacao do perfil.
+- Proxima frente: ligar a tela Conta/Admin a esses endpoints sem quebrar o modo local.
+
 ### 2.0.0-dev.48
 
 - Backend ganhou suporte opcional a PostgreSQL online via `DATABASE_URL`.

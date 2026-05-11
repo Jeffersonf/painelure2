@@ -46,6 +46,39 @@
     });
   }
 
+  async function loginBackend(credentials) {
+    return fetchJson(apiPath("/api/auth/login"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(credentials || {}),
+      timeoutMs: 4000
+    });
+  }
+
+  async function loadBackendUser(token) {
+    if (!token) return null;
+    return fetchJson(apiPath("/api/auth/me"), {
+      headers: { Authorization: `Bearer ${token}` },
+      timeoutMs: 4000
+    });
+  }
+
+  async function updateBackendUser(token, patch) {
+    if (!token) return null;
+    return fetchJson(apiPath("/api/users/me"), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(patch || {}),
+      timeoutMs: 4000
+    });
+  }
+
   P.loadBackendData = loadBackendData;
   P.pushBackendData = pushBackendData;
+  P.loginBackend = loginBackend;
+  P.loadBackendUser = loadBackendUser;
+  P.updateBackendUser = updateBackendUser;
 })();

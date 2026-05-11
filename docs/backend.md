@@ -30,12 +30,16 @@ $env:PORT='4174'; npm start
 ```text
 PORT=4173
 PAINELURE_ADMIN_KEY=uma-chave-local
+PAINELURE_ADMIN_USER=jefferson
+PAINELURE_ADMIN_PASSWORD=uma-senha-forte
 DATABASE_URL=postgres://usuario:senha@host:5432/banco
 PGSSL=true
 CORS_ORIGIN=https://seu-site.github.io
 ```
 
 Se `PAINELURE_ADMIN_KEY` nao for definida, escrita fica liberada para desenvolvimento local.
+
+Se `PAINELURE_ADMIN_USER` e `PAINELURE_ADMIN_PASSWORD` forem definidos, o backend cria o primeiro usuario administrador quando a base ainda estiver vazia.
 
 Se `DATABASE_URL` nao for definida, o backend usa arquivo local automaticamente.
 
@@ -50,6 +54,10 @@ Use `CORS_ORIGIN` quando o frontend estiver no GitHub Pages e o backend em outro
 - `PUT /api/data`
 - `POST /api/import/:tipo`
 - `POST /api/auth/login`
+- `GET /api/auth/me`
+- `GET /api/users`
+- `POST /api/users`
+- `PUT /api/users/me`
 
 Tipos de importacao iniciais:
 
@@ -84,6 +92,8 @@ app_snapshots
 
 `app_snapshots` guarda historico simples de cada gravacao/importacao para facilitar recuperacao futura.
 
+`users` guarda usuarios, perfis, avatar e preferencias sincronizaveis.
+
 O endpoint `GET /api/health` informa o modo ativo:
 
 ```json
@@ -104,6 +114,8 @@ Para publicar com banco online:
 3. Definir `PAINELURE_ADMIN_KEY` para proteger gravacoes.
 4. Subir o backend em um host Node.
 5. Apontar o frontend para esse backend quando a versao publica deixar de ser apenas GitHub Pages.
+
+Tambem defina `PAINELURE_ADMIN_USER` e `PAINELURE_ADMIN_PASSWORD` no primeiro deploy para criar o administrador inicial.
 
 O GitHub Pages continua servindo bem a interface estatica, mas nao executa o backend Node. Para DB online real, precisamos de um host de backend separado.
 

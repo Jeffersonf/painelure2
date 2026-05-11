@@ -10,8 +10,11 @@ const { URL } = require("url");
 const ROOT = path.resolve(__dirname, "..");
 const STORAGE_DIR = path.join(__dirname, "storage");
 const DATA_FILE = path.join(STORAGE_DIR, "app-data.json");
+const USERS_FILE = path.join(STORAGE_DIR, "users.json");
 const PORT = Number(process.env.PORT || 4173);
 const ADMIN_KEY = process.env.PAINELURE_ADMIN_KEY || "";
+const ADMIN_USER = process.env.PAINELURE_ADMIN_USER || "";
+const ADMIN_PASSWORD = process.env.PAINELURE_ADMIN_PASSWORD || "";
 const DATABASE_URL = process.env.DATABASE_URL || "";
 const PGSSL = process.env.PGSSL || "true";
 const CORS_ORIGIN = process.env.CORS_ORIGIN || "";
@@ -90,6 +93,10 @@ function currentStore() {
   return readJsonFile(DATA_FILE, null);
 }
 
+function currentUsers() {
+  return readJsonFile(USERS_FILE, []);
+}
+
 function buildStore(appData, source = "api") {
   return {
     version: 1,
@@ -128,8 +135,22 @@ async function initDatabase() {
       created_at timestamptz not null default now()
     )
   `);
+  await pool.query(`
+    create table if not exists users (
+      id text primary key,
+      username text not null unique,
+      name text not null,
+      role text not null default 'Consulta',
+      password_hash text not null,
+      avatar text,
+      preferences jsonb not null default '{}'::jsonb,
+      created_at timestamptz not null default now(),
+      updated_at timestamptz not null default now()
+    )
+  `);
   dbReady = true;
   dbError = "";
+  await ensureBootstrapUser();
   return true;
 }
 
@@ -187,6 +208,145 @@ async function storeStatus() {
     source: row ? row.source : null,
     error: null
   };
+}
+
+function publicUser(user) {
+  if (!user) return null;
+  return {
+    id: user.id,
+    username: user.username,
+    name: user.name,
+    role: user.role,
+    avatar: user.avatar || "",
+    preferences: user.preferences || {}
+  };
+}
+
+function hashPassword(password, salt = crypto.randomBytes(16).toString("hex")) {
+  const hash = crypto.pbkdf2Sync(String(password), salt, 120000, 32, "sha256").toString("hex");
+  return `pbkdf2$${salt}$${hash}`;
+}
+
+function verifyPassword(password, storedHash) {
+  const [method, salt, hash] = String(storedHash || "").split("$");
+  if (method !== "pbkdf2" || !salt || !hash) return false;
+  const candidate = hashPassword(password, salt).split("$")[2];
+  if (candidate.length !== hash.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(candidate, "hex"), Buffer.from(hash, "hex"));
+}
+
+async function countUsers() {
+  if (pool && dbReady) {
+    const result = await pool.query("select count(*)::int as total from users");
+    return result.rows[0].total;
+  }
+  return currentUsers().length;
+}
+
+async function listUsers() {
+  if (pool && dbReady) {
+    const result = await pool.query("select id, username, name, role, avatar, preferences from users order by name");
+    return result.rows.map(publicUser);
+  }
+  return currentUsers().map(publicUser);
+}
+
+async function findUserByUsername(username) {
+  const cleanUsername = String(username || "").trim().toLowerCase();
+  if (!cleanUsername) return null;
+  if (pool && dbReady) {
+    const result = await pool.query("select * from users where username = $1", [cleanUsername]);
+    return result.rows[0] || null;
+  }
+  return currentUsers().find(user => user.username === cleanUsername) || null;
+}
+
+async function findUserById(id) {
+  if (!id) return null;
+  if (pool && dbReady) {
+    const result = await pool.query("select * from users where id = $1", [id]);
+    return result.rows[0] || null;
+  }
+  return currentUsers().find(user => user.id === id) || null;
+}
+
+async function saveLocalUsers(users) {
+  writeJsonFile(USERS_FILE, users);
+  return users;
+}
+
+async function createUser(input) {
+  const user = {
+    id: crypto.randomUUID(),
+    username: String(input.username || "").trim().toLowerCase(),
+    name: String(input.name || input.username || "Usuario").trim(),
+    role: String(input.role || "Consulta").trim(),
+    password_hash: hashPassword(input.password || crypto.randomBytes(12).toString("hex")),
+    avatar: input.avatar || "",
+    preferences: input.preferences || {}
+  };
+  if (!user.username) throw new Error("Usuario obrigatorio.");
+  if (pool && dbReady) {
+    const result = await pool.query(
+      `
+        insert into users (id, username, name, role, password_hash, avatar, preferences)
+        values ($1, $2, $3, $4, $5, $6, $7)
+        returning id, username, name, role, avatar, preferences
+      `,
+      [user.id, user.username, user.name, user.role, user.password_hash, user.avatar, user.preferences]
+    );
+    return publicUser(result.rows[0]);
+  }
+  const users = currentUsers();
+  if (users.some(item => item.username === user.username)) throw new Error("Usuario ja existe.");
+  users.push(user);
+  await saveLocalUsers(users);
+  return publicUser(user);
+}
+
+async function updateUser(id, patch) {
+  const current = await findUserById(id);
+  if (!current) throw new Error("Usuario nao encontrado.");
+  const next = {
+    ...current,
+    name: patch.name !== undefined ? String(patch.name).trim() : current.name,
+    role: patch.role !== undefined ? String(patch.role).trim() : current.role,
+    avatar: patch.avatar !== undefined ? String(patch.avatar || "") : current.avatar,
+    preferences: patch.preferences !== undefined ? patch.preferences || {} : current.preferences || {}
+  };
+  if (patch.password) next.password_hash = hashPassword(patch.password);
+  if (pool && dbReady) {
+    const result = await pool.query(
+      `
+        update users
+        set name = $2, role = $3, password_hash = $4, avatar = $5, preferences = $6, updated_at = now()
+        where id = $1
+        returning id, username, name, role, avatar, preferences
+      `,
+      [id, next.name, next.role, next.password_hash, next.avatar, next.preferences]
+    );
+    return publicUser(result.rows[0]);
+  }
+  const users = currentUsers().map(user => (user.id === id ? next : user));
+  await saveLocalUsers(users);
+  return publicUser(next);
+}
+
+async function ensureBootstrapUser() {
+  if (!ADMIN_USER || !ADMIN_PASSWORD) return null;
+  if (await countUsers()) return null;
+  return createUser({
+    username: ADMIN_USER,
+    password: ADMIN_PASSWORD,
+    name: "Administrador",
+    role: "Administrador"
+  });
+}
+
+function createSession(user = null) {
+  const token = crypto.randomBytes(24).toString("hex");
+  sessions.set(token, { createdAt: Date.now(), userId: user ? user.id : null, role: user ? user.role : "Administrador" });
+  return token;
 }
 
 function normalizeHeader(header) {
@@ -292,6 +452,24 @@ function isAuthorized(req) {
   return token && sessions.has(token);
 }
 
+function currentSession(req) {
+  const token = bearerToken(req);
+  return token ? sessions.get(token) || null : null;
+}
+
+function isAdminRequest(req) {
+  if (!ADMIN_KEY) return true;
+  const session = currentSession(req);
+  return Boolean(session && session.role === "Administrador");
+}
+
+async function currentSessionUser(req) {
+  const token = bearerToken(req);
+  const session = token ? sessions.get(token) : null;
+  if (!session || !session.userId) return null;
+  return findUserById(session.userId);
+}
+
 function requireAuth(req, res) {
   if (isAuthorized(req)) return true;
   send(res, 401, { ok: false, error: "Nao autorizado." });
@@ -332,13 +510,58 @@ async function handleApi(req, res, pathname) {
 
   if (req.method === "POST" && pathname === "/api/auth/login") {
     const body = JSON.parse(await readBody(req) || "{}");
-    if (!ADMIN_KEY || body.key === ADMIN_KEY) {
-      const token = crypto.randomBytes(24).toString("hex");
-      sessions.set(token, { createdAt: Date.now() });
-      send(res, 200, { ok: true, token });
+    const username = String(body.username || "").trim();
+    const password = String(body.password || "");
+    if (username && password) {
+      const user = await findUserByUsername(username);
+      if (user && verifyPassword(password, user.password_hash)) {
+        const token = createSession(user);
+        send(res, 200, { ok: true, token, user: publicUser(user) });
+      } else {
+        send(res, 401, { ok: false, error: "Usuario ou senha invalidos." });
+      }
+    } else if (!ADMIN_KEY || body.key === ADMIN_KEY) {
+      const token = createSession({ id: null, role: "Administrador" });
+      send(res, 200, { ok: true, token, user: null });
     } else {
       send(res, 401, { ok: false, error: "Chave invalida." });
     }
+    return;
+  }
+
+  if (req.method === "GET" && pathname === "/api/auth/me") {
+    if (!requireAuth(req, res)) return;
+    const user = await currentSessionUser(req);
+    send(res, 200, { ok: true, user: publicUser(user), session: currentSession(req) });
+    return;
+  }
+
+  if (req.method === "GET" && pathname === "/api/users") {
+    if (!requireAuth(req, res)) return;
+    send(res, 200, { ok: true, users: await listUsers() });
+    return;
+  }
+
+  if (req.method === "POST" && pathname === "/api/users") {
+    if (!requireAuth(req, res)) return;
+    if (!isAdminRequest(req)) {
+      send(res, 403, { ok: false, error: "Apenas administrador pode criar usuarios." });
+      return;
+    }
+    const body = JSON.parse(await readBody(req) || "{}");
+    send(res, 201, { ok: true, user: await createUser(body) });
+    return;
+  }
+
+  if (req.method === "PUT" && pathname === "/api/users/me") {
+    if (!requireAuth(req, res)) return;
+    const user = await currentSessionUser(req);
+    if (!user) {
+      send(res, 400, { ok: false, error: "Sessao sem usuario vinculado." });
+      return;
+    }
+    const body = JSON.parse(await readBody(req) || "{}");
+    send(res, 200, { ok: true, user: await updateUser(user.id, body) });
     return;
   }
 
@@ -396,6 +619,7 @@ initDatabase()
     dbError = error.message;
     console.warn(`Banco online indisponivel: ${error.message}`);
   })
+  .then(() => ensureBootstrapUser())
   .finally(() => {
     server.listen(PORT, () => {
       const mode = pool && dbReady ? "postgres" : "arquivo-local";
