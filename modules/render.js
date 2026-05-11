@@ -469,18 +469,25 @@
     }
     const sorted = [...supervisors].sort((a, b) => a.name.localeCompare(b.name));
     host.innerHTML = sorted.map((item, index) => `
-      <button class="table-row" type="button" data-supervisor-index="${index}" data-supervisor-key="${P.searchText([item.name])}" data-search="${P.searchText([item.name, item.email, item.phone, item.schools, item.week, item.month, item.pending])}">
-        <div>
-          <strong>${item.name}</strong>
-          <small>${item.email || item.phone || `${item.schools} escola(s) vinculada(s)`}</small>
+      <button class="supervisor-row" type="button" data-supervisor-index="${index}" data-supervisor-key="${P.searchText([item.name])}" data-search="${P.searchText([item.name, item.email, item.phone, item.schools, item.week, item.month, item.pending])}">
+        <div class="supervisor-person">
+          <div class="school-avatar">${initials(item.name)}</div>
+          <span>
+            <strong>${item.name}</strong>
+            <small>${item.email || item.phone || `${item.schools} escola(s) vinculada(s)`}</small>
+          </span>
         </div>
-        <div class="bar-stat" style="--pct:${pctFromText(item.week)}%">
-          <span>${item.week}</span>
-          <i></i>
-        </div>
-        <div class="bar-stat" style="--pct:${pctFromText(item.month)}%">
-          <span>${item.month}</span>
-          <i></i>
+        <div class="supervisor-metrics">
+          <div class="bar-stat" style="--pct:${pctFromText(item.week)}%">
+            <small>Semana</small>
+            <span>${item.week}</span>
+            <i></i>
+          </div>
+          <div class="bar-stat" style="--pct:${pctFromText(item.month)}%">
+            <small>Mês</small>
+            <span>${item.month}</span>
+            <i></i>
+          </div>
         </div>
         <span class="status-pill ${item.pending ? "warn" : "ok"}">${item.pending ? `${item.pending} faltam` : "Verde"}</span>
       </button>

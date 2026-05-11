@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.40
+
+- Lista de supervisão deixou de usar a linha genérica de tabela.
+- Supervisores ganharam layout próprio com avatar por iniciais, identidade e métricas agrupadas.
+- Meta semanal e mensal agora aparecem como métricas compactas dentro da linha.
+- Responsivo da supervisão foi ajustado para tablet e mobile.
+
 ### 2.0.0-dev.39
 
 - Cards de escolas foram refinados com menos área vazia e mais informação útil.
