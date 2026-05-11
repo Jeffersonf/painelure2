@@ -502,6 +502,15 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.42
+
+- Busca global estilo Finanza adicionada ao campo lateral.
+- Resultados globais agora incluem páginas, escolas, redes, supervisores, contatos e chamados.
+- Central de dados adicionada ao Admin com status das fontes e ações de atualização.
+- Ações de preferência/local state foram centralizadas no Admin.
+- Funções de foco entre escola, rede, inventário e supervisão foram expostas para navegação global.
+- Preferências locais de widgets do dashboard foram adicionadas no Admin.
+
 ### 2.0.0-dev.41
 
 - Fluxo entre Redes, Inventário, Escola e Supervisão ficou conectado por ações diretas.

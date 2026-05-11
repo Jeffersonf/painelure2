@@ -259,6 +259,59 @@ select:focus-visible {
   opacity: .72;
 }
 
+.global-search {
+  display: none;
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 126px;
+  z-index: 20;
+  padding: 8px;
+  border: 1px solid var(--bd);
+  border-radius: 16px;
+  background: var(--sf-solid);
+  box-shadow: 0 18px 42px var(--sh);
+}
+
+.global-search.show {
+  display: grid;
+  gap: 6px;
+}
+
+.global-search button {
+  display: grid;
+  gap: 2px;
+  padding: 10px 11px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--tx);
+  text-align: left;
+  cursor: pointer;
+}
+
+.global-search button:hover {
+  background: rgba(200, 245, 90, .08);
+  border-color: rgba(200, 245, 90, .18);
+}
+
+.global-search span,
+.global-search small,
+.global-empty {
+  color: var(--mt);
+  font-size: 11px;
+}
+
+.global-search strong {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.global-empty {
+  padding: 12px;
+  font-weight: 700;
+}
+
 .nav-label {
   margin: 0 0 6px 10px;
   color: var(--mt);
@@ -842,6 +895,10 @@ select:focus-visible {
   padding: 16px 18px 18px;
 }
 
+.row-list.compact {
+  padding: 12px;
+}
+
 .data-row {
   min-height: 64px;
   display: grid;
@@ -1328,10 +1385,31 @@ select:focus-visible {
   align-items: end;
 }
 
+.admin-center {
+  margin-top: 16px;
+}
+
 .admin-tools label:not(.file-btn) {
   display: grid;
   gap: 7px;
   min-width: 220px;
+}
+
+.admin-tools .check-row {
+  min-width: 0;
+  min-height: 34px;
+  display: inline-flex;
+  grid-auto-flow: column;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border: 1px solid var(--bd);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.check-row input {
+  accent-color: var(--ac);
 }
 
 .admin-tools label span {

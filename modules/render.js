@@ -739,6 +739,10 @@
   }
 
   P.renderDashboard = renderDashboard;
+  P.focusSchool = focusSchool;
+  P.focusNetworkSchool = focusNetworkSchool;
+  P.focusInventorySchool = focusInventorySchool;
+  P.focusSupervisor = focusSupervisor;
   P.renderSchools = renderSchools;
   P.renderNetworkOptions = renderNetworkOptions;
   P.renderInventory = renderInventory;
@@ -751,8 +755,4 @@
   P.renderCalls = renderCalls;
   P.renderReports = renderReports;
   P.renderAdmin = renderAdmin;
-  P.focusSchool = focusSchool;
-  P.focusNetworkSchool = focusNetworkSchool;
-  P.focusSupervisor = focusSupervisor;
-  P.focusInventorySchool = focusInventorySchool;
 })();

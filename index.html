@@ -30,6 +30,7 @@
       <span>⌕</span>
       <input type="search" placeholder="Buscar... (Ctrl+K)">
     </label>
+    <div class="global-search" id="globalSearchResults"></div>
 
     <div class="nav-label">Menu</div>
     <nav class="nav" aria-label="Navegacao principal">
@@ -94,7 +95,7 @@
         </div>
       </div>
 
-      <section class="workbench widget">
+      <section class="workbench widget" data-widget-area="shortcuts">
         <div class="widget-head">
           <div>
             <strong>🧭 Acesso rápido</strong>
@@ -124,7 +125,7 @@
         </div>
       </section>
 
-      <section class="metric-grid">
+      <section class="metric-grid" data-widget-area="metrics">
         <article class="metric-card glow-lime">
           <span>🏫</span>
           <small>Escolas</small>
@@ -151,7 +152,7 @@
         </article>
       </section>
 
-      <section class="content-grid">
+      <section class="content-grid" data-widget-area="operations">
         <article class="box">
           <div class="box-head">
             <div>
@@ -304,6 +305,18 @@
           <input id="backupImportInput" type="file" accept=".json" hidden>
         </div>
         <p class="sync-note" id="adminBackupMeta">Nenhuma ação de backup nesta sessão.</p>
+      </div>
+      <div class="box admin-center">
+        <div class="box-head"><div><strong>Central de dados</strong><small>Fontes, importação e preferências locais</small></div></div>
+        <div class="admin-tools">
+          <label class="check-row"><input type="checkbox" data-pref-widget="shortcuts" checked><span>Atalhos do painel</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-widget="metrics" checked><span>Indicadores</span></label>
+          <label class="check-row"><input type="checkbox" data-pref-widget="operations" checked><span>Decisões e agenda</span></label>
+          <button class="ghost-btn" type="button" id="resetLocalBtn">Limpar estado local</button>
+          <button class="ghost-btn" type="button" id="savePrefsBtn">Salvar preferências</button>
+          <button class="ghost-btn" type="button" id="reloadSourcesBtn">Atualizar fontes</button>
+        </div>
+        <div class="row-list compact" id="sourceStatusList"></div>
       </div>
       <div class="calendar-grid" id="adminGrid"></div>
     </section>

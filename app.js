@@ -68,7 +68,10 @@
   function loadSourcesInBackground() {
     const run = () => {
       P.loadConfiguredSources()
-        .then(() => refreshRenderedPages())
+        .then(() => {
+          refreshRenderedPages();
+          P.renderSourceStatus?.();
+        })
         .catch(error => {
           console.warn("[PainelURE] Fontes oficiais carregam em segundo plano:", error);
         });

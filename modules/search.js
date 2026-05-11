@@ -19,6 +19,57 @@
     return P.$all("[data-search]", activePage);
   }
 
+  function globalItems() {
+    const data = P.getAppData();
+    const pages = [
+      { page: "dashboard", title: "Painel", type: "Página", note: "Resumo operacional" },
+      { page: "schools", title: "Escolas", type: "Página", note: "Unidades e vínculos" },
+      { page: "network", title: "Redes e Câmeras", type: "Página", note: "Infraestrutura por escola" },
+      { page: "inventory", title: "Inventário", type: "Página", note: "Equipamentos por escola" },
+      { page: "supervision", title: "Supervisão", type: "Página", note: "Metas e visitas" },
+      { page: "contacts", title: "Contatos", type: "Página", note: "Setores e canais" },
+      { page: "calendar", title: "Calendário URE", type: "Página", note: "Agenda institucional" },
+      { page: "reports", title: "Relatórios", type: "Página", note: "Indicadores" }
+    ];
+    return [
+      ...pages,
+      ...(data.schools || []).map(item => ({ page: "schools", title: item.name, type: "Escola", note: `${item.city} | CIE ${item.cie}`, focus: item.name })),
+      ...Object.keys(data.networkData || {}).map(name => ({ page: "network", title: name, type: "Rede", note: "Infraestrutura e câmeras", focus: name })),
+      ...(data.supervisors || []).map(item => ({ page: "supervision", title: item.name, type: "Supervisão", note: item.email || `${item.schools} escola(s)`, focus: item.name })),
+      ...(data.contacts || []).map(item => ({ page: "contacts", title: item.name, type: item.sector, note: item.role || item.email })),
+      ...(data.calls || []).map(item => ({ page: "calls", title: item.title, type: "Chamado", note: item.school || item.status }))
+    ].filter(item => !P.canAccess || P.canAccess(item.page));
+  }
+
+  function hideGlobalResults() {
+    const host = P.$("#globalSearchResults");
+    if (host) {
+      host.classList.remove("show");
+      host.innerHTML = "";
+    }
+  }
+
+  function renderGlobalResults(rawQuery) {
+    const host = P.$("#globalSearchResults");
+    if (!host) return;
+    const query = normalize(rawQuery);
+    if (!query) {
+      hideGlobalResults();
+      return;
+    }
+    const results = globalItems()
+      .filter(item => searchText([item.title, item.type, item.note]).includes(query))
+      .slice(0, 8);
+    host.innerHTML = results.length ? results.map(item => `
+      <button type="button" data-global-page="${item.page}" data-global-focus="${item.focus || ""}">
+        <span>${item.type}</span>
+        <strong>${item.title}</strong>
+        <small>${item.note || ""}</small>
+      </button>
+    `).join("") : `<div class="global-empty">Nenhum resultado global.</div>`;
+    host.classList.add("show");
+  }
+
   function ensureSearchEmpty(activePage) {
     let empty = P.$(".search-empty", activePage);
     if (!empty) {
@@ -50,6 +101,7 @@
   function clearSearch() {
     const input = P.$(".sidebar-search input");
     if (input) input.value = "";
+    hideGlobalResults();
     searchableItems().forEach(item => item.classList.remove("is-hidden"));
     P.$all(".search-empty").forEach(item => item.classList.remove("show"));
   }
@@ -57,6 +109,23 @@
   function bindSearch() {
     P.$(".sidebar-search input")?.addEventListener("input", event => {
       applySearch(event.target.value);
+      renderGlobalResults(event.target.value);
+    });
+    document.addEventListener("click", event => {
+      const result = event.target.closest("[data-global-page]");
+      if (result) {
+        const page = result.dataset.globalPage;
+        const focus = result.dataset.globalFocus;
+        P.setPage?.(page);
+        requestAnimationFrame(() => {
+          if (focus && page === "schools") P.focusSchool?.(focus);
+          if (focus && page === "network") P.focusNetworkSchool?.(focus);
+          if (focus && page === "supervision") P.focusSupervisor?.(focus);
+        });
+        clearSearch();
+        return;
+      }
+      if (!event.target.closest(".sidebar-search") && !event.target.closest("#globalSearchResults")) hideGlobalResults();
     });
   }
 
@@ -65,4 +134,5 @@
   P.applySearch = applySearch;
   P.clearSearch = clearSearch;
   P.bindSearch = bindSearch;
+  P.renderGlobalResults = renderGlobalResults;
 })();
