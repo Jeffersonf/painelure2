@@ -141,6 +141,7 @@ async function initDatabase() {
       username text not null unique,
       name text not null,
       role text not null default 'Consulta',
+      contact_id text,
       password_hash text not null,
       avatar text,
       preferences jsonb not null default '{}'::jsonb,
@@ -148,6 +149,7 @@ async function initDatabase() {
       updated_at timestamptz not null default now()
     )
   `);
+  await pool.query("alter table users add column if not exists contact_id text");
   await pool.query(`
     create table if not exists audit_events (
       id text primary key,
@@ -235,6 +237,7 @@ function publicUser(user) {
     username: user.username,
     name: user.name,
     role: user.role,
+    contactId: user.contact_id || user.contactId || "",
     avatar: user.avatar || "",
     preferences: user.preferences || {}
   };
@@ -263,7 +266,7 @@ async function countUsers() {
 
 async function listUsers() {
   if (pool && dbReady) {
-    const result = await pool.query("select id, username, name, role, avatar, preferences from users order by name");
+    const result = await pool.query("select id, username, name, role, contact_id, avatar, preferences from users order by name");
     return result.rows.map(publicUser);
   }
   return currentUsers().map(publicUser);
@@ -299,6 +302,7 @@ async function createUser(input) {
     username: String(input.username || "").trim().toLowerCase(),
     name: String(input.name || input.username || "Usuario").trim(),
     role: String(input.role || "Consulta").trim(),
+    contact_id: String(input.contactId || input.contact_id || "").trim(),
     password_hash: hashPassword(input.password || crypto.randomBytes(12).toString("hex")),
     avatar: input.avatar || "",
     preferences: input.preferences || {}
@@ -307,11 +311,11 @@ async function createUser(input) {
   if (pool && dbReady) {
     const result = await pool.query(
       `
-        insert into users (id, username, name, role, password_hash, avatar, preferences)
-        values ($1, $2, $3, $4, $5, $6, $7)
-        returning id, username, name, role, avatar, preferences
+        insert into users (id, username, name, role, contact_id, password_hash, avatar, preferences)
+        values ($1, $2, $3, $4, $5, $6, $7, $8)
+        returning id, username, name, role, contact_id, avatar, preferences
       `,
-      [user.id, user.username, user.name, user.role, user.password_hash, user.avatar, user.preferences]
+      [user.id, user.username, user.name, user.role, user.contact_id, user.password_hash, user.avatar, user.preferences]
     );
     return publicUser(result.rows[0]);
   }
@@ -329,6 +333,7 @@ async function updateUser(id, patch) {
     ...current,
     name: patch.name !== undefined ? String(patch.name).trim() : current.name,
     role: patch.role !== undefined ? String(patch.role).trim() : current.role,
+    contact_id: patch.contactId !== undefined ? String(patch.contactId || "").trim() : current.contact_id || "",
     avatar: patch.avatar !== undefined ? String(patch.avatar || "") : current.avatar,
     preferences: patch.preferences !== undefined ? patch.preferences || {} : current.preferences || {}
   };
@@ -337,11 +342,11 @@ async function updateUser(id, patch) {
     const result = await pool.query(
       `
         update users
-        set name = $2, role = $3, password_hash = $4, avatar = $5, preferences = $6, updated_at = now()
+        set name = $2, role = $3, contact_id = $4, password_hash = $5, avatar = $6, preferences = $7, updated_at = now()
         where id = $1
-        returning id, username, name, role, avatar, preferences
+        returning id, username, name, role, contact_id, avatar, preferences
       `,
-      [id, next.name, next.role, next.password_hash, next.avatar, next.preferences]
+      [id, next.name, next.role, next.contact_id, next.password_hash, next.avatar, next.preferences]
     );
     return publicUser(result.rows[0]);
   }

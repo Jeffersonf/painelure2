@@ -20,6 +20,8 @@ Render fica fora do caminho principal por enquanto, porque o plano gratuito pode
 - Schema inicial esta em `db/init.sql`.
 - O backend tambem cria as tabelas automaticamente ao iniciar com `DATABASE_URL`.
 - Usuarios, estado do app e snapshots ja possuem estrutura inicial.
+- Usuarios agora possuem `contact_id` para vincular perfil de acesso a uma pessoa da base de Contatos.
+- Avatar/foto deve ser tratado como dado do contato vinculado: quando o usuario troca a foto no perfil, a foto do contato tambem muda.
 
 ## Quando retomarmos
 

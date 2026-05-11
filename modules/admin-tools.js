@@ -4,6 +4,7 @@
   const PREF_KEY = "painelure2_prefs";
   const SOURCE_KEY = "painelure2_source_overrides";
   const AVATAR_KEY = "painelure2_avatar";
+  const AVATAR_PREFIX = "painelure2_avatar_";
 
   const ROLE_ACCESS = {
     Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
@@ -17,7 +18,7 @@
   };
 
   function currentRole() {
-    return localStorage.getItem(ROLE_KEY) || "Administrador";
+    return localStorage.getItem(ROLE_KEY) || P.displayUser?.().role || "Administrador";
   }
 
   function canAccess(page, role = currentRole()) {
@@ -39,10 +40,16 @@
     if (roleSelect) roleSelect.value = role;
     const userRoleSelect = P.$("#userRoleSelect");
     if (userRoleSelect) userRoleSelect.value = role;
+    const activeUserSelect = P.$("#activeUserSelect");
+    const activeUser = P.activeUser?.();
+    if (activeUserSelect && activeUser) activeUserSelect.value = activeUser.id;
     const accountRole = P.$("#accountRoleLabel");
     if (accountRole) accountRole.textContent = role;
+    const display = P.displayUser?.() || { name: "Jefferson", role };
+    const accountName = P.$("#accountNameLabel");
+    if (accountName) accountName.textContent = display.shortName || display.name;
     const adminAccountLine = P.$("#adminAccountLine");
-    if (adminAccountLine) adminAccountLine.textContent = `Jefferson • ${role}`;
+    if (adminAccountLine) adminAccountLine.textContent = `${display.shortName || display.name} • ${role}`;
     P.renderUser?.(P.getAppData?.() || {});
     if (typeof applyPrefs === "function") applyPrefs();
   }
@@ -62,10 +69,13 @@
   }
 
   function applyUserAvatar() {
-    const image = localStorage.getItem(AVATAR_KEY);
+    const display = P.displayUser?.() || { name: "Jefferson", photo: "" };
+    const activeUser = P.activeUser?.();
+    const image = localStorage.getItem(`${AVATAR_PREFIX}${activeUser?.id || "local"}`) || display.photo || "";
     P.$all(".user-avatar").forEach(avatar => {
       avatar.classList.toggle("has-photo", Boolean(image));
       avatar.style.backgroundImage = image ? `url("${image}")` : "";
+      avatar.textContent = P.userInitials?.(display.name) || "JE";
     });
   }
 
@@ -93,20 +103,48 @@
       userRoleSelect.innerHTML = Object.keys(ROLE_ACCESS).map(role => `<option value="${role}">${role}</option>`).join("");
       userRoleSelect.addEventListener("change", () => applyRole(userRoleSelect.value));
     }
+    const activeUserSelect = P.$("#activeUserSelect");
+    if (activeUserSelect && !activeUserSelect.dataset.bound) {
+      activeUserSelect.dataset.bound = "true";
+      activeUserSelect.innerHTML = (P.users?.() || []).map(user => {
+        const display = P.displayUser?.(user) || user;
+        return `<option value="${user.id}">${display.shortName || display.name} • ${user.role}</option>`;
+      }).join("");
+      activeUserSelect.addEventListener("change", () => {
+        const user = P.setActiveUser?.(activeUserSelect.value);
+        if (user) {
+          localStorage.setItem(ROLE_KEY, user.role);
+          applyRole(user.role);
+          applyUserAvatar();
+          P.renderPage?.("user", { force: true });
+        }
+      });
+    }
 
     P.$("#avatarInput")?.addEventListener("change", event => {
       const file = event.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        localStorage.setItem(AVATAR_KEY, reader.result);
+        const user = P.activeUser?.();
+        localStorage.setItem(`${AVATAR_PREFIX}${user?.id || "local"}`, reader.result);
+        if (user) {
+          P.updateLinkedContactPhoto?.(user.id, reader.result);
+          P.renderPage?.("contacts", { force: true });
+        }
         applyUserAvatar();
       };
       reader.readAsDataURL(file);
     });
 
     P.$("#avatarRemoveBtn")?.addEventListener("click", () => {
+      const user = P.activeUser?.();
+      localStorage.removeItem(`${AVATAR_PREFIX}${user?.id || "local"}`);
       localStorage.removeItem(AVATAR_KEY);
+      if (user) {
+        P.updateLinkedContactPhoto?.(user.id, "");
+        P.renderPage?.("contacts", { force: true });
+      }
       const input = P.$("#avatarInput");
       if (input) input.value = "";
       applyUserAvatar();

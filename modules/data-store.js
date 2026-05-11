@@ -15,6 +15,7 @@
     ctcVisits: [],
     calls: [],
     reports: [],
+    users: [],
     adminChecks: []
   };
   const STORAGE_VERSION = 2;
@@ -35,6 +36,7 @@
       ctcVisits: Array.isArray(source.ctcVisits) ? source.ctcVisits : [],
       calls: Array.isArray(source.calls) ? source.calls : [],
       reports: Array.isArray(source.reports) ? source.reports : [],
+      users: Array.isArray(source.users) ? source.users : [],
       adminChecks: Array.isArray(source.adminChecks) ? source.adminChecks : []
     };
   }

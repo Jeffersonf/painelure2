@@ -58,7 +58,7 @@
       <button class="account-row" type="button" id="accountBtn" aria-expanded="false" aria-controls="accountPop">
         <div class="avatar user-avatar" id="accountAvatar">JE</div>
         <div>
-          <strong>Jefferson</strong>
+          <strong id="accountNameLabel">Jefferson</strong>
           <span>🛡️ <span id="accountRoleLabel">Administrador</span></span>
         </div>
         <small>▲</small>
@@ -289,10 +289,18 @@
           <div class="account-hero">
             <div class="avatar large user-avatar" id="userAvatar">JE</div>
             <div>
-              <small>Usuário local</small>
-              <strong>Jefferson</strong>
+              <small id="userIdentitySource">Usuário local</small>
+              <strong id="userNameLabel">Jefferson</strong>
               <span id="userRoleSummary">Administrador</span>
             </div>
+          </div>
+          <div class="settings-row">
+            <div><strong>Contato vinculado</strong><small id="userContactSummary">Dados sincronizados com a página Contatos.</small></div>
+            <span class="status-pill info" id="userContactStatus">Vinculado</span>
+          </div>
+          <div class="settings-row">
+            <div><strong>Usuário ativo</strong><small>Usuários herdados da v1 e vinculados aos contatos.</small></div>
+            <select id="activeUserSelect" aria-label="Trocar usuário ativo"></select>
           </div>
           <div class="settings-row">
             <div><strong>Perfil ativo</strong><small id="userAccessSummary">Acesso completo ao PainelURE.</small></div>
@@ -437,12 +445,14 @@
   <script src="./data/inventory.js"></script>
   <script src="./data/supervision.js"></script>
   <script src="./data/contacts.js"></script>
+  <script src="./data/users.js"></script>
   <script src="./data/governance.js"></script>
   <script src="./data/operations.js"></script>
   <script src="./data/sources.js"></script>
   <script src="./modules/dom.js"></script>
   <script src="./modules/ui-catalog.js"></script>
   <script src="./modules/data-store.js"></script>
+  <script src="./modules/identity.js"></script>
   <script src="./modules/csv.js"></script>
   <script src="./modules/normalizers.js"></script>
   <script src="./modules/source-loader.js"></script>

@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS users (
   username text NOT NULL UNIQUE,
   name text NOT NULL,
   role text NOT NULL DEFAULT 'Consulta',
+  contact_id text,
   password_hash text NOT NULL,
   avatar text,
   preferences jsonb NOT NULL DEFAULT '{}'::jsonb,

@@ -502,6 +502,16 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.51
+
+- Usuarios padrao da v1 foram importados para a v2 como seed de identidade.
+- Cada usuario importado recebeu `contactId` quando ha contato correspondente na base de Contatos.
+- Criado `modules/identity.js` para resolver usuario ativo, contato vinculado, foto, email, setor e cargo.
+- Conta ganhou seletor de usuario ativo para testar usuarios herdados da v1.
+- Foto enviada pelo usuario agora atualiza tambem o contato vinculado na pagina Contatos.
+- Cards de Contatos passam a exibir foto sincronizada quando existir.
+- Backend e schema Supabase ganharam campo `contact_id` em usuarios para manter o vinculo online depois.
+
 ### 2.0.0-dev.50
 
 - Rota Supabase-first documentada como proxima etapa de DB online, sem depender de Render Free.

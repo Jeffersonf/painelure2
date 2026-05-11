@@ -145,9 +145,10 @@
   }
 
   function contactCard(contact) {
+    const photo = contact.photo || "";
     return `
       <article class="contact-card" data-search="${P.searchText([contact.name, contact.role, contact.sector, contact.email, contact.phone])}">
-        <div class="contact-avatar">${initials(contact.name)}</div>
+        <div class="contact-avatar${photo ? " has-photo" : ""}"${photo ? ` style="background-image:url('${photo}')"` : ""}>${initials(contact.name)}</div>
         <div>
           <small>${contact.role}</small>
           <h2>${contact.name}</h2>
@@ -229,10 +230,21 @@
   }
 
   function renderUser(data) {
-    const role = P.currentRole?.() || "Administrador";
+    const display = P.displayUser?.() || { name: "Jefferson", role: "Administrador", linked: false };
+    const role = P.currentRole?.() || display.role || "Administrador";
     const profile = (data.profiles || []).find(item => P.normalize(item.name) === P.normalize(role));
+    setText("#userNameLabel", display.name);
+    setText("#accountNameLabel", display.shortName || display.name);
+    setText("#userIdentitySource", display.linked ? "Usuário vinculado ao contato" : "Usuário importado da v1");
     setText("#userRoleSummary", role);
     setText("#userAccessSummary", profile?.note || "Perfil local de acesso ao painel.");
+    setText("#userContactSummary", display.linked
+      ? `${display.contactRole || "Contato"} • ${display.sector || "Setor"} • ${display.email || display.phone || "sem canal"}`
+      : "Sem contato vinculado. Ajuste o mapeamento em usuários."
+    );
+    setText("#userContactStatus", display.linked ? "Vinculado" : "Pendente");
+    P.$("#userContactStatus")?.classList.toggle("warn", !display.linked);
+    P.$("#userContactStatus")?.classList.toggle("info", display.linked);
     const userRoleSelect = P.$("#userRoleSelect");
     if (userRoleSelect) userRoleSelect.value = role;
 
@@ -801,6 +813,11 @@
       { label: "Inventário carregado", status: data.schoolAssets.length ? "ok" : "warn", note: `${data.schoolAssets.length} linha(s)` },
       { label: "Supervisão carregada", status: data.supervisors.length === 6 ? "ok" : "warn", note: `${data.supervisors.length}/6 supervisor(es)` },
       { label: "Contatos carregados", status: data.contacts.length ? "ok" : "warn", note: `${data.contacts.length} contato(s)` },
+      {
+        label: "Usuários importados da v1",
+        status: data.users.length ? "ok" : "warn",
+        note: `${data.users.length} usuário(s), ${data.users.filter(user => user.contactSync === "linked").length} vinculado(s) a contatos`
+      },
       { label: "Perfis ativos", status: P.ROLE_ACCESS ? "ok" : "danger", note: P.ROLE_ACCESS ? `${Object.keys(P.ROLE_ACCESS).length} perfil(is)` : "matriz indisponível" }
     ];
     const rows = [...systemChecks, ...items];
