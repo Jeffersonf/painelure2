@@ -166,8 +166,6 @@
     setText("#metricInventoryNote", data.schoolAssets.length ? "linhas consolidadas" : "aguardando inventário");
     setText("#metricSupervision", data.supervisors.length);
     setText("#metricSupervisionNote", data.supervisors.length ? "responsáveis ativos" : "fonte pendente");
-    setText("#metricCalendar", calendarCount);
-    setText("#metricCalendarNote", calendarCount ? "eventos carregados" : "agenda preparada");
     setText("#dashboardSummary", `consulta rápida • ${data.schools.length} escolas • ${sourceNote}`);
     setText("#dashboardNoticeTitle", calendarCount ? "Base operacional atualizada" : "Base operacional pronta");
     setText("#dashboardNoticeNote", calendarCount
@@ -178,10 +176,6 @@
     setText("#shortcutNetworkNote", missingNetwork ? `${missingNetwork} escola(s) ainda sem rede` : `${networkCount} rede(s) mapeada(s)`);
     setText("#shortcutInventoryNote", inventoryAlerts ? `${inventoryAlerts} alerta(s) para triagem` : `${data.schoolAssets.length} linha(s) consolidadas`);
     setText("#shortcutSupervisionNote", pendingVisits ? `${pendingVisits} visita(s) pendente(s)` : `${data.supervisors.length} responsável(is) ativos`);
-    setText("#shortcutContactsNote", `${data.contacts.length} contato(s) organizado(s)`);
-    setText("#shortcutCalendarNote", calendarCount ? `${calendarCount} evento(s) carregado(s)` : "agenda institucional");
-    setText("#shortcutCtcNote", ctcVisits ? `${ctcVisits} compromisso(s) técnico(s)` : "agenda técnica preparada");
-    setText("#shortcutReportsNote", openCalls ? `${openCalls} chamado(s) em acompanhamento` : "resumo rápido para gestão");
 
     const decisions = [
       missingNetwork

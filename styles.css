@@ -695,7 +695,7 @@ select:focus-visible {
 }
 
 .shortcut-card {
-  min-height: 116px;
+  min-height: 104px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -750,13 +750,13 @@ select:focus-visible {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 22px;
 }
 
 .metric-card {
-  min-height: 144px;
+  min-height: 132px;
   position: relative;
   overflow: hidden;
   display: flex;

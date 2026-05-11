@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.38
+
+- Dashboard foi enxugado para reduzir redundância visual na primeira dobra.
+- Atalhos principais ficaram focados em quatro áreas centrais: Escolas, Redes, Inventário e Supervisão.
+- Agenda deixou de aparecer como KPI principal e segue acessível por atalho lateral e bloco operacional.
+- Cards do painel inicial foram compactados para ficar mais próximos do ritmo visual do Finanza.
+
 ### 2.0.0-dev.37
 
 - Barra lateral foi enxugada no padrão Finanza.
