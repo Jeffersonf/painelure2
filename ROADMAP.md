@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.46
+
+- Fontes `DM Sans` e `Syne` passaram a ser servidas localmente pelo projeto.
+- Removida dependencia de Google Fonts no carregamento inicial.
+- Pesos principais foram preloaded para evitar refresh com tela sem texto.
+- Mantido o visual no padrao Finanza sem adicionar nova camada de CSS corretiva.
+- Sidebar, busca, titulo de pagina e filtros de contatos foram realinhados ao ritmo visual do Finanza.
+
 ### 2.0.0-dev.45
 
 - Carregamento visual corrigido para evitar tela sem texto durante a busca da fonte oficial.
