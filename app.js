@@ -101,7 +101,12 @@
   }
 
   function bindTheme() {
-    applyTheme(localStorage.getItem(THEME_KEY) || "dark");
+    let savedTheme = "dark";
+    try {
+      savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+    } catch (error) {}
+
+    applyTheme(savedTheme);
 
     const button = document.getElementById("themeBtn");
     if (!button) return;
@@ -109,7 +114,9 @@
     button.addEventListener("click", () => {
       const currentTheme = document.documentElement.dataset.theme === "light" ? "light" : "dark";
       const nextTheme = currentTheme === "light" ? "dark" : "light";
-      localStorage.setItem(THEME_KEY, nextTheme);
+      try {
+        localStorage.setItem(THEME_KEY, nextTheme);
+      } catch (error) {}
       applyTheme(nextTheme);
     });
   }

@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.35
+
+- Tema claro alinhado aos tokens do Finanza, incluindo acentos com contraste adequado.
+- Adicionado carregamento antecipado do tema salvo para reduzir piscada visual.
+- `localStorage` do tema ficou tolerante a ambientes restritos.
+- Cards principais receberam sombra e borda especificas para o tema claro.
+
 ### 2.0.0-dev.34
 
 - Removido o botao de privacidade/esconder dados da barra lateral.

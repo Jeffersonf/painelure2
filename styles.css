@@ -31,21 +31,28 @@
 }
 
 [data-theme="light"] {
-  --bg: #f5f7f0;
+  --ac: #3f7d00;
+  --ac2: #007a61;
+  --fut: #6848d9;
+  --dan: #b93326;
+  --warn: #836000;
+  --grn: #15803d;
+  --bg: #f4f7ef;
   --bg2: #eef2e7;
   --sf: rgba(255, 255, 255, .9);
   --sf2: rgba(246, 249, 240, .86);
   --sf-solid: #ffffff;
-  --bd: rgba(51, 64, 38, .16);
-  --bd2: rgba(51, 64, 38, .08);
-  --tx: #11150d;
-  --tx2: rgba(17, 21, 13, .78);
-  --mt: rgba(17, 21, 13, .52);
-  --sh: rgba(77, 92, 48, .14);
+  --bd: rgba(56, 74, 44, .16);
+  --bd2: rgba(56, 74, 44, .09);
+  --tx: #11170d;
+  --tx2: rgba(17, 23, 13, .82);
+  --mt: rgba(17, 23, 13, .58);
+  --sh: rgba(71, 89, 42, .12);
   --grad-bg:
-    radial-gradient(ellipse 80% 55% at 50% -12%, rgba(200, 245, 90, .2) 0%, transparent 70%),
-    radial-gradient(ellipse 52% 42% at 88% 68%, rgba(90, 245, 200, .14) 0%, transparent 62%),
-    radial-gradient(ellipse 45% 36% at 10% 82%, rgba(167, 139, 250, .12) 0%, transparent 60%);
+    radial-gradient(ellipse 80% 58% at 20% -8%, rgba(197, 232, 118, .34) 0%, transparent 62%),
+    radial-gradient(ellipse 58% 45% at 98% 18%, rgba(83, 202, 169, .18) 0%, transparent 56%),
+    radial-gradient(ellipse 46% 34% at 16% 92%, rgba(246, 194, 92, .14) 0%, transparent 58%),
+    linear-gradient(145deg, #fbfcf6 0%, #eef4e5 46%, #e6efe9 100%);
 }
 
 *,
@@ -69,6 +76,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  transition: background .12s, color .12s;
 }
 
 body::before {
@@ -589,6 +597,42 @@ select:focus-visible {
   border: 1px solid var(--bd);
   border-radius: var(--r-lg);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .09);
+}
+
+[data-theme="light"] .widget,
+[data-theme="light"] .box,
+[data-theme="light"] .table-card,
+[data-theme="light"] .selector-panel {
+  border-color: rgba(74, 86, 140, .13);
+  box-shadow: 0 10px 24px rgba(36, 48, 92, .06);
+}
+
+@supports not (backdrop-filter: blur(1px)) {
+  .sidebar,
+  .mobile-nav,
+  .widget,
+  .box,
+  .table-card,
+  .selector-panel {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  [data-theme="dark"] .sidebar,
+  [data-theme="dark"] .widget,
+  [data-theme="dark"] .box,
+  [data-theme="dark"] .table-card,
+  [data-theme="dark"] .selector-panel {
+    background: #12151e !important;
+  }
+
+  [data-theme="light"] .sidebar,
+  [data-theme="light"] .widget,
+  [data-theme="light"] .box,
+  [data-theme="light"] .table-card,
+  [data-theme="light"] .selector-panel {
+    background: #ffffff !important;
+  }
 }
 
 .sidebar,
