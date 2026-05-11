@@ -502,6 +502,12 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.53
+
+- Página de Escolas ganhou filtros discretos por município, status da ficha e alerta de inventário.
+- Filtros usam os dados já normalizados da v2, sem duplicar fonte ou criar render legado.
+- Cards de escola agora carregam metadados de filtro sem alterar o padrão visual inspirado no Finanza.
+
 ### 2.0.0-dev.52
 
 - Fotos de contatos deixaram de vir seedadas de sites externos.

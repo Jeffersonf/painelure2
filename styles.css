@@ -1283,6 +1283,23 @@ select:focus-visible {
   font-weight: 600;
 }
 
+.school-filters {
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.school-filters p {
+  align-self: center;
+  margin: 0;
+  color: var(--mt);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.filter-hidden {
+  display: none !important;
+}
+
 .network-layout,
 .inventory-grid,
 .calendar-grid {

@@ -158,6 +158,30 @@
       <header class="page-header compact">
         <div><h1>Escolas</h1><p>Consulta rápida das unidades, fichas e vínculos.</p></div>
       </header>
+      <div class="selector-panel school-filters">
+        <label>
+          <span>Município</span>
+          <select id="schoolCityFilter"></select>
+        </label>
+        <label>
+          <span>Ficha</span>
+          <select id="schoolProfileFilter">
+            <option value="all">Todas</option>
+            <option value="ok">Mais completas</option>
+            <option value="warn">Em revisão</option>
+            <option value="danger">Críticas</option>
+          </select>
+        </label>
+        <label>
+          <span>Inventário</span>
+          <select id="schoolInventoryFilter">
+            <option value="all">Todas</option>
+            <option value="alerts">Com alerta</option>
+            <option value="ok">Sem alerta</option>
+          </select>
+        </label>
+        <p id="schoolFilterSummary">21 escolas na base regional.</p>
+      </div>
       <div class="school-grid" id="schoolGrid"></div>
     </section>
 

@@ -61,8 +61,60 @@
     return "danger";
   }
 
+  function inventoryAlertCount(school) {
+    const data = P.getAppData();
+    const metrics = data.schoolInventoryMetrics?.[school.name] || {};
+    const assets = schoolAssets(school.name);
+    return Math.max(Number(metrics.alerts || 0), inventoryTotals(assets).alertUnits);
+  }
+
   function firstNote(text) {
     return String(text || "").split(".").map(item => item.trim()).find(Boolean) || "";
+  }
+
+  function setSelectOptions(select, options, selectedValue) {
+    if (!select) return;
+    select.innerHTML = options.map(option => `<option value="${option.value}">${option.label}</option>`).join("");
+    select.value = options.some(option => option.value === selectedValue) ? selectedValue : options[0]?.value || "";
+  }
+
+  function applySchoolFilters() {
+    const city = P.$("#schoolCityFilter")?.value || "all";
+    const profile = P.$("#schoolProfileFilter")?.value || "all";
+    const inventory = P.$("#schoolInventoryFilter")?.value || "all";
+    const cards = P.$all("#schoolGrid .school-card");
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const cityOk = city === "all" || card.dataset.city === city;
+      const profileOk = profile === "all" || card.dataset.profileStatus === profile;
+      const inventoryOk = inventory === "all"
+        || (inventory === "alerts" && Number(card.dataset.inventoryAlerts || 0) > 0)
+        || (inventory === "ok" && Number(card.dataset.inventoryAlerts || 0) === 0);
+      const visible = cityOk && profileOk && inventoryOk;
+      card.classList.toggle("filter-hidden", !visible);
+      if (visible) visibleCount++;
+    });
+
+    const summary = P.$("#schoolFilterSummary");
+    if (summary) summary.textContent = `${visibleCount}/${cards.length} escola(s) visíveis.`;
+  }
+
+  function renderSchoolFilters(schools) {
+    const citySelect = P.$("#schoolCityFilter");
+    if (!citySelect) return;
+    const currentCity = citySelect.value || "all";
+    const cities = [...new Set(schools.map(school => school.city).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    setSelectOptions(citySelect, [
+      { value: "all", label: "Todos" },
+      ...cities.map(city => ({ value: P.searchText([city]), label: city }))
+    ], currentCity);
+
+    [citySelect, P.$("#schoolProfileFilter"), P.$("#schoolInventoryFilter")].forEach(select => {
+      if (!select || select.dataset.bound) return;
+      select.dataset.bound = "true";
+      select.addEventListener("change", applySchoolFilters);
+    });
   }
 
   function supervisorForSchool(name) {
@@ -325,9 +377,11 @@
       const profilePct = schoolProfileCompletion(school.name);
       const missing = schoolMissingProfileFields(school.name);
       const metrics = data.schoolInventoryMetrics?.[school.name] || { items: school.items || 0, alerts: school.alerts || 0 };
+      const alertCount = inventoryAlertCount(school);
+      const profileStatus = profileStatusFromPct(profilePct);
       const note = missing.length ? `pendente: ${missing.slice(0, 2).join(", ")}` : firstNote(profile?.notes) || "ficha escolar completa";
       return `
-        <button class="school-card" type="button" data-school-name="${school.name}" data-school-key="${P.searchText([school.name])}" data-search="${P.searchText([school.name, school.city, school.cie, school.initials, profile?.director, profile?.email, profile?.phone])}">
+        <button class="school-card" type="button" data-school-name="${school.name}" data-school-key="${P.searchText([school.name])}" data-city="${P.searchText([school.city])}" data-profile-status="${profileStatus}" data-inventory-alerts="${alertCount}" data-search="${P.searchText([school.name, school.city, school.cie, school.initials, profile?.director, profile?.email, profile?.phone])}">
           <div class="school-top">
             <div class="school-avatar">${school.initials}</div>
             <div>
@@ -342,12 +396,14 @@
           </div>
           <p class="school-note">${note}</p>
           <div class="school-foot">
-            <span class="status-pill ${profileStatusFromPct(profilePct)}">ficha</span>
+            <span class="status-pill ${profileStatus}">ficha</span>
             <div class="progress" aria-label="Ficha ${profilePct}%"><i style="width:${profilePct}%"></i></div>
           </div>
         </button>
       `;
     }).join("");
+    renderSchoolFilters(schools);
+    applySchoolFilters();
     grid.querySelectorAll("[data-school-name]").forEach(button => {
       button.addEventListener("click", () => {
         openSchoolPage(button.dataset.schoolName);
