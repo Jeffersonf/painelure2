@@ -502,6 +502,12 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.71
+
+- Login passou a aceitar primeiro nome quando identificar um único usuário, facilitando acesso de supervisores.
+- Tela de login foi refinada visualmente para ficar mais próxima do padrão Finanza.
+- Placeholder de usuário passou a orientar login curto, como `edilene`.
+
 ### 2.0.0-dev.70
 
 - Controle de mês do dashboard deixou de ser estático.

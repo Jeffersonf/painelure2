@@ -19,13 +19,16 @@
 <body>
   <section class="login-screen" id="loginScreen">
     <div class="login-card">
-      <span class="brand-word login-brand"><span>Painel</span><strong>URE</strong></span>
+      <div class="login-head">
+        <span class="brand-word login-brand"><span>Painel</span><strong>URE</strong></span>
+        <span>online</span>
+      </div>
       <div id="loginForm">
         <h1>Entrar</h1>
-        <p>Acesse com seu usuário e PIN inicial.</p>
+        <p>Acesse com seu usuário da URE e PIN.</p>
         <label>
           <span>Usuário</span>
-          <input id="loginUserInput" type="text" autocomplete="username" placeholder="seu.usuario">
+          <input id="loginUserInput" type="text" autocomplete="username" placeholder="ex: edilene">
         </label>
         <label>
           <span>PIN</span>
@@ -48,6 +51,11 @@
       </div>
       <small id="loginStatus">PIN inicial padrão: 1234</small>
       <button class="login-help" type="button">Esqueci meu PIN: fale com o gabinete ou SETEC.</button>
+      <div class="login-foot">
+        <span>Supabase</span>
+        <span>Render</span>
+        <span>URE Itapeva</span>
+      </div>
     </div>
   </section>
 

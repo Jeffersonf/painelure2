@@ -454,9 +454,21 @@ async function findUserByUsername(username) {
   if (!cleanUsername) return null;
   if (pool && dbReady) {
     const result = await pool.query("select * from users where username = $1", [cleanUsername]);
-    return result.rows[0] || null;
+    if (result.rows[0]) return result.rows[0];
+    const users = await pool.query("select * from users order by name");
+    const matches = users.rows.filter(user => {
+      const firstName = String(user.name || "").trim().split(/\s+/)[0]?.toLowerCase();
+      return firstName === cleanUsername || String(user.username || "").toLowerCase().startsWith(`${cleanUsername}.`);
+    });
+    return matches.length === 1 ? matches[0] : null;
   }
-  return currentUsers().find(user => user.username === cleanUsername) || null;
+  const exact = currentUsers().find(user => user.username === cleanUsername);
+  if (exact) return exact;
+  const matches = currentUsers().filter(user => {
+    const firstName = String(user.name || "").trim().split(/\s+/)[0]?.toLowerCase();
+    return firstName === cleanUsername || String(user.username || "").toLowerCase().startsWith(`${cleanUsername}.`);
+  });
+  return matches.length === 1 ? matches[0] : null;
 }
 
 async function findUserById(id) {
