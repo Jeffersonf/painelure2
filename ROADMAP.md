@@ -507,6 +507,7 @@ Não fazer:
 - Login passou a aceitar primeiro nome quando identificar um único usuário, facilitando acesso de supervisores.
 - Tela de login foi refinada visualmente para ficar mais próxima do padrão Finanza.
 - Placeholder de usuário passou a orientar login curto, como `edilene`.
+- Tela de login removeu exemplos e informações técnicas para ficar mais parecida com a v1.
 
 ### 2.0.0-dev.70
 
