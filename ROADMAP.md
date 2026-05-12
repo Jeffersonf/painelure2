@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.70
+
+- Controle de mês do dashboard deixou de ser estático.
+- Criado estado `painelure2_month` com mês salvo no navegador.
+- Botões anterior/próximo agora alternam o mês exibido.
+- Resumo do dashboard passa a usar o mês selecionado.
+- Menu da conta trocou "Trocar perfil" por "Sair" com logout real da sessão online.
+
 ### 2.0.0-dev.69
 
 - Backend passou a registrar `lastLoginAt` nas preferências do usuário a cada login.

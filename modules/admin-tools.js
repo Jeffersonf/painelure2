@@ -122,6 +122,22 @@
     setAuthenticated(!required);
   }
 
+  async function logoutOnline() {
+    if (backendToken) await P.logoutBackend?.(backendToken).catch(() => {});
+    backendToken = "";
+    sessionStorage.removeItem("painelure2_backend_token");
+    P.clearOnlineUser?.();
+    const localUser = P.activeUser?.();
+    applyRole(localUser?.role || "Administrador");
+    applyUserAvatar();
+    P.renderPage?.("user", { force: true });
+    setAuthenticated(false);
+    if (P.$("#loginForm")) P.$("#loginForm").hidden = false;
+    if (P.$("#pinChangeForm")) P.$("#pinChangeForm").hidden = true;
+    showLoginStatus("Sessão encerrada.");
+    P.closeAccountMenu?.();
+  }
+
   function activateOnlineUser(token, user) {
     backendToken = token;
     sessionStorage.setItem("painelure2_backend_token", backendToken);
@@ -279,19 +295,8 @@
       }
     });
 
-    P.$("#onlineLogoutBtn")?.addEventListener("click", async () => {
-      if (backendToken) await P.logoutBackend?.(backendToken).catch(() => {});
-      backendToken = "";
-      sessionStorage.removeItem("painelure2_backend_token");
-      P.clearOnlineUser?.();
-      const localUser = P.activeUser?.();
-      applyRole(localUser?.role || "Administrador");
-      applyUserAvatar();
-      P.renderPage?.("user", { force: true });
-      setAuthenticated(false);
-      if (P.$("#loginForm")) P.$("#loginForm").hidden = false;
-      if (P.$("#pinChangeForm")) P.$("#pinChangeForm").hidden = true;
-    });
+    P.$("#onlineLogoutBtn")?.addEventListener("click", logoutOnline);
+    P.$("#sidebarLogoutBtn")?.addEventListener("click", logoutOnline);
 
     P.$("#restoreAdminBtn")?.addEventListener("click", async () => {
       if (backendToken) await P.logoutBackend?.(backendToken).catch(() => {});

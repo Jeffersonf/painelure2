@@ -403,6 +403,8 @@
   }
 
   function renderDashboard(data) {
+    P.bindMonthControls?.();
+    const monthLabel = P.selectedMonthLabel?.() || "Maio 2026";
     const networkCount = Object.keys(data.networkData || {}).length;
     const calendarCount = data.calendar?.length || 0;
     const missingNetwork = Math.max((data.schools?.length || 0) - networkCount, 0);
@@ -415,7 +417,7 @@
       ? `${officialSources} fonte(s) atualizada(s)`
       : "base local pronta para consulta";
 
-    setText("#dashboardSummary", `consulta rápida • ${data.schools.length} escolas • ${sourceNote}`);
+    setText("#dashboardSummary", `${monthLabel} • ${data.schools.length} escolas • ${sourceNote}`);
     setText("#dashboardNoticeTitle", calendarCount ? "Base operacional atualizada" : "Base operacional pronta");
     setText("#dashboardNoticeNote", calendarCount
       ? "Escolas, supervisão, inventário, redes e agenda disponíveis para consulta."

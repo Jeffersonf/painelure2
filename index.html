@@ -100,7 +100,7 @@
         <button class="pop-item" type="button" data-page="user">⚙️ Conta e perfil</button>
         <button class="pop-item" type="button" data-page="admin">🔐 Painel admin</button>
         <div class="pop-div"></div>
-        <button class="pop-item danger" type="button" data-page="user">👤 Trocar perfil</button>
+        <button class="pop-item danger" type="button" id="sidebarLogoutBtn">⏻ Sair</button>
       </div>
     </div>
   </aside>
@@ -113,7 +113,11 @@
         <p>Centro do dia para consultar escolas, redes, inventário, visitas e agenda da URE.</p>
         </div>
         <div class="header-actions">
-          <button class="month-pill" type="button"><span>‹</span> Maio 2026 <span>›</span></button>
+          <div class="month-switcher" aria-label="Selecionar mês">
+            <button class="month-step" type="button" id="prevMonthBtn" aria-label="Mês anterior">‹</button>
+            <button class="month-pill" type="button" id="currentMonthBtn">Maio 2026</button>
+            <button class="month-step" type="button" id="nextMonthBtn" aria-label="Próximo mês">›</button>
+          </div>
         </div>
       </header>
 
@@ -619,6 +623,7 @@
   <script src="./modules/ui-catalog.js"></script>
   <script src="./modules/data-store.js"></script>
   <script src="./modules/identity.js"></script>
+  <script src="./modules/month-state.js"></script>
   <script src="./modules/csv.js"></script>
   <script src="./modules/normalizers.js"></script>
   <script src="./modules/source-loader.js"></script>

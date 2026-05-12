@@ -829,25 +829,45 @@ select:focus-visible {
   justify-content: flex-end;
 }
 
-.month-pill {
+.month-switcher {
   min-height: 40px;
-  display: inline-flex;
+  display: inline-grid;
+  grid-template-columns: 34px minmax(128px, auto) 34px;
   align-items: center;
-  gap: 20px;
-  padding: 0 18px;
   border: 1px solid var(--bd);
   border-radius: 999px;
   background: var(--sf);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+  overflow: hidden;
+}
+
+.month-pill,
+.month-step {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
   color: var(--tx);
   cursor: pointer;
   font-size: 13px;
-  font-weight: 600;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, .12);
+  font-weight: 800;
 }
 
-.month-pill span {
+.month-pill {
+  padding: 0 12px;
+}
+
+.month-step {
   color: var(--mt);
-  font-size: 15px;
+  font-size: 18px;
+}
+
+.month-step:hover,
+.month-pill:hover {
+  background: rgba(200, 245, 90, .08);
+  color: var(--ac);
 }
 
 .notice-card {

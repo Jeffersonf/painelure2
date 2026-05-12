@@ -66,6 +66,7 @@
   }
 
   function refreshRenderedPages() {
+    P.bindMonthControls?.();
     renderPage("dashboard", { force: true });
     [...renderedPages].forEach(id => renderPage(id, { force: true }));
   }
@@ -154,6 +155,7 @@
 
   function init() {
     bindTheme();
+    P.bindMonthControls?.();
     P.renderPage("dashboard");
     P.bindNavigation({
       onContactSector: sector => {
