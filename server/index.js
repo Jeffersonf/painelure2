@@ -460,7 +460,7 @@ async function findUserByUsername(username) {
       const firstName = String(user.name || "").trim().split(/\s+/)[0]?.toLowerCase();
       return firstName === cleanUsername || String(user.username || "").toLowerCase().startsWith(`${cleanUsername}.`);
     });
-    return matches.length === 1 ? matches[0] : null;
+    return matches[0] || null;
   }
   const exact = currentUsers().find(user => user.username === cleanUsername);
   if (exact) return exact;
@@ -468,7 +468,7 @@ async function findUserByUsername(username) {
     const firstName = String(user.name || "").trim().split(/\s+/)[0]?.toLowerCase();
     return firstName === cleanUsername || String(user.username || "").toLowerCase().startsWith(`${cleanUsername}.`);
   });
-  return matches.length === 1 ? matches[0] : null;
+  return matches[0] || null;
 }
 
 async function findUserById(id) {

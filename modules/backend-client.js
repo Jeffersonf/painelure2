@@ -1,7 +1,16 @@
 (function () {
   const P = window.PainelURE;
   const API_TIMEOUT = 900;
-  const API_BASE = String(window.PAINELURE_API_URL || "").replace(/\/+$/, "");
+  const RENDER_API = "https://painelure2-api.onrender.com";
+
+  function defaultApiBase() {
+    const configured = String(window.PAINELURE_API_URL || "").replace(/\/+$/, "");
+    if (configured) return configured;
+    if (location.hostname.endsWith("github.io")) return RENDER_API;
+    return "";
+  }
+
+  const API_BASE = defaultApiBase();
 
   function apiPath(path) {
     return API_BASE ? `${API_BASE}${path}` : `.${path}`;

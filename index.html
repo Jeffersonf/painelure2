@@ -22,11 +22,16 @@
       <div class="login-head">
         <span class="brand-word login-brand"><span>Painel</span><strong>URE</strong></span>
       </div>
+      <div class="login-org-mark">
+        <strong>setec | seintec</strong>
+        <span>ure itapeva</span>
+      </div>
+      <div class="login-badge">Acesso restrito</div>
       <div id="loginForm">
-        <h1>Entrar</h1>
-        <p>Acesse com seu usuário e PIN.</p>
+        <h1>Entrar no painel</h1>
+        <p>Use seu primeiro nome e PIN para entrar no painel.</p>
         <label>
-          <span>Usuário</span>
+          <span>Nome</span>
           <input id="loginUserInput" type="text" autocomplete="username">
         </label>
         <label>
@@ -36,19 +41,19 @@
         <button class="primary-btn" type="button" id="loginSubmitBtn">Entrar</button>
       </div>
       <div id="pinChangeForm" hidden>
-        <h1>Novo PIN</h1>
-        <p>Troque o PIN inicial para continuar.</p>
+        <h1>Crie um novo PIN</h1>
+        <p>Seu acesso ainda usa o PIN inicial. Escolha um novo PIN para continuar.</p>
         <label>
           <span>Novo PIN</span>
-          <input id="newPinInput" type="password" inputmode="numeric" autocomplete="new-password" placeholder="mínimo 4 dígitos">
+          <input id="newPinInput" type="password" inputmode="numeric" autocomplete="new-password">
         </label>
         <label>
           <span>Confirmar PIN</span>
-          <input id="confirmPinInput" type="password" inputmode="numeric" autocomplete="new-password" placeholder="repita o PIN">
+          <input id="confirmPinInput" type="password" inputmode="numeric" autocomplete="new-password">
         </label>
         <button class="primary-btn" type="button" id="pinChangeSubmitBtn">Salvar PIN</button>
       </div>
-      <small id="loginStatus">Informe seus dados de acesso.</small>
+      <small id="loginStatus"></small>
       <button class="login-help" type="button">Esqueci meu PIN</button>
     </div>
   </section>
