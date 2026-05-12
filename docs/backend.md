@@ -123,6 +123,8 @@ O primeiro usuario administrador e criado automaticamente se `PAINELURE_ADMIN_US
 
 O servidor carrega `.env` automaticamente em desenvolvimento local. Em hospedagem online, prefira variaveis configuradas no painel do provedor.
 
+Para deploy no mesmo desenho do Finanza, use o guia [`deploy-online.md`](./deploy-online.md): API Node no Render e banco PostgreSQL externo, preferencialmente Supabase ou Neon.
+
 O endpoint `GET /api/health` informa o modo ativo:
 
 ```json
@@ -138,7 +140,7 @@ O endpoint `GET /api/health` informa o modo ativo:
 
 O backend ja esta pronto para PostgreSQL online, mas a ativacao oficial fica para uma etapa futura.
 
-Como o Render Free pode dormir e prejudicar a primeira abertura do painel, a direcao atual e priorizar Supabase antes de assumir uma API propria hospedada fora.
+Como o Render Free pode dormir e prejudicar a primeira abertura do painel, a direcao e usar Render apenas como API e manter os dados em Supabase ou Neon.
 
 Para publicar com banco online quando retomarmos:
 

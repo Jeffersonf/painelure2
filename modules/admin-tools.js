@@ -198,6 +198,19 @@
       P.renderPage?.("user", { force: true });
     });
 
+    P.$("#restoreAdminBtn")?.addEventListener("click", async () => {
+      if (backendToken) await P.logoutBackend?.(backendToken).catch(() => {});
+      backendToken = "";
+      sessionStorage.removeItem("painelure2_backend_token");
+      P.clearOnlineUser?.();
+      const adminUser = (P.users?.() || []).find(user => user.role === "Administrador" && user.active !== false);
+      if (adminUser) P.setActiveUser?.(adminUser.id);
+      localStorage.setItem(ROLE_KEY, "Administrador");
+      applyRole("Administrador");
+      applyUserAvatar();
+      P.renderPage?.("user", { force: true });
+    });
+
     P.$("#avatarInput")?.addEventListener("change", event => {
       const file = event.target.files?.[0];
       if (!file) return;

@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.65
+
+- Conferida a arquitetura do Finanza: API Node no Render com PostgreSQL externo, principalmente Supabase.
+- PainelURE 2.0 ganhou `render.yaml` para criar o web service `painelure2-api`.
+- Criado guia `docs/deploy-online.md` com decisao Render + Supabase/Neon e sem Render Database.
+- Backend passou a apontar a documentacao de deploy online para o mesmo desenho do Finanza.
+- Conta ganhou atalho local para restaurar Administrador quando o usuario estiver testando perfis.
+
 ### 2.0.0-dev.64
 
 - Página Conta ganhou entrada de sessão online com usuário e senha do backend.
