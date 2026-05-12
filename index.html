@@ -375,6 +375,15 @@
             <span class="status-pill info" id="userContactStatus">Vinculado</span>
           </div>
           <div class="settings-row">
+            <div><strong>Sessão online</strong><small id="onlineSessionSummary">Entre com usuário do backend quando a API estiver ativa.</small></div>
+            <div class="settings-actions online-login-actions">
+              <input id="onlineLoginInput" type="text" placeholder="Usuário">
+              <input id="onlinePasswordInput" type="password" placeholder="Senha">
+              <button class="ghost-btn" type="button" id="onlineLoginBtn">Entrar</button>
+              <button class="ghost-btn" type="button" id="onlineLogoutBtn">Sair</button>
+            </div>
+          </div>
+          <div class="settings-row">
             <div><strong>Usuário ativo</strong><small>Usuários herdados da v1 e vinculados aos contatos.</small></div>
             <select id="activeUserSelect" aria-label="Trocar usuário ativo"></select>
           </div>

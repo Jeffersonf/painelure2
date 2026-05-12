@@ -834,6 +834,18 @@ async function handleApi(req, res, pathname) {
     return;
   }
 
+  if (req.method === "PUT" && pathname === "/api/users/me") {
+    if (!requireAuth(req, res)) return;
+    const user = await currentSessionUser(req);
+    if (!user) {
+      send(res, 400, { ok: false, error: "Sessao sem usuario vinculado." });
+      return;
+    }
+    const body = JSON.parse(await readBody(req) || "{}");
+    send(res, 200, { ok: true, user: await updateUser(user.id, body) });
+    return;
+  }
+
   if (req.method === "PUT" && pathname.startsWith("/api/users/")) {
     if (!requireAuth(req, res)) return;
     if (!isAdminRequest(req)) {
@@ -845,18 +857,6 @@ async function handleApi(req, res, pathname) {
     const user = await updateUser(id, body);
     await audit(req, "update", "user", id, "Usuario atualizado.", { role: user.role });
     send(res, 200, { ok: true, user });
-    return;
-  }
-
-  if (req.method === "PUT" && pathname === "/api/users/me") {
-    if (!requireAuth(req, res)) return;
-    const user = await currentSessionUser(req);
-    if (!user) {
-      send(res, 400, { ok: false, error: "Sessao sem usuario vinculado." });
-      return;
-    }
-    const body = JSON.parse(await readBody(req) || "{}");
-    send(res, 200, { ok: true, user: await updateUser(user.id, body) });
     return;
   }
 

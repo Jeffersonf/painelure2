@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.64
+
+- Página Conta ganhou entrada de sessão online com usuário e senha do backend.
+- Login online passa a assumir o perfil ativo e atualizar a navegação por permissões.
+- Logout online volta para o usuário local ativo, mantendo o fallback da v1.
+- Avatar passa a considerar o usuário online e pode ser persistido no backend quando houver sessão.
+- Corrigida a prioridade da rota `/api/users/me` para permitir atualização do próprio perfil sem permissão administrativa.
+
 ### 2.0.0-dev.63
 
 - Admin online passou a permitir editar função e vínculo de contato dos usuários cadastrados no backend.

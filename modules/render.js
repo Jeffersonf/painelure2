@@ -472,6 +472,13 @@
     setText("#userContactStatus", display.linked ? "Vinculado" : "Pendente");
     P.$("#userContactStatus")?.classList.toggle("warn", !display.linked);
     P.$("#userContactStatus")?.classList.toggle("info", display.linked);
+    const online = P.onlineUser?.();
+    setText("#onlineSessionSummary", online
+      ? `${online.username || online.login || online.name} conectado ao backend.`
+      : "Sessão local ativa. Entre quando a API estiver disponível."
+    );
+    const logoutButton = P.$("#onlineLogoutBtn");
+    if (logoutButton) logoutButton.hidden = !online;
     const userRoleSelect = P.$("#userRoleSelect");
     if (userRoleSelect) userRoleSelect.value = role;
 

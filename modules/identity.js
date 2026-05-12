@@ -1,6 +1,7 @@
 (function () {
   const P = window.PainelURE;
   const USER_KEY = "painelure2_user";
+  const ONLINE_USER_KEY = "painelure2_online_user";
 
   function normalize(value) {
     return String(value || "")
@@ -56,7 +57,27 @@
     return user;
   }
 
+  function onlineUser() {
+    try {
+      return JSON.parse(sessionStorage.getItem(ONLINE_USER_KEY) || "null");
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function setOnlineUser(user) {
+    if (!user) return null;
+    sessionStorage.setItem(ONLINE_USER_KEY, JSON.stringify(user));
+    return user;
+  }
+
+  function clearOnlineUser() {
+    sessionStorage.removeItem(ONLINE_USER_KEY);
+  }
+
   function displayUser(user = activeUser()) {
+    const selectedUser = arguments.length ? user : onlineUser() || user;
+    user = selectedUser;
     const contact = contactForUser(user);
     return {
       id: user?.id || "",
@@ -76,7 +97,7 @@
 
   function updateLinkedContactPhoto(userId, photo) {
     const data = P.getAppData();
-    const user = users().find(item => item.id === userId);
+    const user = users().find(item => item.id === userId) || onlineUser();
     const contact = contactForUser(user);
     if (!contact) return null;
     const contactsNext = data.contacts.map(item => item.id === contact.id ? { ...item, photo } : item);
@@ -91,6 +112,9 @@
   P.users = users;
   P.activeUser = activeUser;
   P.setActiveUser = setActiveUser;
+  P.onlineUser = onlineUser;
+  P.setOnlineUser = setOnlineUser;
+  P.clearOnlineUser = clearOnlineUser;
   P.displayUser = displayUser;
   P.contactForUser = contactForUser;
   P.updateLinkedContactPhoto = updateLinkedContactPhoto;

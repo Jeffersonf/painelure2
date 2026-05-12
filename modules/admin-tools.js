@@ -19,7 +19,7 @@
   };
 
   function currentRole() {
-    return localStorage.getItem(ROLE_KEY) || P.displayUser?.().role || "Administrador";
+    return P.onlineUser?.()?.role || localStorage.getItem(ROLE_KEY) || P.displayUser?.().role || "Administrador";
   }
 
   function canAccess(page, role = currentRole()) {
@@ -71,7 +71,7 @@
 
   function applyUserAvatar() {
     const display = P.displayUser?.() || { name: "Jefferson", photo: "" };
-    const activeUser = P.activeUser?.();
+    const activeUser = P.onlineUser?.() || P.activeUser?.();
     const image = localStorage.getItem(`${AVATAR_PREFIX}${activeUser?.id || "local"}`) || display.photo || "";
     P.$all(".user-avatar").forEach(avatar => {
       avatar.classList.toggle("has-photo", Boolean(image));
@@ -142,15 +142,49 @@
       });
     }
 
+    P.$("#onlineLoginBtn")?.addEventListener("click", async () => {
+      const username = P.$("#onlineLoginInput")?.value.trim();
+      const password = P.$("#onlinePasswordInput")?.value || "";
+      const summary = P.$("#onlineSessionSummary");
+      try {
+        if (!username || !password) throw new Error("Informe usuário e senha.");
+        const result = await P.loginBackend?.({ username, password });
+        if (!result?.token || !result?.user) throw new Error("Login não retornou usuário.");
+        backendToken = result.token;
+        sessionStorage.setItem("painelure2_backend_token", backendToken);
+        P.setOnlineUser?.(result.user);
+        localStorage.setItem(ROLE_KEY, result.user.role || "Consulta");
+        const passwordInput = P.$("#onlinePasswordInput");
+        if (passwordInput) passwordInput.value = "";
+        applyRole(result.user.role || "Consulta");
+        applyUserAvatar();
+        P.renderPage?.("user", { force: true });
+        if (summary) summary.textContent = `${result.user.username || result.user.name} conectado ao backend.`;
+      } catch (error) {
+        if (summary) summary.textContent = `Falha no login online: ${error.message}`;
+      }
+    });
+
+    P.$("#onlineLogoutBtn")?.addEventListener("click", () => {
+      backendToken = "";
+      sessionStorage.removeItem("painelure2_backend_token");
+      P.clearOnlineUser?.();
+      const localUser = P.activeUser?.();
+      applyRole(localUser?.role || "Administrador");
+      applyUserAvatar();
+      P.renderPage?.("user", { force: true });
+    });
+
     P.$("#avatarInput")?.addEventListener("change", event => {
       const file = event.target.files?.[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        const user = P.activeUser?.();
+        const user = P.onlineUser?.() || P.activeUser?.();
         localStorage.setItem(`${AVATAR_PREFIX}${user?.id || "local"}`, reader.result);
         if (user) {
           P.updateLinkedContactPhoto?.(user.id, reader.result);
+          if (P.onlineUser?.() && backendToken) P.updateBackendUser?.(backendToken, { avatar: reader.result }).catch(() => {});
           P.renderPage?.("contacts", { force: true });
         }
         applyUserAvatar();
@@ -159,11 +193,12 @@
     });
 
     P.$("#avatarRemoveBtn")?.addEventListener("click", () => {
-      const user = P.activeUser?.();
+      const user = P.onlineUser?.() || P.activeUser?.();
       localStorage.removeItem(`${AVATAR_PREFIX}${user?.id || "local"}`);
       localStorage.removeItem(AVATAR_KEY);
       if (user) {
         P.updateLinkedContactPhoto?.(user.id, "");
+        if (P.onlineUser?.() && backendToken) P.updateBackendUser?.(backendToken, { avatar: "" }).catch(() => {});
         P.renderPage?.("contacts", { force: true });
       }
       const input = P.$("#avatarInput");
