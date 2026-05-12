@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.67
+
+- Criado script `npm run seed:online` para popular o backend Render/Supabase com dados da v2.
+- Seed online envia estado do painel, fontes oficiais e usuarios herdados da v1.
+- Senhas iniciais dos usuarios criados ficam em `server/storage/online-users-seed.json`, fora do Git.
+- Guia de deploy passou a documentar o seed inicial online.
+
 ### 2.0.0-dev.66
 
 - Frontend ganhou `config.js` para apontar automaticamente GitHub Pages para `https://painelure2-api.onrender.com`.

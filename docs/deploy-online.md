@@ -111,6 +111,34 @@ $body = @{ username = "SEU_USUARIO"; password = "SUA_SENHA" } | ConvertTo-Json
 Invoke-RestMethod -Method Post -Uri "https://painelure2-api.onrender.com/api/auth/login" -ContentType "application/json" -Body $body
 ```
 
+## Seed Inicial Online
+
+Depois que `storage.mode = postgres` e `ready = true`, rode o seed para enviar a base local da v2 ao banco online:
+
+```powershell
+$env:P2_API_URL="https://painelure2-api.onrender.com"
+$env:P2_ADMIN_USER="jefferson"
+$env:P2_ADMIN_PASSWORD="SENHA_ADMIN"
+npm run seed:online
+```
+
+Alternativa com chave administrativa:
+
+```powershell
+$env:P2_API_URL="https://painelure2-api.onrender.com"
+$env:P2_ADMIN_KEY="CHAVE_ADMIN"
+npm run seed:online
+```
+
+O script:
+
+- cria ou atualiza usuarios online a partir de `data/users.js`;
+- envia o estado atual da v2 para `/api/data`;
+- salva fontes oficiais em `/api/sources`;
+- grava senhas iniciais dos usuarios criados em `server/storage/online-users-seed.json`.
+
+`server/storage/*.json` fica fora do Git.
+
 ## Frontend No GitHub Pages
 
 O arquivo `config.js` aponta automaticamente para:
