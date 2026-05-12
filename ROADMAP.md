@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.61
+
+- Admin ganhou editor de URLs para todas as fontes oficiais configuradas em `data/sources.js`.
+- Fontes podem ser salvas localmente ou enviadas para o backend online.
+- Ao verificar a API, o Admin agora importa fontes persistidas no backend e atualiza a lista visual.
+- Campo antigo de calendário foi mantido por compatibilidade, mas o fluxo principal agora é o editor unificado.
+
 ### 2.0.0-dev.60
 
 - Admin ganhou bloco de Backend online com verificação de API, carregar estado e enviar estado atual.

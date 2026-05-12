@@ -300,6 +300,31 @@
       if (meta) meta.textContent = "Fonte do calendário salva.";
     });
 
+    P.$("#saveSourceOverridesBtn")?.addEventListener("click", () => {
+      const overrides = readSourceEditor();
+      saveSourceOverrides(overrides);
+      applySourceOverrides();
+      renderSourceEditor();
+      renderSourceStatus();
+      setAdminMeta("Fontes oficiais salvas localmente.");
+    });
+
+    P.$("#saveBackendSourcesBtn")?.addEventListener("click", async () => {
+      try {
+        const overrides = readSourceEditor();
+        saveSourceOverrides(overrides);
+        applySourceOverrides();
+        const token = await ensureBackendToken();
+        await P.saveBackendSources?.(token, P.sources || {});
+        renderSourceEditor();
+        renderSourceStatus();
+        refreshBackendPanel();
+        setAdminMeta("Fontes oficiais salvas no backend.");
+      } catch (error) {
+        setAdminMeta(`Falha ao salvar fontes online: ${error.message}`);
+      }
+    });
+
     P.$("#presentationModeBtn")?.addEventListener("click", () => {
       const active = document.documentElement.dataset.presentation === "true";
       document.documentElement.dataset.presentation = active ? "false" : "true";
@@ -311,6 +336,7 @@
     applyRole();
     applyUserAvatar();
     applyPrefs();
+    renderSourceEditor();
     renderSourceStatus();
     refreshBackendPanel();
   }
@@ -384,6 +410,29 @@
     });
   }
 
+  function renderSourceEditor() {
+    const host = P.$("#sourceEditorList");
+    if (!host) return;
+    const overrides = loadSourceOverrides();
+    host.innerHTML = Object.entries(P.sources || {}).map(([key, source]) => {
+      const value = overrides[key] ?? source.url ?? "";
+      return `
+        <div class="settings-row source-editor-row" data-search="${P.searchText([key, source.label, value])}">
+          <div><strong>${source.label || key}</strong><small>${source.status || "pending"} • ${source.type || "csv"}</small></div>
+          <input type="url" data-source-url="${key}" value="${value}" placeholder="https://.../pub?output=csv">
+        </div>
+      `;
+    }).join("");
+  }
+
+  function readSourceEditor() {
+    const overrides = {};
+    P.$all("[data-source-url]").forEach(input => {
+      overrides[input.dataset.sourceUrl] = input.value.trim();
+    });
+    return overrides;
+  }
+
   function renderSourceStatus() {
     const host = P.$("#sourceStatusList");
     if (!host) return;
@@ -415,6 +464,22 @@
       const storage = health?.storage || {};
       if (statusLine) {
         statusLine.textContent = `${storage.mode || "API"} • ${storage.ready ? "pronta" : "indisponível"}${storage.updatedAt ? ` • ${new Date(storage.updatedAt).toLocaleString("pt-BR")}` : ""}`;
+      }
+      const sources = await P.loadBackendSources?.();
+      if (sources?.sources?.length) {
+        sources.sources.forEach(item => {
+          if (!P.sources?.[item.key]) return;
+          P.sources[item.key] = {
+            ...P.sources[item.key],
+            label: item.label || P.sources[item.key].label,
+            type: item.type || P.sources[item.key].type,
+            url: item.url || P.sources[item.key].url,
+            status: item.status || P.sources[item.key].status,
+            metadata: item.metadata || P.sources[item.key].metadata
+          };
+        });
+        renderSourceEditor();
+        renderSourceStatus();
       }
     } catch (error) {
       if (statusLine) statusLine.textContent = `API indisponível: ${error.message}`;
@@ -465,6 +530,7 @@
   P.applyUserAvatar = applyUserAvatar;
   P.bindAdminTools = bindAdminTools;
   P.renderSourceStatus = renderSourceStatus;
+  P.renderSourceEditor = renderSourceEditor;
   P.refreshBackendPanel = refreshBackendPanel;
   P.applyPrefs = applyPrefs;
 })();
