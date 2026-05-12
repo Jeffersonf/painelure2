@@ -834,6 +834,20 @@ async function handleApi(req, res, pathname) {
     return;
   }
 
+  if (req.method === "PUT" && pathname.startsWith("/api/users/")) {
+    if (!requireAuth(req, res)) return;
+    if (!isAdminRequest(req)) {
+      send(res, 403, { ok: false, error: "Apenas administrador pode editar usuarios." });
+      return;
+    }
+    const id = decodeURIComponent(pathname.split("/").pop());
+    const body = JSON.parse(await readBody(req) || "{}");
+    const user = await updateUser(id, body);
+    await audit(req, "update", "user", id, "Usuario atualizado.", { role: user.role });
+    send(res, 200, { ok: true, user });
+    return;
+  }
+
   if (req.method === "PUT" && pathname === "/api/users/me") {
     if (!requireAuth(req, res)) return;
     const user = await currentSessionUser(req);

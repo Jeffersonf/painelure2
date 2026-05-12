@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.62
+
+- Backend ganhou endpoint administrativo para atualizar usuários por id.
+- Cliente ganhou funções para listar, criar e atualizar usuários online.
+- Admin ganhou seção Usuários online com criação de usuário e listagem via API.
+- Documentação de backend passou a registrar `PUT /api/users/:id`.
+
 ### 2.0.0-dev.61
 
 - Admin ganhou editor de URLs para todas as fontes oficiais configuradas em `data/sources.js`.

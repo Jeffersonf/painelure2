@@ -76,6 +76,34 @@
     });
   }
 
+  async function loadBackendUsers(token) {
+    const headers = {};
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return fetchJson(apiPath("/api/users"), { headers, timeoutMs: 4000 });
+  }
+
+  async function createBackendUser(token, user) {
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return fetchJson(apiPath("/api/users"), {
+      method: "POST",
+      headers,
+      body: JSON.stringify(user || {}),
+      timeoutMs: 4000
+    });
+  }
+
+  async function updateBackendUserById(token, id, patch) {
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    return fetchJson(apiPath(`/api/users/${encodeURIComponent(id)}`), {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(patch || {}),
+      timeoutMs: 4000
+    });
+  }
+
   async function loadBackendHealth() {
     return fetchJson(apiPath("/api/health"), { timeoutMs: 4000 });
   }
@@ -112,6 +140,9 @@
   P.loginBackend = loginBackend;
   P.loadBackendUser = loadBackendUser;
   P.updateBackendUser = updateBackendUser;
+  P.loadBackendUsers = loadBackendUsers;
+  P.createBackendUser = createBackendUser;
+  P.updateBackendUserById = updateBackendUserById;
   P.loadBackendHealth = loadBackendHealth;
   P.loadBackendSources = loadBackendSources;
   P.saveBackendSources = saveBackendSources;

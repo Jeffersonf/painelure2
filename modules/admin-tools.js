@@ -119,6 +119,11 @@
       userRoleSelect.innerHTML = Object.keys(ROLE_ACCESS).map(role => `<option value="${role}">${role}</option>`).join("");
       userRoleSelect.addEventListener("change", () => applyRole(userRoleSelect.value));
     }
+    const newUserRoleSelect = P.$("#newUserRoleSelect");
+    if (newUserRoleSelect && !newUserRoleSelect.dataset.bound) {
+      newUserRoleSelect.dataset.bound = "true";
+      newUserRoleSelect.innerHTML = Object.keys(ROLE_ACCESS).map(role => `<option value="${role}">${role}</option>`).join("");
+    }
     const activeUserSelect = P.$("#activeUserSelect");
     if (activeUserSelect && !activeUserSelect.dataset.bound) {
       activeUserSelect.dataset.bound = "true";
@@ -263,6 +268,26 @@
         refreshBackendPanel();
       } catch (error) {
         setAdminMeta(`Falha ao enviar estado online: ${error.message}`);
+      }
+    });
+
+    P.$("#createBackendUserBtn")?.addEventListener("click", async () => {
+      try {
+        const name = P.$("#newUserNameInput")?.value.trim();
+        const username = P.$("#newUserLoginInput")?.value.trim();
+        const role = P.$("#newUserRoleSelect")?.value || "Consulta";
+        const password = P.$("#newUserPasswordInput")?.value || "";
+        if (!name || !username || !password) throw new Error("Preencha nome, login e senha inicial.");
+        const token = await ensureBackendToken();
+        await P.createBackendUser?.(token, { name, username, role, password });
+        ["#newUserNameInput", "#newUserLoginInput", "#newUserPasswordInput"].forEach(selector => {
+          const input = P.$(selector);
+          if (input) input.value = "";
+        });
+        setAdminMeta("Usuário online criado.");
+        refreshBackendPanel();
+      } catch (error) {
+        setAdminMeta(`Falha ao criar usuário online: ${error.message}`);
       }
     });
 
@@ -458,6 +483,7 @@
     const statusLine = P.$("#backendStatusLine");
     const snapshotHost = P.$("#backendSnapshotList");
     const auditHost = P.$("#backendAuditList");
+    const userHost = P.$("#backendUserList");
 
     try {
       const health = await P.loadBackendHealth?.();
@@ -485,6 +511,7 @@
       if (statusLine) statusLine.textContent = `API indisponível: ${error.message}`;
       if (snapshotHost) snapshotHost.innerHTML = `<div class="settings-row compact"><div><strong>Sem conexão</strong><small>Snapshots aparecem quando a API estiver acessível.</small></div></div>`;
       if (auditHost) auditHost.innerHTML = `<div class="settings-row compact"><div><strong>Sem conexão</strong><small>Auditoria aparece quando a API estiver acessível.</small></div></div>`;
+      if (userHost) userHost.innerHTML = `<div class="settings-row compact"><div><strong>Sem conexão</strong><small>Usuários online aparecem quando a API estiver acessível.</small></div></div>`;
       return;
     }
 
@@ -518,6 +545,22 @@
       }
     } catch (error) {
       if (auditHost) auditHost.innerHTML = `<div class="settings-row compact"><div><strong>Auditoria protegida</strong><small>Use a chave administrativa para listar eventos.</small></div></div>`;
+    }
+
+    try {
+      const token = backendToken || "";
+      const payload = await P.loadBackendUsers?.(token);
+      const users = payload?.users || [];
+      if (userHost) {
+        userHost.innerHTML = users.length ? users.map(user => `
+          <div class="settings-row compact" data-search="${P.searchText([user.name, user.username, user.role])}">
+            <div><strong>${user.name}</strong><small>${user.username} • ${user.role}${user.contactId ? ` • contato ${user.contactId}` : ""}</small></div>
+            <span class="status-pill info">online</span>
+          </div>
+        `).join("") : `<div class="settings-row compact"><div><strong>Nenhum usuário online</strong><small>Crie o primeiro usuário acima ou configure bootstrap no .env.</small></div></div>`;
+      }
+    } catch (error) {
+      if (userHost) userHost.innerHTML = `<div class="settings-row compact"><div><strong>Usuários protegidos</strong><small>Use a chave administrativa para listar usuários.</small></div></div>`;
     }
   }
 

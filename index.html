@@ -533,6 +533,20 @@
           <div class="settings-title">Auditoria online</div>
           <div class="settings-list" id="backendAuditList"></div>
         </section>
+        <section class="settings-section span-2">
+          <div class="settings-title">Usuários online</div>
+          <div class="settings-row">
+            <div><strong>Novo usuário</strong><small>Cria usuário no backend quando a API estiver configurada.</small></div>
+            <div class="settings-actions user-create-actions">
+              <input id="newUserNameInput" type="text" placeholder="Nome">
+              <input id="newUserLoginInput" type="text" placeholder="Login">
+              <select id="newUserRoleSelect"></select>
+              <input id="newUserPasswordInput" type="password" placeholder="Senha inicial">
+              <button class="ghost-btn" type="button" id="createBackendUserBtn">Criar</button>
+            </div>
+          </div>
+          <div class="settings-list" id="backendUserList"></div>
+        </section>
       </div>
       <div class="calendar-grid" id="adminGrid"></div>
     </section>
