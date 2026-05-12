@@ -165,7 +165,8 @@
       }
     });
 
-    P.$("#onlineLogoutBtn")?.addEventListener("click", () => {
+    P.$("#onlineLogoutBtn")?.addEventListener("click", async () => {
+      if (backendToken) await P.logoutBackend?.(backendToken).catch(() => {});
       backendToken = "";
       sessionStorage.removeItem("painelure2_backend_token");
       P.clearOnlineUser?.();

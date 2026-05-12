@@ -738,6 +738,11 @@ function currentSession(req) {
   return token ? sessions.get(token) || null : null;
 }
 
+function deleteSession(req) {
+  const token = bearerToken(req);
+  if (token) sessions.delete(token);
+}
+
 function isAdminRequest(req) {
   if (!ADMIN_KEY) return true;
   const session = currentSession(req);
@@ -814,6 +819,12 @@ async function handleApi(req, res, pathname) {
     if (!requireAuth(req, res)) return;
     const user = await currentSessionUser(req);
     send(res, 200, { ok: true, user: publicUser(user), session: currentSession(req) });
+    return;
+  }
+
+  if (req.method === "POST" && pathname === "/api/auth/logout") {
+    deleteSession(req);
+    send(res, 200, { ok: true });
     return;
   }
 

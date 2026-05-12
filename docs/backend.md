@@ -54,6 +54,7 @@ Use `CORS_ORIGIN` quando o frontend estiver no GitHub Pages e o backend em outro
 - `PUT /api/data`
 - `POST /api/import/:tipo`
 - `POST /api/auth/login`
+- `POST /api/auth/logout`
 - `GET /api/auth/me`
 - `GET /api/users`
 - `POST /api/users`

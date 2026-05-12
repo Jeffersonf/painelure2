@@ -63,6 +63,15 @@
     });
   }
 
+  async function logoutBackend(token) {
+    if (!token) return { ok: true };
+    return fetchJson(apiPath("/api/auth/logout"), {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      timeoutMs: 4000
+    });
+  }
+
   async function updateBackendUser(token, patch) {
     if (!token) return null;
     return fetchJson(apiPath("/api/users/me"), {
@@ -138,6 +147,7 @@
   P.loadBackendData = loadBackendData;
   P.pushBackendData = pushBackendData;
   P.loginBackend = loginBackend;
+  P.logoutBackend = logoutBackend;
   P.loadBackendUser = loadBackendUser;
   P.updateBackendUser = updateBackendUser;
   P.loadBackendUsers = loadBackendUsers;

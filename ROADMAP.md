@@ -507,6 +507,7 @@ Não fazer:
 - Página Conta ganhou entrada de sessão online com usuário e senha do backend.
 - Login online passa a assumir o perfil ativo e atualizar a navegação por permissões.
 - Logout online volta para o usuário local ativo, mantendo o fallback da v1.
+- Backend ganhou `POST /api/auth/logout` e o cliente passou a encerrar a sessão no servidor.
 - Avatar passa a considerar o usuário online e pode ser persistido no backend quando houver sessão.
 - Corrigida a prioridade da rota `/api/users/me` para permitir atualização do próprio perfil sem permissão administrativa.
 
