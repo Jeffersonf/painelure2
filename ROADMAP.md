@@ -502,6 +502,14 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.72
+
+- Dashboard passou a adaptar resumo, aviso e atalhos ao perfil ativo.
+- Detalhe da escola ganhou fila de proximos acompanhamentos respeitando permissoes.
+- Detalhe do supervisor ganhou progresso semanal/mensal, carteira em atencao e aviso de divergencia/gabinete.
+- Redes e Cameras passaram a separar credenciais e mascarar esse bloco fora dos perfis tecnicos autorizados.
+- Auditoria de fundamentos foi atualizada para marcar as pendencias 3 a 7 como parcialmente atendidas.
+
 ### 2.0.0-dev.71
 
 - Login passou a aceitar primeiro nome quando identificar um único usuário, facilitando acesso de supervisores.

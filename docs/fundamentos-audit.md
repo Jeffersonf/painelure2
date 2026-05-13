@@ -136,14 +136,14 @@ V1:
 V2:
 
 - ja usa `scopedData`;
-- ainda tem estrutura mais generica;
-- precisa melhorar copy por perfil e remover atalhos que nao fazem sentido para cada usuario.
+- passou a adaptar copy, aviso principal e atalhos ao perfil ativo;
+- supervisor recebe linguagem de carteira propria;
+- perfis tecnicos, gabinete e pedagogico recebem contexto operacional diferente.
 
 Pendente:
 
-- dashboard do supervisor deve dizer claramente "sua carteira";
-- indicadores devem usar as escolas vinculadas e metas do proprio supervisor;
-- dashboard de CTC/SEINTEC/Admin deve ter blocos proprios.
+- validar a matriz institucional final antes de travar as mensagens de cada perfil;
+- criar testes automaticos de escopo quando as prioridades 1 e 2 forem liberadas.
 
 ### Escolas
 
@@ -157,11 +157,10 @@ V2:
 
 - lista e detalhe existem;
 - agora recebem escopo;
-- detalhe ainda e resumo, nao tem todas as visoes profundas da v1.
+- detalhe ganhou fila de proximos acompanhamentos com ficha, inventario, rede e chamados conforme permissao.
 
 Pendente:
 
-- trazer blocos uteis da ficha da v1 sem herdar layout pesado;
 - revisar campos que realmente importam para apresentacao e uso diario;
 - garantir que escolas fora do escopo nao aparecam em selects de inventario/redes.
 
@@ -180,13 +179,11 @@ V2:
 
 - lista, detalhe e metas basicas existem;
 - escopo do supervisor entrou;
-- ainda falta parte rica do detalhe da v1.
+- detalhe ganhou progresso semanal/mensal, lista de atencoes da carteira e aviso de divergencia/gabinete.
 
 Pendente:
 
-- trazer lista de visitadas/faltantes com visual Finanza;
 - ajustar indicadores por mes selecionado;
-- manter aviso de divergencia/gabinete;
 - ligar fonte oficial de meses sem reintroduzir travamento.
 
 ### Redes e Cameras
@@ -201,12 +198,10 @@ V2:
 
 - consulta por escola em widgets;
 - paginas existem;
-- ainda precisa controle mais fino para credenciais.
+- credenciais agora ficam separadas do bloco tecnico e sao mascaradas fora de Administrador, SETEC, SEINTEC e Tecnicos CTC.
 
 Pendente:
 
-- separar "rede/ips/cameras" de "credenciais";
-- definir quem ve credenciais;
 - backend deve filtrar dados sensiveis.
 
 ### Inventario
