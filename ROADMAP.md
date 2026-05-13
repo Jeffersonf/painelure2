@@ -514,11 +514,19 @@ Não fazer:
 
 ## Changelog
 
-### 2.0.0-dev.83
+### 2.0.0-dev.85
 
-- Resumos operacionais passaram de coluna longa para grid responsivo, reduzindo altura e aproximando a densidade do Finanza.
-- Fontes locais passaram para `font-display: block` para reduzir a piscada de fonte padrao antes da fonte oficial carregar.
-- QA visual inicial focou em estabilidade de refresh e leitura compacta das paginas principais.
+- Cards de escola foram redesenhados como widgets de decisao, com placar de ficha, itens e alertas.
+- Tela de inventario ganhou triagem explicita antes das categorias e da lista completa.
+- `detail-widget`, `contact-card` e `supervisor-row` tiveram densidade, escala e espacamento refinados.
+- Checklist passou a marcar a primeira rodada de QA visual de escolas, inventario e componentes principais.
+
+### 2.0.0-dev.86
+
+- Calendario URE ganhou visual mensal com dias, eventos e atalhos para o detalhe.
+- Agenda passou a alternar entre modo compartilhado e modo pessoal.
+- Eventos pessoais sao separados por `scope`/`type`/responsavel quando a fonte trouxer esses campos.
+- Checklist passou a marcar a primeira versao da agenda visual compartilhada/pessoal.
 
 ### 2.0.0-dev.84
 
@@ -526,6 +534,12 @@ Não fazer:
 - Registradas pendencias da v1 que ainda precisam entrar melhor na v2: agenda, supervisao, CTC, escolas e inventario.
 - Registrado proximo foco visual: `school-card`, `contact-card`, `detail-widget` e `supervisor-row`.
 - Roadmap passou a apontar o checklist como trilho operacional da versao.
+
+### 2.0.0-dev.83
+
+- Resumos operacionais passaram de coluna longa para grid responsivo, reduzindo altura e aproximando a densidade do Finanza.
+- Fontes locais passaram para `font-display: block` para reduzir a piscada de fonte padrao antes da fonte oficial carregar.
+- QA visual inicial focou em estabilidade de refresh e leitura compacta das paginas principais.
 
 ### 2.0.0-dev.82
 

@@ -15,10 +15,10 @@ Objetivo: deixar claro o que ainda falta para a v2 herdar o que importa da v1 se
 
 ### Agenda
 
-- [ ] Criar agenda com calendario visual, nao apenas cards.
-- [ ] Separar calendario compartilhado da URE.
-- [ ] Criar calendario pessoal por usuario/perfil.
-- [ ] Permitir alternar entre agenda geral e agenda pessoal sem confundir o usuario.
+- [x] Criar agenda com calendario visual, nao apenas cards.
+- [x] Separar calendario compartilhado da URE.
+- [x] Criar calendario pessoal por usuario/perfil.
+- [x] Permitir alternar entre agenda geral e agenda pessoal sem confundir o usuario.
 - [ ] Definir fonte oficial do calendario em `data/sources.js`.
 - [ ] Garantir que eventos pessoais respeitem login e escopo.
 
@@ -41,29 +41,29 @@ Objetivo: deixar claro o que ainda falta para a v2 herdar o que importa da v1 se
 
 ### Escolas
 
-- [ ] Reformular visual da tela de escolas, que ainda esta crua.
-- [ ] Melhorar cards de escola para parecerem produto Finanza, nao cadastro tecnico.
-- [ ] Separar melhor: ficha, inventario, supervisao, rede e chamados.
-- [ ] Reduzir texto secundario nos cards.
-- [ ] Criar estados visuais claros: ok, atencao, pendente, critico.
+- [x] Reformular primeira camada visual da tela de escolas, que ainda estava crua.
+- [x] Melhorar cards de escola para parecerem produto Finanza, nao cadastro tecnico.
+- [x] Separar melhor: ficha, inventario, supervisao, rede e chamados.
+- [x] Reduzir texto secundario nos cards.
+- [x] Criar estados visuais claros: ok, atencao, pendente, critico.
 - [ ] Detalhe da escola precisa virar a principal pagina operacional da unidade.
 
 ### Inventario
 
-- [ ] Reformular tela de inventario, que ainda esta ruim visualmente.
+- [x] Reformular primeira camada da tela de inventario, que ainda estava ruim visualmente.
 - [ ] Melhorar seletor de escola e filtros.
-- [ ] Transformar categorias em blocos mais legiveis.
-- [ ] Separar resumo, alertas e lista de itens.
-- [ ] Destacar manutencao/defeito sem poluir a tela inteira.
+- [x] Transformar categorias em blocos mais legiveis.
+- [x] Separar resumo, alertas e lista de itens.
+- [x] Destacar manutencao/defeito sem poluir a tela inteira.
 - [ ] Validar origem dos dados e normalizacao antes de crescer a interface.
 
 ## Proximo Foco Visual
 
-- [ ] QA visual fino em `school-card`.
-- [ ] QA visual fino em `contact-card`.
-- [ ] QA visual fino em `detail-widget`.
-- [ ] QA visual fino em `supervisor-row`.
-- [ ] Ajustar escala, espacamento, hierarquia e densidade desses componentes.
+- [x] QA visual fino em `school-card`.
+- [x] QA visual fino em `contact-card`.
+- [x] QA visual fino em `detail-widget`.
+- [x] QA visual fino em `supervisor-row`.
+- [x] Ajustar escala, espacamento, hierarquia e densidade desses componentes.
 - [ ] Remover qualquer variacao que pareca fora do padrao Finanza.
 
 ## Fluxos Principais Para Testar

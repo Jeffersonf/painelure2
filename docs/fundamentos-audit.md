@@ -305,6 +305,7 @@ V2 esta mais proxima do Finanza que a v1, mas ainda existem riscos:
 - Detalhes de Escola e Supervisor agora tambem abrem por decisao rapida antes do contexto;
 - Resumos operacionais agora usam grid responsivo para reduzir altura e melhorar densidade visual;
 - Fontes locais usam carregamento bloqueante para reduzir flash de fonte no refresh;
+- Calendario ganhou primeira versao visual mensal com recorte compartilhado/pessoal;
 - algumas tabelas e filtros ainda parecem sistema tecnico;
 - o login esta melhor, mas ainda nao e copia perfeita da v1 nem tao refinado quanto Finanza;
 - headings e tamanhos precisam ser consistentes por tipo de tela.

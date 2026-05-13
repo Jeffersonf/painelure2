@@ -663,26 +663,27 @@
       const network = data.networkData?.[school.name];
       const networkStatus = network ? "mapped" : "pending";
       const supervisor = supervisorForSchool(school.name);
-      const note = missing.length ? `pendente: ${missing.slice(0, 2).join(", ")}` : firstNote(profile?.notes) || "ficha escolar completa";
+      const cardTone = alertCount ? "warn" : (!network || profileStatus !== "ok" ? "info" : "ok");
+      const cardLabel = alertCount ? "Inventario" : (!network ? "Rede" : (profileStatus !== "ok" ? "Ficha" : "OK"));
+      const note = followUpText(missing, alertCount, network, 0);
       return `
-        <button class="school-card" type="button" data-school-name="${school.name}" data-school-key="${P.searchText([school.name])}" data-city="${P.searchText([school.city])}" data-profile-status="${profileStatus}" data-inventory-alerts="${alertCount}" data-network-status="${networkStatus}" data-search="${P.searchText([school.name, school.city, school.cie, school.initials, profile?.director, profile?.email, profile?.phone, supervisor?.name])}">
+        <button class="school-card school-card-${cardTone}" type="button" data-school-name="${school.name}" data-school-key="${P.searchText([school.name])}" data-city="${P.searchText([school.city])}" data-profile-status="${profileStatus}" data-inventory-alerts="${alertCount}" data-network-status="${networkStatus}" data-search="${P.searchText([school.name, school.city, school.cie, school.initials, profile?.director, profile?.email, profile?.phone, supervisor?.name])}">
           <div class="school-top">
             <div class="school-avatar">${school.initials}</div>
             <div>
               <h2>${school.name}</h2>
               <p>${school.city} | CIE ${school.cie}</p>
             </div>
-            <span class="status-pill ${network ? "info" : "warn"}">${network ? "rede" : "sem rede"}</span>
+            <span class="status-pill ${cardTone}">${cardLabel}</span>
           </div>
-          <div class="school-meta">
-            <span>${profilePct}% ficha</span>
-            <span>${metrics.items || 0} item(ns)</span>
-            <span>${alertCount ? `${alertCount} alerta(s)` : "inventario ok"}</span>
-            <span>${supervisor?.name || "sem supervisor"}</span>
+          <div class="school-scoreboard">
+            <span><strong>${profilePct}%</strong><small>ficha</small></span>
+            <span><strong>${metrics.items || 0}</strong><small>itens</small></span>
+            <span><strong>${alertCount || 0}</strong><small>alertas</small></span>
           </div>
           <p class="school-note">${note}</p>
           <div class="school-foot">
-            <span class="status-pill ${profileStatus}">ficha</span>
+            <span>${supervisor?.name || "sem supervisor"}</span>
             <div class="progress" aria-label="Ficha ${profilePct}%"><i style="width:${profilePct}%"></i></div>
           </div>
         </button>
@@ -1022,6 +1023,7 @@
       if (asset.status !== "ok") acc[category].alerts += units;
       return acc;
     }, {})).map(([, item]) => item).sort((a, b) => b.alerts - a.alerts || b.units - a.units);
+    const alertAssets = selectedAssets.filter(asset => asset.status !== "ok").slice(0, 5);
 
     grid.innerHTML = `
       <article class="network-summary">
@@ -1036,8 +1038,26 @@
           <button class="ghost-btn" type="button" data-open-supervisor="${supervisor?.name || ""}" ${supervisor ? "" : "disabled"}>Abrir supervisor</button>
         </div>
       </article>
+      <article class="inventory-list box">
+        <div class="box-head"><div><strong>Triagem da escola</strong><small>${alertAssets.length ? "Itens que pedem acao" : "Sem alerta no filtro atual"}</small></div></div>
+        <div class="row-list compact">
+          ${alertAssets.length ? alertAssets.map(asset => `
+            <div class="data-row compact" data-inventory-key="${P.searchText([asset.school, asset.sourceName || asset.name, asset.notes])}" data-search="${P.searchText([asset.school, asset.name, asset.sourceName, asset.notes, asset.status])}">
+              <span class="row-icon">⚠️</span>
+              <span><strong>${asset.sourceName || asset.name}</strong><small>${asset.notes || asset.name}</small></span>
+              <em class="status-pill ${assetTone(asset.status)}">${assetUnits(asset)} • ${assetStatusLabel(asset.status)}</em>
+            </div>
+          `).join("") : `
+            <div class="data-row compact">
+              <span class="row-icon">✅</span>
+              <span><strong>Sem alerta resumido</strong><small>A escola selecionada nao possui item em manutencao ou defeito neste filtro.</small></span>
+              <em class="status-pill ok">ok</em>
+            </div>
+          `}
+        </div>
+      </article>
       ${categories.map(item => `
-        <article class="detail-widget" data-search="${P.searchText([selectedSchool, item.category, item.units, item.alerts])}">
+        <article class="detail-widget inventory-category" data-search="${P.searchText([selectedSchool, item.category, item.units, item.alerts])}">
           <div>
             <small>${item.category}</small>
             <strong>${item.units} unidade(s)</strong>
@@ -1309,26 +1329,103 @@
   function renderCalendar(calendar) {
     const grid = P.$("#calendarGrid");
     if (!grid) return;
-    renderCalendarOperationalSummary(calendar);
-    if (!calendar.length) {
-      grid.innerHTML = `<div class="empty-state">Nenhum evento carregado ainda.</div>`;
+    bindCalendarTabs();
+    const mode = P.$("[data-calendar-mode].active")?.dataset.calendarMode || "shared";
+    const visible = calendarByMode(calendar, mode);
+    renderCalendarOperationalSummary(visible, mode);
+    if (!visible.length) {
+      grid.innerHTML = `<div class="empty-state">${mode === "personal" ? "Nenhum evento pessoal carregado ainda." : "Nenhum evento compartilhado carregado ainda."}</div>`;
       return;
     }
-    grid.innerHTML = calendar.map(item => `
-      <article class="detail-widget" data-calendar-key="${P.searchText([item.label, item.value])}" data-search="${P.searchText([item.label, item.value, item.note])}">
-        <div>
-          <small>${item.label}</small>
-          <strong>${item.value}</strong>
-          <p>${item.note}</p>
-        </div>
-        <span class="status-pill info">Agenda</span>
-      </article>
-    `).join("");
+    grid.innerHTML = calendarBoardMarkup(visible);
+    grid.querySelectorAll(".calendar-day [data-calendar-key]").forEach(button => {
+      button.addEventListener("click", () => {
+        const target = grid.querySelector(`.detail-widget[data-calendar-key="${button.dataset.calendarKey}"]`);
+        if (!target) return;
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+        target.classList.add("focused");
+        window.setTimeout(() => target.classList.remove("focused"), 1600);
+      });
+    });
   }
 
-  function renderCalendarOperationalSummary(calendar) {
+  function bindCalendarTabs() {
+    P.$all("[data-calendar-mode]").forEach(button => {
+      if (button.dataset.bound) return;
+      button.dataset.bound = "true";
+      button.addEventListener("click", () => {
+        P.$all("[data-calendar-mode]").forEach(tab => tab.classList.toggle("active", tab === button));
+        renderCalendar(P.getAppData().calendar);
+      });
+    });
+  }
+
+  function calendarByMode(calendar, mode) {
+    const user = P.displayUser?.() || {};
+    const userKey = P.normalize([user.name, user.login, user.username].filter(Boolean).join(" "));
+    return (calendar || []).filter(item => {
+      const ownerKey = P.normalize([item.owner, item.user, item.assignee].filter(Boolean).join(" "));
+      const personal = item.scope === "personal" || item.type === "personal" || Boolean(ownerKey && userKey && userKey.includes(ownerKey));
+      return mode === "personal" ? personal : !personal;
+    });
+  }
+
+  function calendarDate(item) {
+    const value = String(item.value || item.date || "");
+    const match = value.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!match) return null;
+    return new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
+  }
+
+  function calendarBoardMarkup(calendar) {
+    const selected = P.selectedMonth?.() || { year: 2026, month: 5 };
+    const first = new Date(selected.year, selected.month - 1, 1);
+    const daysInMonth = new Date(selected.year, selected.month, 0).getDate();
+    const offset = first.getDay();
+    const byDay = calendar.reduce((acc, item) => {
+      const date = calendarDate(item);
+      if (!date || date.getFullYear() !== selected.year || date.getMonth() !== selected.month - 1) return acc;
+      const day = date.getDate();
+      acc[day] = acc[day] || [];
+      acc[day].push(item);
+      return acc;
+    }, {});
+    const cells = [
+      ...Array.from({ length: offset }, (_, index) => `<div class="calendar-day muted" aria-hidden="true"></div>`),
+      ...Array.from({ length: daysInMonth }, (_, index) => {
+        const day = index + 1;
+        const items = byDay[day] || [];
+        return `
+          <div class="calendar-day${items.length ? " has-event" : ""}">
+            <strong>${day}</strong>
+            ${items.slice(0, 2).map(item => `<button type="button" data-calendar-key="${P.searchText([item.label, item.value])}">${item.label}</button>`).join("")}
+            ${items.length > 2 ? `<small>+${items.length - 2}</small>` : ""}
+          </div>
+        `;
+      })
+    ];
+    return `
+      <article class="box calendar-board">
+        <div class="box-head"><div><strong>${P.selectedMonthLabel?.() || "Mês atual"}</strong><small>Calendario visual do recorte selecionado</small></div></div>
+        <div class="calendar-weekdays"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sab</span></div>
+        <div class="calendar-days">${cells.join("")}</div>
+      </article>
+      ${calendar.map(item => `
+        <article class="detail-widget" data-calendar-key="${P.searchText([item.label, item.value])}" data-search="${P.searchText([item.label, item.value, item.note])}">
+          <div>
+            <small>${item.value || "Sem data"}</small>
+            <strong>${item.label}</strong>
+            <p>${item.note}</p>
+          </div>
+          <span class="status-pill info">Agenda</span>
+        </article>
+      `).join("")}
+    `;
+  }
+
+  function renderCalendarOperationalSummary(calendar, mode = "shared") {
     const rows = [
-      { icon: "🗓️", title: "Agenda carregada", note: `${calendar.length} evento(s) ou prazo(s) disponiveis.`, label: `${calendar.length}`, tone: calendar.length ? "info" : "warn" },
+      { icon: "🗓️", title: mode === "personal" ? "Agenda pessoal" : "Agenda compartilhada", note: `${calendar.length} evento(s) ou prazo(s) disponiveis.`, label: `${calendar.length}`, tone: calendar.length ? "info" : "warn" },
       { icon: "🚗", title: "Recursos compartilhados", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("carro")).length} item(ns) relacionados a carro oficial.`, label: "recurso", tone: "info" },
       { icon: "📌", title: "Prazos", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("prazo")).length} item(ns) com sinal de prazo institucional.`, label: "prazo", tone: "warn" },
       { icon: "✅", title: "Fonte", note: calendar.length ? "Agenda pronta para consulta no recorte atual." : "Aguardando fonte oficial do calendario URE.", label: calendar.length ? "ok" : "pendente", tone: calendar.length ? "ok" : "warn" }
