@@ -502,6 +502,12 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.75
+
+- Admin principal passou a mostrar diagnosticos de API, fontes oficiais e escopo ativo.
+- Removida duplicacao antiga dos renderizadores de fontes no Admin.
+- Painel administrativo ficou mais proximo de central operacional: dados, API, fontes, usuarios, snapshots e auditoria no mesmo fluxo.
+
 ### 2.0.0-dev.74
 
 - `npm run check` passou a rodar teste automatico de escopo por perfil.

@@ -1370,11 +1370,32 @@
     const grid = P.$("#adminGrid");
     if (!grid) return;
     const data = P.getAppData();
+    const sources = Object.entries(P.sources || {});
+    const configuredSources = sources.filter(([, source]) => source.url).length;
+    const officialSources = sources.filter(([, source]) => source.status === "official").length;
+    const sensitiveSources = sources.filter(([, source]) => source.metadata?.sensitive).length;
+    const backend = P.backendStatus || {};
+    const currentRole = P.currentRole?.() || "Administrador";
     const systemChecks = [
       { label: "Escolas carregadas", status: data.schools.length === 21 ? "ok" : "warn", note: `${data.schools.length}/21 escola(s)` },
       { label: "Inventário carregado", status: data.schoolAssets.length ? "ok" : "warn", note: `${data.schoolAssets.length} linha(s)` },
       { label: "Supervisão carregada", status: data.supervisors.length === 6 ? "ok" : "warn", note: `${data.supervisors.length}/6 supervisor(es)` },
       { label: "Contatos carregados", status: data.contacts.length ? "ok" : "warn", note: `${data.contacts.length} contato(s)` },
+      {
+        label: "Backend online",
+        status: backend.ok ? "ok" : "warn",
+        note: backend.ok ? `API conectada${backend.updatedAt ? ` em ${new Date(backend.updatedAt).toLocaleString("pt-BR")}` : ""}` : "Use Verificar/Carregar para validar a API."
+      },
+      {
+        label: "Fontes oficiais",
+        status: configuredSources || officialSources ? "ok" : "warn",
+        note: `${configuredSources}/${sources.length} configurada(s), ${officialSources} oficial(is), ${sensitiveSources} sensível(is)`
+      },
+      {
+        label: "Escopo ativo",
+        status: P.canAccessData ? "ok" : "danger",
+        note: `${currentRole} com ${P.roleAccess?.(currentRole)?.length || 0} página(s) liberada(s). Teste automático cobre os perfis atuais.`
+      },
       {
         label: "Fichas escolares",
         status: data.schoolProfiles.length ? "ok" : "warn",

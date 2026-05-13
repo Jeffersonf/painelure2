@@ -283,6 +283,7 @@ Gargalos ainda provaveis:
 - todos os scripts ainda carregam no inicio;
 - busca global monta itens de muitas entidades;
 - Admin e fontes podem fazer chamadas pesadas;
+- Admin ja mostra diagnostico principal de API, fontes oficiais, escopo ativo e bases carregadas;
 - render de listas grandes ainda usa `innerHTML` completo.
 
 Recomendacao:
@@ -298,7 +299,7 @@ Recomendacao:
 V2 esta mais proxima do Finanza que a v1, mas ainda existem riscos:
 
 - paginas internas ainda misturam densidade de dashboard com detalhe operacional;
-- Admin tem formulario demais visivel;
+- Admin tem formulario demais visivel, apesar de ja concentrar API, fontes, usuarios, snapshots e auditoria em um unico fluxo;
 - algumas tabelas e filtros ainda parecem sistema tecnico;
 - o login esta melhor, mas ainda nao e copia perfeita da v1 nem tao refinado quanto Finanza;
 - headings e tamanhos precisam ser consistentes por tipo de tela.

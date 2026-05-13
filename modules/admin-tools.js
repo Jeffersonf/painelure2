@@ -696,48 +696,12 @@
     });
   }
 
-  function renderSourceEditor() {
-    const host = P.$("#sourceEditorList");
-    if (!host) return;
-    const overrides = loadSourceOverrides();
-    host.innerHTML = Object.entries(P.sources || {}).map(([key, source]) => {
-      const value = overrides[key] ?? source.url ?? "";
-      return `
-        <div class="settings-row source-editor-row" data-search="${P.searchText([key, source.label, value])}">
-          <div><strong>${source.label || key}</strong><small>${source.status || "pending"} • ${source.type || "csv"}</small></div>
-          <input type="url" data-source-url="${key}" value="${value}" placeholder="https://.../pub?output=csv">
-        </div>
-      `;
-    }).join("");
-  }
-
   function readSourceEditor() {
     const overrides = {};
     P.$all("[data-source-url]").forEach(input => {
       overrides[input.dataset.sourceUrl] = input.value.trim();
     });
     return overrides;
-  }
-
-  function renderSourceStatus() {
-    const host = P.$("#sourceStatusList");
-    if (!host) return;
-    const statuses = P.sourceStatus?.length
-      ? P.sourceStatus
-      : Object.entries(P.sources || {}).map(([key, source]) => ({ key, status: source.url ? source.status || "configured" : "pending" }));
-    host.innerHTML = statuses.map(item => {
-      const source = P.sources?.[item.key] || {};
-      const label = source.label || item.key;
-      const ok = item.status === "loaded" || item.status === "official";
-      const status = item.status === "skipped" || item.status === "pending" ? "pendente" : item.status;
-      return `
-        <div class="data-row compact" data-search="${P.searchText([label, status])}">
-          <span class="row-icon">↻</span>
-          <span><strong>${label}</strong><small>${source.url ? "fonte configurada" : "sem URL configurada"}</small></span>
-          <em class="status-pill ${ok ? "ok" : "info"}">${status}</em>
-        </div>
-      `;
-    }).join("");
   }
 
   function sourceMetaLine(source, compact = false) {
