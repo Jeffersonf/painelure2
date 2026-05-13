@@ -11,6 +11,19 @@ Objetivo: deixar claro o que ainda falta para a v2 herdar o que importa da v1 se
 - [ ] Toda funcionalidade herdada da v1 precisa respeitar escopo por perfil.
 - [ ] `npm run check` precisa passar antes de cada push.
 
+## Ponto De Partida Da Proxima Sessao
+
+Quando retomarmos, comecar por estes problemas antes de qualquer funcionalidade nova:
+
+- [ ] Barra lateral nao esta confiavel; atalhos com icones sem texto nao sao adivinhaveis.
+- [ ] Supervisao nao esta funcionando bem; tela de supervisor e detalhe ainda ficam piores que a v1 em uso real.
+- [ ] Escolas precisa ser reavaliada do zero: layout, hierarquia e fluxo estao ruins.
+- [ ] Inventario precisa ser simplificado; excesso de blocos nao ajuda a operacao.
+- [ ] Emojis quebrados/encoding corrompido precisam ser corrigidos no app inteiro.
+- [ ] Visual precisa voltar ao padrao Finanza: mais limpo, menos pesado, mais coeso.
+- [ ] Resumos no topo das paginas estao pouco uteis; remover ou trocar por informacao realmente acionavel.
+- [ ] Alertas genericos como critico/revisar/atencao sem regra oficial devem sair ou virar status com logica clara.
+
 ## Pendencias Da V1 Que Ainda Nao Estao Boas Na V2
 
 ### Agenda

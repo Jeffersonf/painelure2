@@ -80,6 +80,20 @@ Antes de importar novas funcionalidades da 1.0, a prioridade da 2.0 é estabiliz
 
 Checklist operacional da versao: [`docs/qa-checklist.md`](docs/qa-checklist.md).
 
+## Proxima Sessao: Recalibrar Antes De Crescer
+
+Na proxima retomada, nao comecar por funcionalidade nova. O foco e corrigir o que esta atrapalhando a experiencia real:
+
+1. Barra lateral: atalhos precisam ter texto ou affordance clara; icone sozinho nao basta.
+2. Supervisao: comparar com a v1 e recuperar o que funcionava melhor antes de redesenhar.
+3. Pagina do supervisor: precisa funcionar primeiro, depois ficar bonita.
+4. Escolas: reavaliar layout e fluxo inteiro, removendo blocos que parecem enfeite.
+5. Inventario: simplificar consulta, filtros e lista; menos resumo inutil, mais resposta direta.
+6. Emojis/encoding: corrigir caracteres quebrados no app inteiro.
+7. Padrao Finanza: reduzir peso visual, remover variacoes soltas e voltar para um sistema coeso.
+8. Alertas genericos: remover `critico`, `revisar`, `atencao` quando nao houver regra oficial clara.
+9. Resumos das paginas: cortar os que nao ajudam decisao real.
+
 Pendencias criticas registradas no checklist:
 
 - agenda com calendario compartilhado e pessoal;
@@ -513,6 +527,13 @@ Não fazer:
 - Misturar importação, normalização e renderização na mesma função grande.
 
 ## Changelog
+
+### 2.0.0-dev.92
+
+- Registrado o ponto real de retomada: recalibrar barra lateral, supervisao, escolas, inventario, emojis, resumos e alertas antes de crescer funcionalidades.
+- Atalhos fixos da sidebar deixaram de depender de icones isolados e passaram a exibir texto curto.
+- Resumos genericos de paginas foram ocultados para reduzir ruido visual enquanto a interface e reavaliada.
+- `index.html` teve os principais textos estaticos com encoding quebrado trocados por ASCII legivel.
 
 ### 2.0.0-dev.91
 

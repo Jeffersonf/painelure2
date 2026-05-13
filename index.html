@@ -65,38 +65,37 @@
     <div class="brand">
       <span class="brand-word"><span>Painel</span><strong>URE</strong></span>
       <div class="brand-actions">
-        <button class="icon-btn" id="themeBtn" type="button" aria-label="Usar tema claro" aria-pressed="false">☀️</button>
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Usar tema claro" aria-pressed="false">☀</button>
       </div>
     </div>
 
     <label class="sidebar-search">
-      <span>🔍</span>
+      <span>⌕</span>
       <input type="search" placeholder="Buscar... (Ctrl+K)">
     </label>
     <div class="global-search" id="globalSearchResults"></div>
 
     <div class="nav-label">Menu</div>
     <nav class="nav" aria-label="Navegacao principal">
-      <button class="nav-item active" type="button" data-page="dashboard"><span>📊</span>Painel</button>
-      <button class="nav-item" type="button" data-page="schools"><span>🏫</span>Escolas</button>
-      <button class="nav-item" type="button" data-page="supervision"><span>🧭</span>Supervisão</button>
-      <button class="nav-item" type="button" data-page="contacts"><span>☎️</span>Contatos</button>
+      <button class="nav-item active" type="button" data-page="dashboard"><span>PA</span>Painel</button>
+      <button class="nav-item" type="button" data-page="schools"><span>ES</span>Escolas</button>
+      <button class="nav-item" type="button" data-page="supervision"><span>SV</span>Supervisao</button>
+      <button class="nav-item" type="button" data-page="contacts"><span>CO</span>Contatos</button>
     </nav>
 
     <section class="sidebar-card">
       <div class="sidebar-card-head">
         <span>Atalhos fixos</span>
       </div>
-      <div class="sidebar-shortcuts">
-        <button type="button" data-jump="network" title="Redes e Cameras">🌐</button>
-        <button type="button" data-jump="inventory" title="Inventario">💻</button>
-        <button type="button" data-jump="ctc" title="Técnicos CTC">🛠️</button>
-        <button type="button" data-jump="calls" title="Chamados">📥</button>
-        <button type="button" data-jump="calendar" title="Calendário">📅</button>
-        <button type="button" data-jump="reports" title="Relatórios">📈</button>
+      <div class="sidebar-shortcuts labeled">
+        <button type="button" data-jump="network"><span>Redes</span></button>
+        <button type="button" data-jump="inventory"><span>Invent.</span></button>
+        <button type="button" data-jump="ctc"><span>CTC</span></button>
+        <button type="button" data-jump="calls"><span>Cham.</span></button>
+        <button type="button" data-jump="calendar"><span>Agenda</span></button>
+        <button type="button" data-jump="reports"><span>Relat.</span></button>
       </div>
     </section>
-
     <div class="account">
       <button class="account-row" type="button" id="accountBtn" aria-expanded="false" aria-controls="accountPop">
         <div class="avatar user-avatar" id="accountAvatar">JE</div>
@@ -107,10 +106,10 @@
         <small>›</small>
       </button>
       <div class="account-pop" id="accountPop">
-        <button class="pop-item" type="button" data-page="user">⚙️ Conta e perfil</button>
-        <button class="pop-item" type="button" data-page="admin">🔐 Painel admin</button>
+        <button class="pop-item" type="button" data-page="user">Conta e perfil</button>
+        <button class="pop-item" type="button" data-page="admin">Painel admin</button>
         <div class="pop-div"></div>
-        <button class="pop-item danger" type="button" id="sidebarLogoutBtn">⏻ Sair</button>
+        <button class="pop-item danger" type="button" id="sidebarLogoutBtn">Sair</button>
       </div>
     </div>
   </aside>
@@ -120,58 +119,58 @@
       <header class="page-header">
         <div>
           <h1>Painel</h1>
-        <p>Centro do dia para consultar escolas, redes, inventário, visitas e agenda da URE.</p>
+        <p>Centro do dia para consultar escolas, redes, inventario, visitas e agenda da URE.</p>
         </div>
         <div class="header-actions">
-          <div class="month-switcher" aria-label="Selecionar mês">
-            <button class="month-step" type="button" id="prevMonthBtn" aria-label="Mês anterior">‹</button>
+          <div class="month-switcher" aria-label="Selecionar mes">
+            <button class="month-step" type="button" id="prevMonthBtn" aria-label="Mes anterior">‹</button>
             <button class="month-pill" type="button" id="currentMonthBtn">Maio 2026</button>
-            <button class="month-step" type="button" id="nextMonthBtn" aria-label="Próximo mês">›</button>
+            <button class="month-step" type="button" id="nextMonthBtn" aria-label="Proximo mes">›</button>
           </div>
         </div>
       </header>
 
       <button class="notice-card" type="button" data-jump="reports">
-        <span class="notice-icon">⏱</span>
+        <span class="notice-icon">i</span>
         <span>
           <strong id="dashboardNoticeTitle">Base operacional carregada</strong>
-          <small id="dashboardNoticeNote">Escolas, supervisão, inventário e redes disponíveis para consulta. Calendário aguarda fonte oficial.</small>
+          <small id="dashboardNoticeNote">Escolas, supervisao, inventario e redes disponiveis para consulta. Calendario aguarda fonte oficial.</small>
         </span>
-        <em>Relatórios</em>
+        <em>Relatorios</em>
       </button>
 
       <div class="manager-strip">
         <div>
-          <strong>Página inicial da URE</strong>
-          <span id="dashboardSummary">consulta rápida • dados locais primeiro • fontes oficiais em segundo plano</span>
+          <strong>Pagina inicial da URE</strong>
+          <span id="dashboardSummary">consulta rapida | dados locais primeiro | fontes oficiais em segundo plano</span>
         </div>
       </div>
 
       <section class="workbench widget" data-widget-area="shortcuts">
         <div class="widget-head">
           <div>
-            <strong>🧭 Acesso rápido</strong>
+            <strong>Acesso rapido</strong>
           </div>
         </div>
         <div class="shortcut-grid">
           <button class="shortcut-card" type="button" data-jump="schools">
-            <span>🏫</span>
+            <span>ES</span>
             <strong>Escolas</strong>
-            <small id="shortcutSchoolsNote">Unidades, fichas e inventário por escola</small>
+            <small id="shortcutSchoolsNote">Unidades, fichas e inventario por escola</small>
           </button>
           <button class="shortcut-card" type="button" data-jump="network">
-            <span>🌐</span>
-            <strong>Redes e Câmeras</strong>
+            <span>RE</span>
+            <strong>Redes e Cameras</strong>
             <small id="shortcutNetworkNote">Rede, IPs, DVR e infraestrutura</small>
           </button>
           <button class="shortcut-card" type="button" data-jump="inventory">
-            <span>💻</span>
-            <strong>Inventário</strong>
+            <span>IN</span>
+            <strong>Inventario</strong>
             <small id="shortcutInventoryNote">Equipamentos, status e alertas</small>
           </button>
           <button class="shortcut-card" type="button" data-jump="supervision">
-            <span>🧭</span>
-            <strong>Supervisão</strong>
+            <span>SV</span>
+            <strong>Supervisao</strong>
             <small id="shortcutSupervisionNote">Metas, visitas e escolas vinculadas</small>
           </button>
         </div>
@@ -181,8 +180,8 @@
         <article class="box">
           <div class="box-head">
             <div>
-              <strong>Próximas decisões</strong>
-              <small>O que merece atenção hoje</small>
+              <strong>Proximas decisoes</strong>
+              <small>O que merece atencao hoje</small>
             </div>
           </div>
           <div class="row-list" id="decisionRows"></div>
@@ -192,7 +191,7 @@
           <div class="box-head">
             <div>
               <strong>Agenda geral</strong>
-              <small>Calendário operacional da URE</small>
+              <small>Calendario operacional da URE</small>
             </div>
             <button class="ghost-btn" type="button" data-jump="calendar">Ver</button>
           </div>
@@ -203,11 +202,11 @@
 
     <section class="page" id="page-schools">
       <header class="page-header compact">
-        <div><h1>Escolas</h1><p>Consulta rápida das unidades, fichas e vínculos.</p></div>
+        <div><h1>Escolas</h1><p>Consulta rapida das unidades, fichas e vinculos.</p></div>
       </header>
       <div class="selector-panel school-filters">
         <label>
-          <span>Município</span>
+          <span>Municipio</span>
           <select id="schoolCityFilter"></select>
         </label>
         <label>
@@ -215,12 +214,12 @@
           <select id="schoolProfileFilter">
             <option value="all">Todas</option>
             <option value="ok">Mais completas</option>
-            <option value="warn">Em revisão</option>
-            <option value="danger">Críticas</option>
+            <option value="warn">Em revisao</option>
+            <option value="danger">Criticas</option>
           </select>
         </label>
         <label>
-          <span>Inventário</span>
+          <span>Inventario</span>
           <select id="schoolInventoryFilter">
             <option value="all">Todas</option>
             <option value="alerts">Com alerta</option>
@@ -255,7 +254,7 @@
 
     <section class="page" id="page-network">
       <header class="page-header compact">
-        <div><h1>Redes e Câmeras</h1><p>Infraestrutura, IPs e câmeras por escola.</p></div>
+        <div><h1>Redes e Cameras</h1><p>Infraestrutura, IPs e cameras por escola.</p></div>
       </header>
       <div class="selector-panel">
         <label>
@@ -272,7 +271,7 @@
 
     <section class="page" id="page-inventory">
       <header class="page-header compact">
-        <div><h1>Inventário</h1><p>Equipamentos, status e alertas por escola.</p></div>
+        <div><h1>Inventario</h1><p>Equipamentos, status e alertas por escola.</p></div>
       </header>
       <div class="selector-panel">
         <label>
@@ -281,14 +280,14 @@
         </label>
         <label>
           <span>Filtro</span>
-          <input id="inventoryFilterInput" type="search" placeholder="Equipamento, status ou observação">
+          <input id="inventoryFilterInput" type="search" placeholder="Equipamento, status ou observacao">
         </label>
         <label>
           <span>Status</span>
           <select id="inventoryStatusSelect">
             <option value="">Todos</option>
             <option value="ok">OK</option>
-            <option value="manutencao">Manutenção</option>
+            <option value="manutencao">Manutencao</option>
             <option value="defeito">Defeito</option>
           </select>
         </label>
@@ -306,22 +305,22 @@
 
     <section class="page" id="page-supervision">
       <header class="page-header compact">
-        <div><h1>Supervisão</h1><p>Metas, visitas e escolas vinculadas.</p></div>
+        <div><h1>Supervisao</h1><p>Metas, visitas e escolas vinculadas.</p></div>
       </header>
       <div class="selector-panel supervisor-filters">
         <label>
-          <span>Situação</span>
+          <span>Situacao</span>
           <select id="supervisorStatusFilter">
             <option value="all">Todos</option>
             <option value="ok">Meta ok</option>
-            <option value="warn">Com pendência</option>
-            <option value="danger">Crítico</option>
+            <option value="warn">Com pendencia</option>
+            <option value="danger">Critico</option>
           </select>
         </label>
         <label>
-          <span>Ordenação</span>
+          <span>Ordenacao</span>
           <select id="supervisorSortFilter">
-            <option value="name">Ordem alfabética</option>
+            <option value="name">Ordem alfabetica</option>
             <option value="pending">Mais pendentes</option>
             <option value="schools">Mais escolas</option>
           </select>
@@ -342,18 +341,18 @@
     <section class="page" id="page-supervisor-detail">
       <header class="page-header compact detail-page-header">
         <button class="back-btn" type="button" data-back>‹</button>
-        <div><h1 id="supervisorDetailTitle">Supervisor</h1><p id="supervisorDetailSubtitle">Metas, vínculos e acompanhamento.</p></div>
+        <div><h1 id="supervisorDetailTitle">Supervisor</h1><p id="supervisorDetailSubtitle">Metas, vinculos e acompanhamento.</p></div>
       </header>
       <div class="supervisor-detail" id="supervisorDetailPageBody"></div>
     </section>
 
     <section class="page" id="page-ctc">
       <header class="page-header compact">
-        <div><h1>Técnicos CTC</h1><p>Agenda técnica, visitas e demandas.</p></div>
+        <div><h1>Tecnicos CTC</h1><p>Agenda tecnica, visitas e demandas.</p></div>
       </header>
       <div class="selector-panel operation-filters">
         <label>
-          <span>Técnico</span>
+          <span>Tecnico</span>
           <select id="ctcOwnerFilter"></select>
         </label>
         <label>
@@ -361,7 +360,7 @@
           <select id="ctcSchoolFilter"></select>
         </label>
         <button class="ghost-btn filter-reset" type="button" id="ctcFilterReset">Limpar</button>
-        <p id="ctcFilterSummary">Visitas técnicas carregadas.</p>
+        <p id="ctcFilterSummary">Visitas tecnicas carregadas.</p>
       </div>
       <article class="box summary-box">
         <div class="box-head"><div><strong>Resumo tecnico</strong><small>Visitas e escolas no recorte atual</small></div></div>
@@ -410,8 +409,8 @@
         <button type="button" data-sector="Compras">Compras</button>
         <button type="button" data-sector="Pagamento">Pagamento</button>
         <button type="button" data-sector="RH">RH</button>
-        <button type="button" data-sector="Supervisão">Supervisão</button>
-        <button type="button" data-sector="Pedagógico">Pedagógico</button>
+        <button type="button" data-sector="Supervisão">Supervisao</button>
+        <button type="button" data-sector="Pedagógico">Pedagogico</button>
       </div>
       <article class="box summary-box">
         <div class="box-head"><div><strong>Resumo dos contatos</strong><small>Canais disponiveis no recorte atual</small></div></div>
@@ -422,7 +421,7 @@
 
     <section class="page" id="page-calendar">
       <header class="page-header compact">
-        <div><h1>Calendário URE</h1><p>Eventos e recursos compartilhados da diretoria.</p></div>
+        <div><h1>Calendario URE</h1><p>Eventos e recursos compartilhados da diretoria.</p></div>
       </header>
       <div class="contact-tabs calendar-tabs">
         <button class="active" type="button" data-calendar-mode="shared">Compartilhado</button>
@@ -437,7 +436,7 @@
 
     <section class="page" id="page-reports">
       <header class="page-header compact">
-        <div><h1>Relatórios</h1><p>Resumo rápido da operação.</p></div>
+        <div><h1>Relatorios</h1><p>Resumo rapido da operacao.</p></div>
       </header>
       <div class="metric-grid" id="reportsGrid"></div>
       <div class="box">
@@ -449,34 +448,34 @@
     <section class="page" id="page-user">
       <header class="page-header compact detail-page-header">
         <button class="back-btn" type="button" data-back>‹</button>
-        <div><h1>Conta</h1><p>Perfil ativo, acessos e preferências locais.</p></div>
+        <div><h1>Conta</h1><p>Perfil ativo, acessos e preferencias locais.</p></div>
       </header>
       <div class="settings-shell">
         <section class="settings-section account-panel">
           <div class="account-hero">
             <div class="avatar large user-avatar" id="userAvatar">JE</div>
             <div>
-              <small id="userIdentitySource">Usuário local</small>
+              <small id="userIdentitySource">Usuario local</small>
               <strong id="userNameLabel">Jefferson</strong>
               <span id="userRoleSummary">Administrador</span>
             </div>
           </div>
           <div class="settings-row">
-            <div><strong>Contato vinculado</strong><small id="userContactSummary">Dados sincronizados com a página Contatos.</small></div>
+            <div><strong>Contato vinculado</strong><small id="userContactSummary">Dados sincronizados com a pagina Contatos.</small></div>
             <span class="status-pill info" id="userContactStatus">Vinculado</span>
           </div>
           <div class="settings-row">
-            <div><strong>Sessão online</strong><small id="onlineSessionSummary">Entre com usuário do backend quando a API estiver ativa.</small></div>
+            <div><strong>Sessao online</strong><small id="onlineSessionSummary">Entre com usuario do backend quando a API estiver ativa.</small></div>
             <div class="settings-actions online-login-actions">
-              <input id="onlineLoginInput" type="text" placeholder="Usuário">
+              <input id="onlineLoginInput" type="text" placeholder="Usuario">
               <input id="onlinePasswordInput" type="password" placeholder="Senha">
               <button class="ghost-btn" type="button" id="onlineLoginBtn">Entrar</button>
               <button class="ghost-btn" type="button" id="onlineLogoutBtn">Sair</button>
             </div>
           </div>
           <div class="settings-row">
-            <div><strong>Usuário ativo</strong><small>Usuários herdados da v1 e vinculados aos contatos.</small></div>
-            <select id="activeUserSelect" aria-label="Trocar usuário ativo"></select>
+            <div><strong>Usuario ativo</strong><small>Usuarios herdados da v1 e vinculados aos contatos.</small></div>
+            <select id="activeUserSelect" aria-label="Trocar usuario ativo"></select>
           </div>
           <div class="settings-row">
             <div><strong>Perfil ativo</strong><small id="userAccessSummary">Acesso completo ao PainelURE.</small></div>
@@ -486,7 +485,7 @@
             </div>
           </div>
           <div class="settings-row">
-            <div><strong>Tema</strong><small>Alternância visual salva neste navegador.</small></div>
+            <div><strong>Tema</strong><small>Alternancia visual salva neste navegador.</small></div>
             <button class="ghost-btn" type="button" id="userThemeBtn">Alternar tema</button>
           </div>
           <div class="settings-row">
@@ -498,7 +497,7 @@
             </div>
           </div>
           <div class="settings-row">
-            <div><strong>Administração</strong><small>Backups, fontes oficiais, importações e modo apresentação.</small></div>
+            <div><strong>Administracao</strong><small>Backups, fontes oficiais, importacoes e modo apresentacao.</small></div>
             <button class="ghost-btn" type="button" data-jump="admin">Abrir admin</button>
           </div>
         </section>
@@ -511,42 +510,42 @@
 
     <section class="page" id="page-profiles">
       <header class="page-header compact">
-        <div><h1>Perfis</h1><p>Acessos por categoria de usuário.</p></div>
+        <div><h1>Perfis</h1><p>Acessos por categoria de usuario.</p></div>
       </header>
       <div class="calendar-grid" id="profilesGrid"></div>
     </section>
 
     <section class="page" id="page-quality">
       <header class="page-header compact">
-        <div><h1>Qualidade</h1><p>Checklist de publicação e riscos.</p></div>
+        <div><h1>Qualidade</h1><p>Checklist de publicacao e riscos.</p></div>
       </header>
       <div class="calendar-grid" id="qualityGrid"></div>
     </section>
 
     <section class="page" id="page-admin">
       <header class="page-header compact">
-        <div><h1>Admin</h1><p>Controles globais, fontes oficiais e saúde do painel.</p></div>
+        <div><h1>Admin</h1><p>Controles globais, fontes oficiais e saude do painel.</p></div>
       </header>
       <div class="settings-shell admin-layout">
         <section class="settings-section" data-admin-collapsible data-admin-open="true">
-          <div class="settings-title">Visão administrativa</div>
+          <div class="settings-title">Visao administrativa</div>
           <div class="settings-row">
-            <div><strong>Conta atual</strong><small id="adminAccountLine">Jefferson • Administrador</small></div>
+            <div><strong>Conta atual</strong><small id="adminAccountLine">Jefferson | Administrador</small></div>
             <span class="status-pill ok">Admin</span>
           </div>
           <div class="settings-row">
-            <div><strong>Perfil ativo</strong><small>Simula permissões como na v1, sem perder acesso pela página Conta.</small></div>
+            <div><strong>Perfil ativo</strong><small>Simula permissoes como na v1, sem perder acesso pela pagina Conta.</small></div>
             <select id="activeRoleSelect"></select>
           </div>
           <div class="settings-row">
-            <div><strong>Publicação</strong><small>Base 2.0 separada da versão oficial 1.0.</small></div>
+            <div><strong>Publicacao</strong><small>Base 2.0 separada da versao oficial 1.0.</small></div>
             <button class="ghost-btn" type="button" id="reloadSourcesBtn">Atualizar fontes</button>
           </div>
         </section>
         <section class="settings-section" data-admin-collapsible data-admin-open="true">
           <div class="settings-title">Backup local</div>
           <div class="settings-row">
-            <div><strong>Estado do painel</strong><small id="adminBackupMeta">Nenhuma ação de backup nesta sessão.</small></div>
+            <div><strong>Estado do painel</strong><small id="adminBackupMeta">Nenhuma acao de backup nesta sessao.</small></div>
             <div class="settings-actions">
               <button class="ghost-btn" type="button" id="localSaveBtn">Salvar local</button>
               <button class="ghost-btn" type="button" id="backupExportBtn">Exportar</button>
@@ -555,14 +554,14 @@
             </div>
           </div>
           <div class="settings-row">
-            <div><strong>Limpeza local</strong><small>Remove alterações salvas neste navegador.</small></div>
+            <div><strong>Limpeza local</strong><small>Remove alteracoes salvas neste navegador.</small></div>
             <button class="ghost-btn" type="button" id="resetLocalBtn">Limpar estado</button>
           </div>
         </section>
         <section class="settings-section" data-admin-collapsible>
           <div class="settings-title">Backend online</div>
           <div class="settings-row">
-            <div><strong>Status da API</strong><small id="backendStatusLine">Aguardando verificação.</small></div>
+            <div><strong>Status da API</strong><small id="backendStatusLine">Aguardando verificacao.</small></div>
             <button class="ghost-btn" type="button" id="backendHealthBtn">Verificar</button>
           </div>
           <div class="settings-row">
@@ -574,23 +573,23 @@
           </div>
         </section>
         <section class="settings-section" data-admin-collapsible>
-          <div class="settings-title">Importações da base</div>
+          <div class="settings-title">Importacoes da base</div>
           <div class="settings-row">
             <div><strong>CSV normalizado</strong><small>Fluxo herdado da v1, mas tratado antes de renderizar.</small></div>
             <div class="settings-actions">
               <select id="importTargetSelect">
                 <option value="schools">Escolas</option>
                 <option value="contacts">Contatos</option>
-                <option value="network">Redes e câmeras</option>
-                <option value="calendar">Calendário</option>
-                <option value="supervision">Supervisão</option>
+                <option value="network">Redes e cameras</option>
+                <option value="calendar">Calendario</option>
+                <option value="supervision">Supervisao</option>
               </select>
               <label class="ghost-btn file-btn" for="csvImportInput">Importar CSV</label>
               <input id="csvImportInput" type="file" accept=".csv,text/csv" hidden>
             </div>
           </div>
           <div class="settings-row">
-            <div><strong>Calendário oficial</strong><small>URL pública CSV para agenda institucional.</small></div>
+            <div><strong>Calendario oficial</strong><small>URL publica CSV para agenda institucional.</small></div>
             <div class="settings-actions wide">
               <input id="calendarSourceInput" type="url" placeholder="https://.../pub?output=csv">
               <button class="ghost-btn" type="button" id="saveCalendarSourceBtn">Salvar</button>
@@ -598,29 +597,29 @@
           </div>
         </section>
         <section class="settings-section">
-          <div class="settings-title">Preferências e apresentação</div>
+          <div class="settings-title">Preferencias e apresentacao</div>
           <div class="settings-row">
-            <div><strong>Modo apresentação</strong><small>Oculta áreas administrativas em demonstrações.</small></div>
+            <div><strong>Modo apresentacao</strong><small>Oculta areas administrativas em demonstracoes.</small></div>
             <button class="ghost-btn" type="button" id="presentationModeBtn">Alternar</button>
           </div>
           <div class="admin-tools compact">
             <label class="check-row"><input type="checkbox" data-pref-widget="shortcuts" checked><span>Atalhos</span></label>
             <label class="check-row"><input type="checkbox" data-pref-widget="metrics" checked><span>Indicadores</span></label>
-            <label class="check-row"><input type="checkbox" data-pref-widget="operations" checked><span>Decisões</span></label>
+            <label class="check-row"><input type="checkbox" data-pref-widget="operations" checked><span>Decisoes</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="network" checked><span>Redes</span></label>
-            <label class="check-row"><input type="checkbox" data-pref-shortcut="inventory" checked><span>Inventário</span></label>
+            <label class="check-row"><input type="checkbox" data-pref-shortcut="inventory" checked><span>Inventario</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="ctc" checked><span>CTC</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="calls" checked><span>Chamados</span></label>
-            <label class="check-row"><input type="checkbox" data-pref-shortcut="calendar" checked><span>Calendário</span></label>
-            <label class="check-row"><input type="checkbox" data-pref-shortcut="reports" checked><span>Relatórios</span></label>
-            <button class="ghost-btn" type="button" id="savePrefsBtn">Salvar preferências</button>
+            <label class="check-row"><input type="checkbox" data-pref-shortcut="calendar" checked><span>Calendario</span></label>
+            <label class="check-row"><input type="checkbox" data-pref-shortcut="reports" checked><span>Relatorios</span></label>
+            <button class="ghost-btn" type="button" id="savePrefsBtn">Salvar preferencias</button>
           </div>
         </section>
         <section class="settings-section span-2" data-admin-collapsible>
           <div class="settings-title">Fontes oficiais</div>
           <div class="settings-list" id="sourceEditorList"></div>
           <div class="settings-row">
-            <div><strong>Salvar fontes</strong><small>Grava localmente e, se possível, também no backend online.</small></div>
+            <div><strong>Salvar fontes</strong><small>Grava localmente e, se possivel, tambem no backend online.</small></div>
             <div class="settings-actions">
               <button class="ghost-btn" type="button" id="saveSourceOverridesBtn">Salvar local</button>
               <button class="ghost-btn" type="button" id="saveBackendSourcesBtn">Salvar online</button>
@@ -637,13 +636,13 @@
           <div class="settings-list" id="backendAuditList"></div>
         </section>
         <section class="settings-section span-2" data-admin-collapsible>
-          <div class="settings-title">Histórico de importações</div>
+          <div class="settings-title">Historico de importacoes</div>
           <div class="settings-list" id="backendImportList"></div>
         </section>
         <section class="settings-section span-2" data-admin-collapsible>
-          <div class="settings-title">Usuários online</div>
+          <div class="settings-title">Usuarios online</div>
           <div class="settings-row">
-            <div><strong>Novo usuário</strong><small>Cria usuário no backend quando a API estiver configurada.</small></div>
+            <div><strong>Novo usuario</strong><small>Cria usuario no backend quando a API estiver configurada.</small></div>
             <div class="settings-actions user-create-actions">
               <input id="newUserNameInput" type="text" placeholder="Nome">
               <input id="newUserLoginInput" type="text" placeholder="Login">
@@ -660,10 +659,10 @@
   </main>
 
   <nav class="mobile-nav" aria-label="Navegacao mobile">
-    <button class="active" type="button" data-page="dashboard">📊<span>Painel</span></button>
-    <button type="button" data-page="schools">🏫<span>Escolas</span></button>
-    <button type="button" data-page="supervision">🧭<span>Supervisão</span></button>
-    <button type="button" data-page="contacts">☎️<span>Contatos</span></button>
+    <button class="active" type="button" data-page="dashboard">PA<span>Painel</span></button>
+    <button type="button" data-page="schools">ES<span>Escolas</span></button>
+    <button type="button" data-page="supervision">SV<span>Supervisao</span></button>
+    <button type="button" data-page="contacts">CO<span>Contatos</span></button>
   </nav>
 
   <script src="./data/mock.js"></script>
