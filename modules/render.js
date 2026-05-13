@@ -251,8 +251,6 @@
   }
 
   function renderSchoolOperationalSummary(schools) {
-    const host = P.$("#schoolSummaryRows");
-    if (!host) return;
     const data = P.getAppData();
     const total = schools.length;
     const cities = new Set(schools.map(school => school.city).filter(Boolean)).size;
@@ -266,13 +264,7 @@
       { icon: "💻", title: "Inventario", note: inventoryAlerts ? `${inventoryAlerts} unidade(s) em manutencao ou defeito.` : "Sem alerta de inventario neste recorte.", label: inventoryAlerts ? "atencao" : "ok", tone: inventoryAlerts ? "warn" : "ok" },
       { icon: "🌐", title: "Redes e supervisao", note: `${networkMapped}/${total} rede(s) mapeada(s) e ${linkedSupervision}/${total} escola(s) com supervisor.`, label: networkMapped === total && linkedSupervision === total ? "ok" : "base", tone: networkMapped === total && linkedSupervision === total ? "ok" : "info" }
     ];
-    host.innerHTML = rows.map(row => `
-      <div class="data-row compact" data-search="${P.searchText([row.title, row.note, row.label])}">
-        <span class="row-icon">${row.icon}</span>
-        <span><strong>${row.title}</strong><small>${row.note}</small></span>
-        <em class="status-pill ${row.tone}">${row.label}</em>
-      </div>
-    `).join("");
+    renderSummaryRows("#schoolSummaryRows", rows);
   }
 
   function supervisorForSchool(name) {
@@ -517,6 +509,18 @@
         <em class="status-pill ${item.tone}">${item.label}</em>
       </button>
     `;
+  }
+
+  function renderSummaryRows(selector, rows) {
+    const host = P.$(selector);
+    if (!host) return;
+    host.innerHTML = rows.map(row => `
+      <div class="data-row compact" data-search="${P.searchText([row.title, row.note, row.label])}">
+        <span class="row-icon">${row.icon}</span>
+        <span><strong>${row.title}</strong><small>${row.note}</small></span>
+        <em class="status-pill ${row.tone}">${row.label}</em>
+      </div>
+    `).join("");
   }
 
   function renderDashboard(data) {
@@ -851,17 +855,31 @@
   function renderNetworkOptions(networkData) {
     const select = P.$("#networkSelect");
     if (!select) return;
-    select.innerHTML = Object.keys(networkData).map(name => `<option value="${name}">${name}</option>`).join("");
-    select.onchange = () => renderNetwork(networkData);
-    renderNetwork(networkData);
+    const data = networkData || {};
+    select.innerHTML = Object.keys(data).map(name => `<option value="${name}">${name}</option>`).join("");
+    select.onchange = () => renderNetwork(data);
+    renderNetwork(data);
+  }
+
+  function renderNetworkOperationalSummary(networkData, selectedName, selectedData) {
+    const names = Object.keys(networkData || {});
+    const rows = [
+      { icon: "🌐", title: "Escolas mapeadas", note: `${names.length} escola(s) com dados de infraestrutura.`, label: `${names.length}`, tone: names.length ? "info" : "warn" },
+      { icon: "🔢", title: "IPs", note: `${selectedData?.ips?.length || 0} registro(s) de IP para ${selectedName || "a escola selecionada"}.`, label: selectedData?.ips?.length ? "ok" : "pendente", tone: selectedData?.ips?.length ? "ok" : "warn" },
+      { icon: "📹", title: "Cameras", note: `${selectedData?.cameras?.length || 0} informacao(oes) de cameras disponiveis.`, label: selectedData?.cameras?.length ? "ok" : "base", tone: selectedData?.cameras?.length ? "ok" : "info" },
+      { icon: "🔐", title: "Credenciais", note: canViewCredentials() ? "Perfil autorizado a consultar credenciais tecnicas." : "Credenciais ficam protegidas para este perfil.", label: canViewCredentials() ? "liberado" : "restrito", tone: canViewCredentials() ? "ok" : "warn" }
+    ];
+    renderSummaryRows("#networkSummaryRows", rows);
   }
 
   function renderNetwork(networkData) {
     const select = P.$("#networkSelect");
     const layout = P.$("#networkLayout");
     if (!select || !layout) return;
-    const selectedName = select.value || Object.keys(networkData)[0];
-    const data = networkData[select.value] || networkData[Object.keys(networkData)[0]];
+    const names = Object.keys(networkData || {});
+    const selectedName = select.value || names[0] || "";
+    const data = networkData?.[selectedName] || networkData?.[names[0]];
+    renderNetworkOperationalSummary(networkData, selectedName, data);
     if (!data) {
       layout.innerHTML = `<div class="empty-state">Nenhum dado de rede cadastrado ainda.</div>`;
       return;
@@ -916,12 +934,28 @@
     });
   }
 
+  function renderInventoryOperationalSummary(assets, selectedSchool, selectedAssets, totals) {
+    const globalTotals = inventoryTotals(assets);
+    const schools = new Set(assets.map(asset => asset.school).filter(Boolean)).size;
+    const categoryCount = new Set(selectedAssets.map(asset => assetCategory(asset))).size;
+    const rows = [
+      { icon: "💻", title: "Inventario da escola", note: `${totals.lines} linha(s), ${totals.units} unidade(s) e ${categoryCount} categoria(s).`, label: `${totals.units}`, tone: "info" },
+      { icon: "⚠️", title: "Alertas", note: totals.alertUnits ? `${totals.alertUnits} unidade(s) em manutencao ou defeito em ${selectedSchool}.` : "Sem alerta na escola selecionada.", label: totals.alertUnits ? "revisar" : "ok", tone: totals.alertUnits ? "warn" : "ok" },
+      { icon: "🏫", title: "Base carregada", note: `${schools} escola(s) com inventario e ${globalTotals.lines} linha(s) totais.`, label: `${schools}`, tone: "info" },
+      { icon: "✅", title: "Conferencia", note: globalTotals.alertUnits ? `${globalTotals.alertUnits} alerta(s) na base completa.` : "Base completa sem alerta resumido.", label: globalTotals.alertUnits ? "atencao" : "ok", tone: globalTotals.alertUnits ? "warn" : "ok" }
+    ];
+    renderSummaryRows("#inventorySummaryRows", rows);
+  }
+
   function renderInventory(data) {
     const grid = P.$("#inventoryGrid");
     const select = P.$("#inventorySelect");
     if (!grid) return;
     const assets = data.schoolAssets || [];
     if (!assets.length) {
+      renderSummaryRows("#inventorySummaryRows", [
+        { icon: "💻", title: "Inventario", note: "Nenhuma linha carregada para o perfil atual.", label: "vazio", tone: "warn" }
+      ]);
       grid.innerHTML = `<div class="empty-state">Nenhum dado de inventário carregado ainda.</div>`;
       return;
     }
@@ -955,6 +989,7 @@
       return P.searchText([asset.name, asset.sourceName, asset.notes, asset.status]).includes(query);
     });
     const totals = inventoryTotals(selectedAssets);
+    renderInventoryOperationalSummary(assets, selectedSchool, selectedAssets, totals);
     const network = data.networkData?.[selectedSchool];
     const supervisor = supervisorForSchool(selectedSchool);
     const categories = Object.entries(selectedAssets.reduce((acc, asset) => {
@@ -1030,8 +1065,6 @@
   }
 
   function renderSupervisionOperationalSummary(supervisors) {
-    const host = P.$("#supervisionSummaryRows");
-    if (!host) return;
     const totals = supervisors.reduce((acc, item) => {
       const week = progressParts(item.week);
       const month = progressParts(item.month);
@@ -1051,13 +1084,7 @@
       { icon: "🏫", title: "Carteira", note: `${totals.schools} escola(s) vinculada(s) a ${supervisors.length} supervisor(es).`, label: `${supervisors.length}`, tone: "info" },
       { icon: "✅", title: "Situacao geral", note: sourceNote || `${totals.ok}/${supervisors.length} supervisor(es) sem pendencia no painel.`, label: sourceNote ? "fonte" : "status", tone: sourceNote ? "info" : (totals.ok === supervisors.length ? "ok" : "warn") }
     ];
-    host.innerHTML = rows.map(row => `
-      <div class="data-row compact" data-search="${P.searchText([row.title, row.note, row.label])}">
-        <span class="row-icon">${row.icon}</span>
-        <span><strong>${row.title}</strong><small>${row.note}</small></span>
-        <em class="status-pill ${row.tone}">${row.label}</em>
-      </div>
-    `).join("");
+    renderSummaryRows("#supervisionSummaryRows", rows);
   }
 
   function renderSupervisors(supervisors) {
@@ -1238,10 +1265,25 @@
     });
   }
 
+  function renderContactOperationalSummary(contacts, visible, sector) {
+    const sectors = new Set(contacts.map(contact => contact.sector).filter(Boolean)).size;
+    const emailCount = visible.filter(contact => contact.email).length;
+    const phoneCount = visible.filter(contact => contact.phone).length;
+    const photoCount = visible.filter(contact => contact.photo).length;
+    const rows = [
+      { icon: "☎️", title: "Contatos visiveis", note: sector === "Todos" ? `${visible.length} contato(s) em ${sectors} setor(es).` : `${visible.length} contato(s) em ${sector}.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
+      { icon: "✉️", title: "Email", note: `${emailCount}/${visible.length || 0} contato(s) com email disponivel.`, label: emailCount === visible.length && visible.length ? "ok" : "base", tone: emailCount === visible.length && visible.length ? "ok" : "info" },
+      { icon: "📞", title: "Telefone e ramal", note: `${phoneCount}/${visible.length || 0} contato(s) com canal telefonico.`, label: phoneCount === visible.length && visible.length ? "ok" : "revisar", tone: phoneCount === visible.length && visible.length ? "ok" : "warn" },
+      { icon: "👤", title: "Perfis vinculados", note: `${photoCount} contato(s) ja usam foto enviada pelo usuario.`, label: photoCount ? "foto" : "local", tone: photoCount ? "ok" : "info" }
+    ];
+    renderSummaryRows("#contactSummaryRows", rows);
+  }
+
   function renderContacts(contacts, sector = "Todos") {
     const grid = P.$("#contactGrid");
     if (!grid) return;
     const visible = sector === "Todos" ? contacts : contacts.filter(contact => contact.sector === sector);
+    renderContactOperationalSummary(contacts, visible, sector);
     grid.innerHTML = visible.length
       ? visible.map(contactCard).join("")
       : `<div class="empty-state">Nenhum contato cadastrado para ${sector} ainda.</div>`;
@@ -1250,6 +1292,7 @@
   function renderCalendar(calendar) {
     const grid = P.$("#calendarGrid");
     if (!grid) return;
+    renderCalendarOperationalSummary(calendar);
     if (!calendar.length) {
       grid.innerHTML = `<div class="empty-state">Nenhum evento carregado ainda.</div>`;
       return;
@@ -1264,6 +1307,16 @@
         <span class="status-pill info">Agenda</span>
       </article>
     `).join("");
+  }
+
+  function renderCalendarOperationalSummary(calendar) {
+    const rows = [
+      { icon: "🗓️", title: "Agenda carregada", note: `${calendar.length} evento(s) ou prazo(s) disponiveis.`, label: `${calendar.length}`, tone: calendar.length ? "info" : "warn" },
+      { icon: "🚗", title: "Recursos compartilhados", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("carro")).length} item(ns) relacionados a carro oficial.`, label: "recurso", tone: "info" },
+      { icon: "📌", title: "Prazos", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("prazo")).length} item(ns) com sinal de prazo institucional.`, label: "prazo", tone: "warn" },
+      { icon: "✅", title: "Fonte", note: calendar.length ? "Agenda pronta para consulta no recorte atual." : "Aguardando fonte oficial do calendario URE.", label: calendar.length ? "ok" : "pendente", tone: calendar.length ? "ok" : "warn" }
+    ];
+    renderSummaryRows("#calendarSummaryRows", rows);
   }
 
   function renderProfiles(profiles) {
@@ -1320,6 +1373,7 @@
       const schoolOk = selectedSchool === "all" || P.searchText([visit.place]) === selectedSchool;
       return ownerOk && schoolOk;
     });
+    renderCtcOperationalSummary(visits, visible);
     const summary = P.$("#ctcFilterSummary");
     if (summary) summary.textContent = `${visible.length}/${visits.length} visita(s) visíveis.`;
 
@@ -1338,6 +1392,19 @@
     grid.querySelectorAll("[data-open-school]").forEach(button => {
       button.addEventListener("click", () => focusSchool(button.dataset.openSchool));
     });
+  }
+
+  function renderCtcOperationalSummary(visits, visible) {
+    const owners = new Set(visible.map(visit => visit.owner).filter(Boolean)).size;
+    const schools = new Set(visible.map(visit => visit.place).filter(Boolean)).size;
+    const dates = new Set(visible.map(visit => visit.date).filter(Boolean)).size;
+    const rows = [
+      { icon: "🛠️", title: "Visitas tecnicas", note: `${visible.length}/${visits.length} visita(s) no recorte atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
+      { icon: "👤", title: "Tecnicos", note: `${owners} tecnico(s) com agenda visivel.`, label: `${owners}`, tone: owners ? "ok" : "warn" },
+      { icon: "🏫", title: "Escolas atendidas", note: `${schools} escola(s) aparecem nas visitas filtradas.`, label: `${schools}`, tone: schools ? "info" : "warn" },
+      { icon: "📅", title: "Dias de agenda", note: `${dates} dia(s) distintos no recorte.`, label: `${dates}`, tone: dates ? "info" : "warn" }
+    ];
+    renderSummaryRows("#ctcSummaryRows", rows);
   }
 
   function renderCalls(calls) {
@@ -1363,6 +1430,7 @@
       const schoolOk = selectedSchool === "all" || P.searchText([call.school]) === selectedSchool;
       return statusOk && schoolOk;
     });
+    renderCallOperationalSummary(calls, visible);
     const summary = P.$("#callFilterSummary");
     if (summary) summary.textContent = `${visible.length}/${calls.length} chamado(s) visíveis.`;
 
@@ -1382,6 +1450,20 @@
     grid.querySelectorAll("[data-open-school]").forEach(button => {
       button.addEventListener("click", () => focusSchool(button.dataset.openSchool));
     });
+  }
+
+  function renderCallOperationalSummary(calls, visible) {
+    const open = visible.filter(call => call.status === "aberto").length;
+    const route = visible.filter(call => call.status === "em_rota").length;
+    const resolved = visible.filter(call => call.status === "resolvido").length;
+    const schools = new Set(visible.map(call => call.school).filter(Boolean)).size;
+    const rows = [
+      { icon: "📥", title: "Fila visivel", note: `${visible.length}/${calls.length} chamado(s) no recorte atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "ok" },
+      { icon: "⚠️", title: "Abertos", note: `${open} chamado(s) aguardando encaminhamento.`, label: `${open}`, tone: open ? "warn" : "ok" },
+      { icon: "🧭", title: "Em rota", note: `${route} chamado(s) em atendimento.`, label: `${route}`, tone: route ? "info" : "ok" },
+      { icon: "🏫", title: "Escolas envolvidas", note: `${schools} escola(s) com chamado no filtro. Resolvidos: ${resolved}.`, label: `${schools}`, tone: schools ? "info" : "ok" }
+    ];
+    renderSummaryRows("#callSummaryRows", rows);
   }
 
   function renderReports(data) {

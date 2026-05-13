@@ -502,6 +502,21 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.81
+
+- Tecnicos CTC ganhou resumo de visitas, tecnicos, escolas atendidas e dias de agenda.
+- Chamados ganhou resumo de fila, abertos, em rota e escolas envolvidas.
+- Calendario URE ganhou resumo de agenda, recursos compartilhados, prazos e status da fonte.
+- A leitura "resumo primeiro, lista depois" agora cobre todas as paginas operacionais principais.
+
+### 2.0.0-dev.80
+
+- Redes e Cameras ganhou resumo tecnico antes dos widgets da escola selecionada.
+- Inventario ganhou resumo de triagem antes da lista de equipamentos.
+- Contatos ganhou resumo por setor com email, telefone e fotos vinculadas por perfil.
+- Criado helper unico para resumos (`renderSummaryRows`) para evitar duplicacao de markup e manter o padrao visual.
+- A diretriz "resumo primeiro, lista depois" agora cobre Escolas, Supervisao, Redes, Inventario e Contatos.
+
 ### 2.0.0-dev.79
 
 - Escolas ganhou resumo operacional antes da grade: base, fichas, inventario e redes/supervisao.
