@@ -502,6 +502,13 @@ Não fazer:
 
 ## Changelog
 
+### 2.0.0-dev.79
+
+- Escolas ganhou resumo operacional antes da grade: base, fichas, inventario e redes/supervisao.
+- Supervisao ganhou resumo operacional antes da lista: semana, mes, carteira e situacao geral.
+- Os novos resumos reutilizam `box`, `row-list`, `data-row` e `status-pill`, sem criar visual paralelo ao padrao Finanza.
+- A leitura de tela ficou mais decisoria antes de abrir listas longas.
+
 ### 2.0.0-dev.78
 
 - Seções dobráveis do Admin passaram a salvar estado no navegador.

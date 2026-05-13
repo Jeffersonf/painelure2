@@ -1273,6 +1273,14 @@ select:focus-visible {
   padding: 12px;
 }
 
+.summary-box {
+  margin: 0 0 14px;
+}
+
+.summary-box .data-row {
+  cursor: default;
+}
+
 .data-row {
   min-height: 64px;
   display: grid;

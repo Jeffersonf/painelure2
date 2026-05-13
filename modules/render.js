@@ -250,6 +250,31 @@
     });
   }
 
+  function renderSchoolOperationalSummary(schools) {
+    const host = P.$("#schoolSummaryRows");
+    if (!host) return;
+    const data = P.getAppData();
+    const total = schools.length;
+    const cities = new Set(schools.map(school => school.city).filter(Boolean)).size;
+    const completeProfiles = schools.filter(school => schoolProfileCompletion(school.name) >= 65).length;
+    const inventoryAlerts = schools.reduce((sum, school) => sum + inventoryAlertCount(school), 0);
+    const networkMapped = schools.filter(school => data.networkData?.[school.name]).length;
+    const linkedSupervision = schools.filter(school => supervisorForSchool(school.name)).length;
+    const rows = [
+      { icon: "🏫", title: "Base escolar", note: `${total} escola(s) em ${cities || 0} municipio(s).`, label: `${total}`, tone: "info" },
+      { icon: "📋", title: "Fichas escolares", note: `${completeProfiles}/${total} ficha(s) com dados principais preenchidos.`, label: total && completeProfiles === total ? "ok" : "revisar", tone: total && completeProfiles === total ? "ok" : "warn" },
+      { icon: "💻", title: "Inventario", note: inventoryAlerts ? `${inventoryAlerts} unidade(s) em manutencao ou defeito.` : "Sem alerta de inventario neste recorte.", label: inventoryAlerts ? "atencao" : "ok", tone: inventoryAlerts ? "warn" : "ok" },
+      { icon: "🌐", title: "Redes e supervisao", note: `${networkMapped}/${total} rede(s) mapeada(s) e ${linkedSupervision}/${total} escola(s) com supervisor.`, label: networkMapped === total && linkedSupervision === total ? "ok" : "base", tone: networkMapped === total && linkedSupervision === total ? "ok" : "info" }
+    ];
+    host.innerHTML = rows.map(row => `
+      <div class="data-row compact" data-search="${P.searchText([row.title, row.note, row.label])}">
+        <span class="row-icon">${row.icon}</span>
+        <span><strong>${row.title}</strong><small>${row.note}</small></span>
+        <em class="status-pill ${row.tone}">${row.label}</em>
+      </div>
+    `).join("");
+  }
+
   function supervisorForSchool(name) {
     const target = P.normalize(name);
     return P.getAppData().supervisors.find(supervisor =>
@@ -614,6 +639,7 @@
   function renderSchools(schools) {
     const grid = P.$("#schoolGrid");
     if (!grid) return;
+    renderSchoolOperationalSummary(schools);
     if (!schools.length) {
       grid.innerHTML = `<div class="empty-state">Nenhuma escola carregada ainda.</div>`;
       return;
@@ -1003,9 +1029,41 @@
     `).join("");
   }
 
+  function renderSupervisionOperationalSummary(supervisors) {
+    const host = P.$("#supervisionSummaryRows");
+    if (!host) return;
+    const totals = supervisors.reduce((acc, item) => {
+      const week = progressParts(item.week);
+      const month = progressParts(item.month);
+      acc.weekDone += week.done;
+      acc.weekTotal += week.total;
+      acc.monthDone += month.done;
+      acc.monthTotal += month.total;
+      acc.pending += Number(item.pending || 0);
+      acc.schools += Number(item.schools || item.assignedSchools?.length || 0);
+      if (supervisorTone(item) === "ok") acc.ok += 1;
+      return acc;
+    }, { weekDone: 0, weekTotal: 0, monthDone: 0, monthTotal: 0, pending: 0, schools: 0, ok: 0 });
+    const sourceNote = supervisionMonthNote();
+    const rows = [
+      { icon: "🎯", title: "Metas da semana", note: `${totals.weekDone}/${totals.weekTotal || 0} visita(s) registradas no recorte atual.`, label: totals.weekTotal && totals.weekDone >= totals.weekTotal ? "verde" : "meta", tone: totals.weekTotal && totals.weekDone >= totals.weekTotal ? "ok" : "warn" },
+      { icon: "📅", title: "Meta mensal", note: `${totals.monthDone}/${totals.monthTotal || 0} visita(s) no mes oficial.`, label: totals.pending ? `${totals.pending} faltam` : "verde", tone: totals.pending ? "warn" : "ok" },
+      { icon: "🏫", title: "Carteira", note: `${totals.schools} escola(s) vinculada(s) a ${supervisors.length} supervisor(es).`, label: `${supervisors.length}`, tone: "info" },
+      { icon: "✅", title: "Situacao geral", note: sourceNote || `${totals.ok}/${supervisors.length} supervisor(es) sem pendencia no painel.`, label: sourceNote ? "fonte" : "status", tone: sourceNote ? "info" : (totals.ok === supervisors.length ? "ok" : "warn") }
+    ];
+    host.innerHTML = rows.map(row => `
+      <div class="data-row compact" data-search="${P.searchText([row.title, row.note, row.label])}">
+        <span class="row-icon">${row.icon}</span>
+        <span><strong>${row.title}</strong><small>${row.note}</small></span>
+        <em class="status-pill ${row.tone}">${row.label}</em>
+      </div>
+    `).join("");
+  }
+
   function renderSupervisors(supervisors) {
     const host = P.$("#supervisorRows");
     if (!host) return;
+    renderSupervisionOperationalSummary(supervisors);
     if (!supervisors.length) {
       host.innerHTML = `<div class="empty-state">Nenhum supervisor carregado ainda.</div>`;
       return;
