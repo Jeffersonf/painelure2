@@ -175,12 +175,20 @@
     P.renderApp?.();
   }
 
+  async function loadScopedBackendData() {
+    if (!backendToken || !P.loadBackendData) return null;
+    const payload = await P.loadBackendData(backendToken);
+    if (payload?.data?.appData) P.renderApp?.();
+    return payload;
+  }
+
   async function submitLogin(username, password) {
     showLoginStatus("");
     if (!username || !password) throw new Error("Informe nome e PIN.");
     const result = await P.loginBackend?.({ username, password });
     if (!result?.token || !result?.user) throw new Error("Login nao retornou usuario.");
     activateOnlineUser(result.token, result.user);
+    await loadScopedBackendData().catch(() => {});
     if (result.user.preferences?.forcePinChange) {
       showPinChange(true);
       showLoginStatus("Troque o PIN inicial para continuar.");
@@ -233,6 +241,7 @@
         applyUserAvatar();
         P.renderPage?.("user", { force: true });
         showPinChange(Boolean(user.preferences?.forcePinChange));
+        await loadScopedBackendData().catch(() => {});
         if (!user.preferences?.forcePinChange) P.renderApp?.();
       }
       return user || null;
@@ -450,9 +459,10 @@
       refreshBackendPanel();
     });
 
-    P.$("#backendPullBtn")?.addEventListener("click", () => {
+    P.$("#backendPullBtn")?.addEventListener("click", async () => {
       setAdminMeta("Carregando estado online...");
-      P.loadBackendData?.()
+      const token = await ensureBackendToken();
+      P.loadBackendData?.(token)
         .then(payload => {
           if (payload?.data?.appData) {
             P.renderApp?.();

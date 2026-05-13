@@ -30,10 +30,11 @@
     }
   }
 
-  async function loadBackendData() {
-    if (location.protocol === "file:") return null;
+  async function loadBackendData(token = "") {
     try {
-      const payload = await fetchJson(apiPath("/api/data"));
+      const headers = {};
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const payload = await fetchJson(apiPath("/api/data"), { headers });
       const appData = payload?.data?.appData;
       if (appData) {
         P.setAppData({ ...(P.getAppData() || {}), ...appData });

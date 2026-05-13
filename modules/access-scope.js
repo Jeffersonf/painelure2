@@ -1,5 +1,15 @@
 (function () {
   const P = window.PainelURE;
+  const ACCESS = {
+    Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
+    "Supervisão": ["dashboard", "schools", "supervision", "contacts", "calendar", "reports"],
+    "Técnicos CTC": ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "calendar"],
+    SETEC: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "reports"],
+    SEINTEC: ["dashboard", "schools", "network", "inventory", "contacts", "reports"],
+    Gabinete: ["dashboard", "schools", "calls", "contacts", "calendar", "reports"],
+    Pedagógico: ["dashboard", "schools", "supervision", "contacts", "calendar"],
+    Consulta: ["dashboard", "schools", "contacts"]
+  };
 
   function normalized(value) {
     if (P.normalize) return P.normalize(value);
@@ -16,6 +26,16 @@
 
   function isSupervisorRole(role = P.currentRole?.()) {
     return normalized(role).includes("supervis");
+  }
+
+  function roleAccess(role) {
+    const target = normalized(role);
+    const key = Object.keys(ACCESS).find(name => normalized(name) === target);
+    return ACCESS[key] || ACCESS.Consulta;
+  }
+
+  function canAccessData(page, role = P.currentRole?.()) {
+    return roleAccess(role).includes(page);
   }
 
   function isSupervisorUser(user = activeIdentity()) {
@@ -83,25 +103,55 @@
   }
 
   function scopedData(data = P.getAppData?.()) {
-    if (!data || !isSupervisorUser()) return data;
-    const allowed = allowedSchoolSet(data);
-    const schools = visibleSchools(data);
-    const supervisors = visibleSupervisors(data);
+    if (!data) return data;
+    const user = activeIdentity();
+    const role = user?.role || P.currentRole?.() || "Consulta";
+    const supervisorScope = isSupervisorUser(user);
+    const allowed = supervisorScope ? allowedSchoolSet(data) : null;
+    const schools = supervisorScope ? visibleSchools(data) : (data.schools || []);
+    const supervisors = supervisorScope ? visibleSupervisors(data) : (data.supervisors || []);
+    const byAccess = {
+      schools: canAccessData("schools", role),
+      network: canAccessData("network", role),
+      inventory: canAccessData("inventory", role),
+      supervision: canAccessData("supervision", role),
+      contacts: canAccessData("contacts", role),
+      calendar: canAccessData("calendar", role),
+      ctc: canAccessData("ctc", role),
+      calls: canAccessData("calls", role),
+      reports: canAccessData("reports", role),
+      profiles: canAccessData("profiles", role),
+      quality: canAccessData("quality", role),
+      admin: canAccessData("admin", role)
+    };
+    const schoolScopedObject = source => supervisorScope ? filterObjectBySchool(source, allowed) : source;
+    const schoolScopedItems = (items, field = "school") => supervisorScope ? filterBySchoolField(items, allowed, field) : items;
     return {
       ...data,
-      schools,
-      supervisors,
-      networkData: filterObjectBySchool(data.networkData || {}, allowed),
-      schoolInventoryMetrics: filterObjectBySchool(data.schoolInventoryMetrics || {}, allowed),
-      schoolProfiles: filterBySchoolField(data.schoolProfiles || [], allowed),
-      schoolAssets: filterBySchoolField(data.schoolAssets || [], allowed),
-      inventory: filterBySchoolField(data.inventory || [], allowed),
-      calls: filterBySchoolField(data.calls || [], allowed),
-      ctcVisits: (data.ctcVisits || []).filter(visit => allowed.has(normalized(visit.place))),
-      reports: data.reports || []
+      schools: byAccess.schools ? schools : [],
+      supervisors: byAccess.supervision ? supervisors : [],
+      networkData: byAccess.network ? schoolScopedObject(data.networkData || {}) : {},
+      schoolInventoryMetrics: byAccess.inventory ? schoolScopedObject(data.schoolInventoryMetrics || {}) : {},
+      schoolProfiles: byAccess.schools ? schoolScopedItems(data.schoolProfiles || []) : [],
+      schoolAssets: byAccess.inventory ? schoolScopedItems(data.schoolAssets || []) : [],
+      inventory: byAccess.inventory ? schoolScopedItems(data.inventory || []) : [],
+      calls: byAccess.calls ? schoolScopedItems(data.calls || []) : [],
+      ctcVisits: byAccess.ctc
+        ? (supervisorScope ? (data.ctcVisits || []).filter(visit => allowed.has(normalized(visit.place))) : (data.ctcVisits || []))
+        : [],
+      contacts: byAccess.contacts ? (data.contacts || []) : [],
+      calendar: byAccess.calendar ? (data.calendar || []) : [],
+      reports: byAccess.reports ? (data.reports || []) : [],
+      profiles: byAccess.profiles ? (data.profiles || []) : [],
+      quality: byAccess.quality ? (data.quality || []) : [],
+      users: byAccess.admin ? (data.users || []) : [],
+      adminChecks: byAccess.admin ? (data.adminChecks || []) : []
     };
   }
 
+  P.DATA_ACCESS = ACCESS;
+  P.roleAccess = roleAccess;
+  P.canAccessData = canAccessData;
   P.isSupervisorRole = isSupervisorRole;
   P.isSupervisorUser = isSupervisorUser;
   P.supervisorForCurrentUser = supervisorForCurrentUser;

@@ -95,7 +95,12 @@
     if (!P.loadBackendData) return;
 
     const run = () => {
-      P.loadBackendData()
+      let token = "";
+      try {
+        token = sessionStorage.getItem("painelure2_backend_token") || "";
+      } catch (error) {}
+      if (!token) return;
+      P.loadBackendData(token)
         .then(payload => {
           if (payload?.data?.appData) {
             refreshRenderedPages();

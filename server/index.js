@@ -39,6 +39,16 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || "";
 const sessions = new Map();
 let dbReady = false;
 let dbError = "";
+const DATA_ACCESS = {
+  Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
+  "Supervisao": ["dashboard", "schools", "supervision", "contacts", "calendar", "reports"],
+  "Tecnicos CTC": ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "calendar"],
+  SETEC: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "reports"],
+  SEINTEC: ["dashboard", "schools", "network", "inventory", "contacts", "reports"],
+  Gabinete: ["dashboard", "schools", "calls", "contacts", "calendar", "reports"],
+  Pedagogico: ["dashboard", "schools", "supervision", "contacts", "calendar"],
+  Consulta: ["dashboard", "schools", "contacts"]
+};
 const pool = DATABASE_URL
   ? new Pool({
       connectionString: DATABASE_URL,
@@ -431,6 +441,97 @@ function verifyPassword(password, storedHash) {
   const candidate = hashPassword(password, salt).split("$")[2];
   if (candidate.length !== hash.length) return false;
   return crypto.timingSafeEqual(Buffer.from(candidate, "hex"), Buffer.from(hash, "hex"));
+}
+
+function normalizeText(value) {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function isSupervisorRole(role) {
+  return normalizeText(role).includes("supervis");
+}
+
+function accessForRole(role) {
+  const target = normalizeText(role);
+  const key = Object.keys(DATA_ACCESS).find(item => normalizeText(item) === target);
+  return DATA_ACCESS[key] || DATA_ACCESS.Consulta;
+}
+
+function canAccessData(page, user = null) {
+  return accessForRole(user?.role || "Consulta").includes(page);
+}
+
+function supervisorForUser(appData = {}, user = null) {
+  if (!user || !isSupervisorRole(user.role)) return null;
+  const userKeys = [user.name, user.username, user.contactName, user.supervisorName]
+    .map(normalizeText)
+    .filter(Boolean);
+  return (appData.supervisors || []).find(supervisor => {
+    const supervisorKeys = [supervisor.name, supervisor.email, supervisor.login, supervisor.username]
+      .map(value => {
+        const normalized = normalizeText(value);
+        return normalized.includes("@") ? normalized.split("@")[0] : normalized;
+      })
+      .filter(Boolean);
+    return supervisorKeys.some(key => userKeys.includes(key));
+  }) || null;
+}
+
+function scopeAppDataForUser(appData = {}, user = null) {
+  if (!user) return {};
+  const supervisorScope = isSupervisorRole(user.role);
+  const supervisor = supervisorScope ? supervisorForUser(appData, user) : null;
+  const allowed = new Set((supervisor?.assignedSchools || []).map(normalizeText));
+  const bySchoolField = (items = [], field = "school") => items.filter(item => allowed.has(normalizeText(item?.[field])));
+  const objectBySchool = (source = {}) => Object.fromEntries(
+    Object.entries(source).filter(([school]) => allowed.has(normalizeText(school)))
+  );
+  const schoolScopedItems = (items, field = "school") => supervisorScope ? bySchoolField(items, field) : items;
+  const schoolScopedObject = source => supervisorScope ? objectBySchool(source) : source;
+  const schools = supervisorScope
+    ? (appData.schools || []).filter(school => allowed.has(normalizeText(school.name)))
+    : (appData.schools || []);
+  const supervisors = supervisorScope
+    ? (supervisor ? [supervisor] : [])
+    : (appData.supervisors || []);
+  return {
+    ...appData,
+    schools: canAccessData("schools", user) ? schools : [],
+    supervisors: canAccessData("supervision", user) ? supervisors : [],
+    networkData: canAccessData("network", user) ? schoolScopedObject(appData.networkData || {}) : {},
+    schoolInventoryMetrics: canAccessData("inventory", user) ? schoolScopedObject(appData.schoolInventoryMetrics || {}) : {},
+    schoolProfiles: canAccessData("schools", user) ? schoolScopedItems(appData.schoolProfiles || []) : [],
+    schoolAssets: canAccessData("inventory", user) ? schoolScopedItems(appData.schoolAssets || []) : [],
+    inventory: canAccessData("inventory", user) ? schoolScopedItems(appData.inventory || []) : [],
+    calls: canAccessData("calls", user) ? schoolScopedItems(appData.calls || []) : [],
+    ctcVisits: canAccessData("ctc", user)
+      ? (supervisorScope ? (appData.ctcVisits || []).filter(visit => allowed.has(normalizeText(visit.place))) : (appData.ctcVisits || []))
+      : [],
+    contacts: canAccessData("contacts", user) ? (appData.contacts || []) : [],
+    calendar: canAccessData("calendar", user) ? (appData.calendar || []) : [],
+    reports: canAccessData("reports", user) ? (appData.reports || []) : [],
+    profiles: canAccessData("profiles", user) ? (appData.profiles || []) : [],
+    quality: canAccessData("quality", user) ? (appData.quality || []) : [],
+    users: canAccessData("admin", user) ? (appData.users || []) : [],
+    adminChecks: canAccessData("admin", user) ? (appData.adminChecks || []) : []
+  };
+}
+
+async function scopedStoreForRequest(req) {
+  const store = await readStore();
+  const session = currentSession(req);
+  const user = await currentSessionUser(req)
+    || (session ? { role: session.role || "Consulta", name: "Sessao admin" } : null)
+    || (!ADMIN_KEY ? { role: "Administrador", name: "Desenvolvimento local" } : null);
+  const appData = store?.appData || {};
+  return {
+    ...(store || { updatedAt: null, source: null }),
+    appData: scopeAppDataForUser(appData, user)
+  };
 }
 
 async function countUsers() {
@@ -919,7 +1020,8 @@ async function handleApi(req, res, pathname) {
   }
 
   if (req.method === "GET" && pathname === "/api/data") {
-    send(res, 200, { ok: true, data: await readStore(), storage: await storeStatus() });
+    if (!requireAuth(req, res)) return;
+    send(res, 200, { ok: true, data: await scopedStoreForRequest(req), storage: await storeStatus() });
     return;
   }
 

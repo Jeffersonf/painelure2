@@ -71,9 +71,26 @@ Teste logico feito com Magda:
 - `canViewSupervisor("Marcio Nunes da Cruz")`: falso;
 - `canViewSupervisor("Magda Gisele Silva Oliveira")`: verdadeiro.
 
+### Status atual
+
+O escopo passou a existir no frontend e no backend.
+
+No frontend, `modules/access-scope.js` filtra os dados locais antes de renderizar.
+
+No backend, `/api/data` passou a exigir sessao e a devolver o recorte permitido pelo perfil:
+
+- Administrador: base completa.
+- SETEC, SEINTEC e Tecnicos CTC: dados tecnicos e operacionais conforme matriz de acesso.
+- Supervisao: apenas escolas vinculadas e o proprio registro de supervisao.
+- Gabinete: escolas, chamados, contatos, calendario e relatorios.
+- Pedagogico: escolas, supervisao, contatos e calendario.
+- Consulta: escolas e contatos.
+
+Dados de paginas sem permissao deixam de ser enviados no payload, incluindo `users`, `networkData`, `schoolAssets`, `adminChecks` e demais blocos fora do perfil.
+
 ### Pendente
 
-O escopo ainda e frontend. O backend precisa entregar dados ja filtrados para usuarios nao administradores.
+Auditar se cada perfil acima esta exatamente como a regra institucional desejada. A base agora suporta recorte por categoria, mas a matriz final de negocio ainda pode ser refinada.
 
 ## 2. Seguranca Backend
 
@@ -81,17 +98,16 @@ O escopo ainda e frontend. O backend precisa entregar dados ja filtrados para us
 
 O backend tem login, sessao, usuarios e papeis. Endpoints sensiveis de escrita exigem autenticacao/admin em varios casos.
 
-Risco principal:
+Risco principal ja tratado:
 
-- `GET /api/data` esta publico e retorna a base completa.
+- `GET /api/data` deixou de ser publico e agora exige sessao.
+- O payload passa por recorte de perfil antes de sair do backend.
 
 Isso era aceitavel enquanto a v2 era prototipo estatico, mas agora que temos login por perfil, o ideal e:
 
-- `GET /api/data` exigir token;
-- usuario Administrador/SEINTEC/CTC receber base completa conforme regra;
-- Supervisao receber apenas `scopedData` do proprio usuario;
-- Consulta/Pedagogico receber recorte conforme matriz;
-- dados sensiveis de credenciais/redes terem regra propria.
+- definir se dados de credenciais/redes ficam totalmente liberados para SETEC/SEINTEC/CTC ou se terao uma permissao menor separada;
+- criar testes automatizados de escopo por perfil;
+- registrar no Admin qual perfil ve cada fonte.
 
 ### Recomendacao
 
