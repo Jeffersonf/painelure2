@@ -2329,6 +2329,26 @@ select:focus-visible {
     var(--sf);
 }
 
+.inventory-hero-warn {
+  border-color: rgba(245, 200, 90, .24);
+  background:
+    radial-gradient(circle at right top, rgba(245, 200, 90, .14), transparent 32%),
+    linear-gradient(160deg, rgba(245, 200, 90, .045), transparent 62%),
+    var(--sf);
+}
+
+.inventory-hero-main {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+}
+
+.inventory-hero-main p {
+  grid-column: 2;
+}
+
 .inventory-hero-main small,
 .inventory-hero-main strong,
 .inventory-hero-main p {
@@ -2358,7 +2378,7 @@ select:focus-visible {
 
 .inventory-hero-score {
   display: grid;
-  grid-template-columns: repeat(3, 86px);
+  grid-template-columns: repeat(4, 86px);
   gap: 8px;
 }
 

@@ -588,30 +588,30 @@
 
     const decisions = [
       missingNetwork
-        ? { icon: "RE", title: "Completar dados de rede", note: `${missingNetwork} escola(s) sem infraestrutura mapeada.`, label: "Rede", tone: "warn", page: "network" }
-        : { icon: "RE", title: "Redes mapeadas", note: `${networkCount} escola(s) com dados tecnicos disponiveis.`, label: "OK", tone: "ok", page: "network" },
+        ? { icon: "&#127760;", title: "Completar dados de rede", note: `${missingNetwork} escola(s) sem infraestrutura mapeada.`, label: "Rede", tone: "warn", page: "network" }
+        : { icon: "&#127760;", title: "Redes mapeadas", note: `${networkCount} escola(s) com dados tecnicos disponiveis.`, label: "OK", tone: "ok", page: "network" },
       inventoryAlerts
-        ? { icon: "IN", title: "Inventario com manutencao/defeito", note: `${inventoryAlerts} unidade(s) fora de OK.`, label: "Invent.", tone: "warn", page: "inventory" }
-        : { icon: "IN", title: "Inventario consolidado", note: `${data.schoolAssets.length} linha(s) carregada(s).`, label: "OK", tone: "ok", page: "inventory" },
+        ? { icon: "&#128187;", title: "Inventario com manutencao/defeito", note: `${inventoryAlerts} unidade(s) fora de OK.`, label: "Invent.", tone: "warn", page: "inventory" }
+        : { icon: "&#128187;", title: "Inventario consolidado", note: `${data.schoolAssets.length} linha(s) carregada(s).`, label: "OK", tone: "ok", page: "inventory" },
       pendingVisits
-        ? { icon: "SV", title: "Acompanhar visitas pendentes", note: `${pendingVisits} visita(s) faltando nas metas atuais.`, label: "Meta", tone: "warn", page: "supervision" }
-        : { icon: "SV", title: "Supervisao em dia", note: `${data.supervisors.length} responsavel(is) ativos no painel.`, label: "OK", tone: "ok", page: "supervision" }
+        ? { icon: "&#129517;", title: "Acompanhar visitas pendentes", note: `${pendingVisits} visita(s) faltando nas metas atuais.`, label: "Meta", tone: "warn", page: "supervision" }
+        : { icon: "&#129517;", title: "Supervisao em dia", note: `${data.supervisors.length} responsavel(is) ativos no painel.`, label: "OK", tone: "ok", page: "supervision" }
     ];
 
     const agenda = [
       calendarCount
-        ? { icon: "AG", title: "Agenda com eventos", note: `${calendarCount} evento(s) carregado(s) para consulta.`, label: "Agenda", tone: "info", page: "calendar" }
-        : { icon: "AG", title: "Calendario preparado", note: "Area pronta para a agenda institucional da URE.", label: "Agenda", tone: "info", page: "calendar" },
+        ? { icon: "&#128197;", title: "Agenda com eventos", note: `${calendarCount} evento(s) carregado(s) para consulta.`, label: "Agenda", tone: "info", page: "calendar" }
+        : { icon: "&#128197;", title: "Calendario preparado", note: "Area pronta para a agenda institucional da URE.", label: "Agenda", tone: "info", page: "calendar" },
       ctcVisits
-        ? { icon: "CT", title: "Visitas tecnicas previstas", note: `${ctcVisits} compromisso(s) tecnico(s) na base atual.`, label: "CTC", tone: "info", page: "ctc" }
-        : { icon: "AG", title: "Agenda CTC pronta", note: "Area preparada para rotas e compromissos tecnicos.", label: "CTC", tone: "info", page: "ctc" },
+        ? { icon: "&#128736;&#65039;", title: "Visitas tecnicas previstas", note: `${ctcVisits} compromisso(s) tecnico(s) na base atual.`, label: "CTC", tone: "info", page: "ctc" }
+        : { icon: "&#128736;&#65039;", title: "Agenda CTC pronta", note: "Area preparada para rotas e compromissos tecnicos.", label: "CTC", tone: "info", page: "ctc" },
       openCalls
-        ? { icon: "CH", title: "Chamados em acompanhamento", note: `${openCalls} chamado(s) ainda nao resolvido(s).`, label: "Fila", tone: "warn", page: "calls" }
-        : { icon: "CH", title: "Fila de chamados estavel", note: "Sem pendencia aberta na base atual.", label: "OK", tone: "ok", page: "calls" }
+        ? { icon: "&#128229;", title: "Chamados em acompanhamento", note: `${openCalls} chamado(s) ainda nao resolvido(s).`, label: "Fila", tone: "warn", page: "calls" }
+        : { icon: "&#128229;", title: "Fila de chamados estavel", note: "Sem pendencia aberta na base atual.", label: "OK", tone: "ok", page: "calls" }
     ];
 
     const profileDecision = {
-      icon: "PF",
+      icon: "&#129513;",
       title: profile.title,
       note: profile.note,
       label: "Perfil",
@@ -1004,10 +1004,10 @@
     const schools = new Set(assets.map(asset => asset.school).filter(Boolean)).size;
     const categoryCount = new Set(selectedAssets.map(asset => assetCategory(asset))).size;
     const rows = [
-      { icon: "IN", title: "Inventario da escola", note: `${totals.lines} linha(s), ${totals.units} unidade(s) e ${categoryCount} categoria(s).`, label: `${totals.units}`, tone: "info" },
-      { icon: "ST", title: "Manutencao/defeito", note: totals.alertUnits ? `${totals.alertUnits} unidade(s) fora de OK em ${selectedSchool}.` : "Todos os itens filtrados estao OK.", label: `${totals.alertUnits}`, tone: totals.alertUnits ? "warn" : "ok" },
-      { icon: "ES", title: "Base carregada", note: `${schools} escola(s) com inventario e ${globalTotals.lines} linha(s) totais.`, label: `${schools}`, tone: "info" },
-      { icon: "OK", title: "Conferencia", note: `${globalTotals.alertUnits} unidade(s) fora de OK na base completa.`, label: globalTotals.alertUnits ? "acompanhar" : "ok", tone: globalTotals.alertUnits ? "warn" : "ok" }
+      { icon: "&#128187;", title: "Inventario da escola", note: `${totals.lines} linha(s), ${totals.units} unidade(s) e ${categoryCount} categoria(s).`, label: `${totals.units}`, tone: "info" },
+      { icon: "&#128736;&#65039;", title: "Manutencao/defeito", note: totals.alertUnits ? `${totals.alertUnits} unidade(s) fora de OK em ${selectedSchool}.` : "Todos os itens filtrados estao OK.", label: `${totals.alertUnits}`, tone: totals.alertUnits ? "warn" : "ok" },
+      { icon: "&#127979;", title: "Base carregada", note: `${schools} escola(s) com inventario e ${globalTotals.lines} linha(s) totais.`, label: `${schools}`, tone: "info" },
+      { icon: "&#9989;", title: "Conferencia", note: `${globalTotals.alertUnits} unidade(s) fora de OK na base completa.`, label: globalTotals.alertUnits ? "acompanhar" : "ok", tone: globalTotals.alertUnits ? "warn" : "ok" }
     ];
     renderSummaryRows("#inventorySummaryRows", rows);
   }
@@ -1019,7 +1019,7 @@
     const assets = data.schoolAssets || [];
     if (!assets.length) {
       renderSummaryRows("#inventorySummaryRows", [
-        { icon: "IN", title: "Inventario", note: "Nenhuma linha carregada para o perfil atual.", label: "vazio", tone: "warn" }
+        { icon: "&#128187;", title: "Inventario", note: "Nenhuma linha carregada para o perfil atual.", label: "vazio", tone: "warn" }
       ]);
       grid.innerHTML = `<div class="empty-state">Nenhum dado de inventario carregado ainda.</div>`;
       return;
@@ -1070,18 +1070,20 @@
       .filter(asset => asset.status !== "ok")
       .sort((a, b) => assetUnits(b) - assetUnits(a))
       .slice(0, 6);
-    const okLines = selectedAssets.filter(asset => asset.status === "ok").length;
-
     grid.innerHTML = `
-      <article class="inventory-hero">
+      <article class="inventory-hero inventory-hero-${totals.alertUnits ? "warn" : "ok"}">
         <div class="inventory-hero-main">
-          <small>Escola selecionada</small>
-          <strong>${selectedSchool}</strong>
+          <span class="row-icon">&#128187;</span>
+          <div>
+            <small>Escola selecionada</small>
+            <strong>${selectedSchool}</strong>
+          </div>
           <p>${totals.lines} linha(s) | ${totals.units} unidade(s) | ${totals.alertUnits} manutencao/defeito</p>
         </div>
         <div class="inventory-hero-score">
-          <span><strong>${alertAssets.length}</strong><small>fora de OK</small></span>
-          <span><strong>${okLines}</strong><small>ok</small></span>
+          <span><strong>${totals.lines}</strong><small>linhas</small></span>
+          <span><strong>${totals.units}</strong><small>unidades</small></span>
+          <span><strong>${totals.alertUnits}</strong><small>manut./defeito</small></span>
           <span><strong>${categories.length}</strong><small>categorias</small></span>
         </div>
         <div class="detail-actions">
@@ -1095,13 +1097,13 @@
         <div class="row-list compact">
           ${alertAssets.length ? alertAssets.map(asset => `
             <div class="data-row compact" data-inventory-key="${P.searchText([asset.school, asset.sourceName || asset.name, asset.notes])}" data-search="${P.searchText([asset.school, asset.name, asset.sourceName, asset.notes, asset.status])}">
-              <span class="row-icon">!</span>
+              <span class="row-icon">&#9888;&#65039;</span>
               <span><strong>${asset.sourceName || asset.name}</strong><small>${asset.notes || asset.name}</small></span>
               <em class="status-pill ${assetTone(asset.status)}">${assetUnits(asset)} | ${assetStatusLabel(asset.status)}</em>
             </div>
           `).join("") : `
             <div class="data-row compact">
-              <span class="row-icon">OK</span>
+              <span class="row-icon">&#9989;</span>
               <span><strong>Todos OK</strong><small>A escola selecionada nao possui item em manutencao ou defeito neste filtro.</small></span>
               <em class="status-pill ok">ok</em>
             </div>
@@ -1712,7 +1714,7 @@
       ["Publicacao", "2.0 publicado em repositorio proprio e GitHub Pages.", "ok"]
     ].map(([title, note, status]) => `
       <div class="data-row" data-search="${P.searchText([title, note, status])}">
-        <span class="row-icon">RL</span>
+        <span class="row-icon">&#128200;</span>
         <span><strong>${title}</strong><small>${note}</small></span>
         <em class="status-pill ${status}">${status === "ok" ? "ok" : "revisar"}</em>
       </div>
