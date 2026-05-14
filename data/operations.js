@@ -8,6 +8,12 @@
     { owner: "Bruno", date: "2026-05-12", time: "10:00", place: "PEI EE Oscar Kurtz Camargo", objective: "Revisão técnica de câmeras." }
   ];
 
+  P.seedData.cars = [
+    { vehicle: "Carro oficial 1", date: "2026-05-15", time: "08:00", requester: "Gabinete", destination: "Itapeva", driver: "A definir", status: "reservado", note: "Reserva operacional para deslocamento institucional." },
+    { vehicle: "Carro oficial 2", date: "2026-05-15", time: "13:30", requester: "SETEC", destination: "Ribeirao Grande", driver: "A definir", status: "pendente", note: "Aguardando confirmacao de motorista." },
+    { vehicle: "Carro oficial 1", date: "2026-05-16", time: "09:00", requester: "Supervisao", destination: "Capao Bonito", driver: "A definir", status: "reservado", note: "Agenda de visita e acompanhamento escolar." }
+  ];
+
   P.seedData.calls = [
     { title: "Inventário com itens em manutenção", school: "EE Professor Gerson de Barros Margarido", status: "aberto", note: "Priorizar itens críticos antes da próxima visita." },
     { title: "Câmeras abaixo do previsto", school: "EE Bairro Turvo dos Almeidas", status: "em_rota", note: "Verificar DVR e pontos de energia." },

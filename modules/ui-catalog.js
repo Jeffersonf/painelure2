@@ -8,6 +8,7 @@
     inventory: { icon: "💻", label: "Inventario", note: "Equipamentos e status", type: "Pagina" },
     ctc: { icon: "🛠️", label: "Tecnicos CTC", note: "Agenda tecnica", type: "Pagina" },
     calls: { icon: "📥", label: "Chamados", note: "Fila operacional", type: "Pagina" },
+    cars: { icon: "🚗", label: "Carros", note: "Agendamento oficial", type: "Pagina" },
     supervision: { icon: "🧭", label: "Supervisao", note: "Metas e vinculos", type: "Pagina" },
     contacts: { icon: "☎️", label: "Contatos", note: "Setores e ramais", type: "Pagina" },
     calendar: { icon: "📅", label: "Calendario URE", note: "Agenda institucional", type: "Pagina" },

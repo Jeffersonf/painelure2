@@ -189,12 +189,26 @@
     });
   }
 
+  function normalizeCarRows(rows) {
+    return rows.map(row => ({
+      vehicle: firstValue(row, ["carro", "veiculo", "vehicle", "recurso"], "Carro oficial"),
+      date: firstValue(row, ["data", "date", "quando"], ""),
+      time: firstValue(row, ["hora", "horario", "time"], ""),
+      requester: firstValue(row, ["solicitante", "responsavel", "requester", "owner"], ""),
+      destination: firstValue(row, ["destino", "local", "destination", "place"], ""),
+      driver: firstValue(row, ["motorista", "driver"], ""),
+      status: firstValue(row, ["status", "situacao", "tone"], "pendente"),
+      note: firstValue(row, ["observacao", "descricao", "note", "motivo"], "")
+    }));
+  }
+
   P.normalizers = {
     contacts: normalizeContactRows,
     schools: normalizeSchoolRows,
     inventory: normalizeInventoryRows,
     supervision: normalizeSupervisorRows,
     network: normalizeNetworkRows,
-    calendar: normalizeCalendarRows
+    calendar: normalizeCalendarRows,
+    cars: normalizeCarRows
   };
 })();

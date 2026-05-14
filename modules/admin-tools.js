@@ -9,13 +9,13 @@
   let backendToken = sessionStorage.getItem("painelure2_backend_token") || "";
 
   const ROLE_ACCESS = {
-    Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
-    "Supervisão": ["dashboard", "schools", "supervision", "contacts", "calendar", "reports"],
-    "Técnicos CTC": ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "calendar"],
-    SETEC: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "reports"],
-    SEINTEC: ["dashboard", "schools", "network", "inventory", "contacts", "reports"],
-    Gabinete: ["dashboard", "schools", "calls", "contacts", "calendar", "reports"],
-    Pedagógico: ["dashboard", "schools", "supervision", "contacts", "calendar"],
+    Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "cars", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
+    "Supervisão": ["dashboard", "schools", "supervision", "contacts", "cars", "calendar", "reports"],
+    "Técnicos CTC": ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "cars", "calendar"],
+    SETEC: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "cars", "reports"],
+    SEINTEC: ["dashboard", "schools", "network", "inventory", "contacts", "cars", "reports"],
+    Gabinete: ["dashboard", "schools", "calls", "contacts", "cars", "calendar", "reports"],
+    Pedagógico: ["dashboard", "schools", "supervision", "contacts", "cars", "calendar"],
     Consulta: ["dashboard", "schools", "contacts"]
   };
 
@@ -679,7 +679,7 @@
   function defaultPrefs() {
     return {
       widgets: { shortcuts: true, metrics: true, operations: true },
-      shortcuts: { network: true, inventory: true, ctc: true, calls: true, calendar: true, reports: true }
+      shortcuts: { network: true, inventory: true, ctc: true, calls: true, cars: true, calendar: true, reports: true }
     };
   }
 

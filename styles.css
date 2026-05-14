@@ -2290,6 +2290,150 @@ select:focus-visible {
   font-size: 12px;
 }
 
+.cars-hero {
+  grid-column: 1 / -1;
+  min-height: 142px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid rgba(200, 245, 90, .2);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at right top, rgba(200, 245, 90, .14), transparent 34%),
+    linear-gradient(145deg, rgba(255, 255, 255, .035), rgba(255, 255, 255, .012)),
+    var(--sf);
+}
+
+.cars-hero strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--tx);
+  font-family: var(--font-display);
+  font-size: clamp(30px, 4vw, 52px);
+  line-height: .9;
+}
+
+.cars-hero p {
+  margin: 10px 0 0;
+  color: var(--mt);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.cars-hero-score {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(82px, 1fr));
+  gap: 8px;
+}
+
+.cars-hero-score span,
+.car-booking-grid span {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--bd2);
+  border-radius: 15px;
+  background: rgba(255, 255, 255, .025);
+}
+
+.cars-hero-score strong,
+.cars-hero-score small,
+.car-booking-grid strong,
+.car-booking-grid small {
+  display: block;
+}
+
+.cars-hero-score strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.cars-hero-score small,
+.car-booking-grid small {
+  margin-top: 5px;
+  color: var(--mt);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.car-booking-card {
+  min-height: 232px;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--bd);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at right top, rgba(200, 245, 90, .1), transparent 30%),
+    var(--sf);
+}
+
+.car-booking-warn {
+  border-color: rgba(245, 200, 90, .24);
+  background:
+    radial-gradient(circle at right top, rgba(245, 200, 90, .12), transparent 32%),
+    var(--sf);
+}
+
+.car-booking-danger {
+  border-color: rgba(255, 107, 107, .24);
+}
+
+.car-booking-top {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.car-booking-top small,
+.car-booking-top strong {
+  display: block;
+}
+
+.car-booking-top small {
+  color: var(--mt);
+  font-size: 10px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.car-booking-top strong {
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--tx);
+  font-size: 16px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.car-booking-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.car-booking-grid strong {
+  margin-top: 5px;
+  overflow: hidden;
+  color: var(--tx);
+  font-size: 12px;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.car-booking-card p {
+  margin: 0;
+  color: var(--mt);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .detail-widget {
   position: relative;
   overflow: hidden;
@@ -3677,6 +3821,7 @@ select:focus-visible {
   .supervision-v1-layout,
   .supervisor-record-columns,
   .schools-hero-card,
+  .cars-hero,
   .school-profile-hero,
   .school-profile-grid {
     grid-template-columns: 1fr;
@@ -3775,6 +3920,8 @@ select:focus-visible {
   .schools-city-stack,
   .school-finanza-body,
   .school-finanza-metrics,
+  .cars-hero-score,
+  .car-booking-grid,
   .school-profile-metrics,
   .school-profile-fields,
   .contact-grid,

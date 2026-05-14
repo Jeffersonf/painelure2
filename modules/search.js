@@ -30,6 +30,7 @@
       "contacts",
       "calendar",
       "ctc",
+      "cars",
       "calls",
       "reports"
     ].map(page => {
@@ -57,6 +58,13 @@
         type: "CTC",
         note: `${item.date} ${item.time} | ${item.objective}`,
         focus: searchText([item.owner, item.date, item.time, item.place])
+      })),
+      ...(P.carBookings?.(data) || []).map(item => ({
+        page: "cars",
+        title: `${item.vehicle} - ${item.destination || item.requester || "Agendamento"}`,
+        type: "Carros",
+        note: `${item.date || "sem data"} ${item.time || ""} | ${item.status || "pendente"}`,
+        focus: searchText([item.vehicle, item.date, item.time, item.destination, item.requester])
       })),
       ...(data.calls || []).map(item => ({ page: "calls", title: item.title, type: "Chamado", note: item.school || item.status, focus: item.title }))
     ].filter(item => !P.canAccess || P.canAccess(item.page));
@@ -148,6 +156,7 @@
           if (focus && page === "contacts") P.focusContact?.(focus, sector);
           if (focus && page === "calendar") P.focusCalendarItem?.(focus);
           if (focus && page === "ctc") P.focusCtcVisit?.(focus);
+          if (focus && page === "cars") P.focusCarBooking?.(focus);
           if (focus && page === "calls") P.focusCall?.(focus);
         });
         clearSearch();

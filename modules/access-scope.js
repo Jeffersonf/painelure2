@@ -1,13 +1,13 @@
 (function () {
   const P = window.PainelURE;
   const ACCESS = {
-    Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
-    "Supervisão": ["dashboard", "schools", "supervision", "contacts", "calendar", "reports"],
-    "Técnicos CTC": ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "calendar"],
-    SETEC: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "reports"],
-    SEINTEC: ["dashboard", "schools", "network", "inventory", "contacts", "reports"],
-    Gabinete: ["dashboard", "schools", "calls", "contacts", "calendar", "reports"],
-    Pedagógico: ["dashboard", "schools", "supervision", "contacts", "calendar"],
+    Administrador: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "cars", "supervision", "contacts", "calendar", "reports", "profiles", "quality", "admin"],
+    "Supervisão": ["dashboard", "schools", "supervision", "contacts", "cars", "calendar", "reports"],
+    "Técnicos CTC": ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "cars", "calendar"],
+    SETEC: ["dashboard", "schools", "network", "inventory", "ctc", "calls", "contacts", "cars", "reports"],
+    SEINTEC: ["dashboard", "schools", "network", "inventory", "contacts", "cars", "reports"],
+    Gabinete: ["dashboard", "schools", "calls", "contacts", "cars", "calendar", "reports"],
+    Pedagógico: ["dashboard", "schools", "supervision", "contacts", "cars", "calendar"],
     Consulta: ["dashboard", "schools", "contacts"]
   };
 
@@ -123,6 +123,7 @@
       contacts: canAccessData("contacts", role),
       calendar: canAccessData("calendar", role),
       ctc: canAccessData("ctc", role),
+      cars: canAccessData("cars", role),
       calls: canAccessData("calls", role),
       reports: canAccessData("reports", role),
       profiles: canAccessData("profiles", role),
@@ -152,6 +153,7 @@
       ctcVisits: byAccess.ctc
         ? (supervisorScope ? (data.ctcVisits || []).filter(visit => allowed.has(normalized(visit.place))) : (data.ctcVisits || []))
         : [],
+      cars: byAccess.cars ? (data.cars || []) : [],
       contacts: byAccess.contacts ? (data.contacts || []) : [],
       calendar: byAccess.calendar ? (data.calendar || []) : [],
       reports: byAccess.reports ? (data.reports || []) : [],

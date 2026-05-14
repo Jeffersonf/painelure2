@@ -44,6 +44,13 @@
       url: "",
       status: "pending",
       metadata: { domain: "Calendario", cadence: "mensal", owner: "Gabinete" }
+    },
+    cars: {
+      label: "Agendamento de carros",
+      type: "csv",
+      url: "",
+      status: "pending",
+      metadata: { domain: "Carros", cadence: "mensal", owner: "Gabinete" }
     }
   };
 })();

@@ -39,6 +39,9 @@
     ctc(data) {
       P.renderCtc(data.ctcVisits);
     },
+    cars(data) {
+      P.renderCars(data);
+    },
     calls(data) {
       P.renderCalls(data.calls);
     },

@@ -567,6 +567,7 @@
     const monthLabel = P.selectedMonthLabel?.() || "Maio 2026";
     const networkCount = Object.keys(data.networkData || {}).length;
     const calendarCount = data.calendar?.length || 0;
+    const carCount = carBookings(data).length;
     const missingNetwork = Math.max((data.schools?.length || 0) - networkCount, 0);
     const inventoryAlerts = Object.values(data.schoolInventoryMetrics || {}).reduce((sum, item) => sum + Number(item.alerts || 0), 0);
     const pendingVisits = (data.supervisors || []).reduce((sum, item) => sum + Number(item.pending || 0), 0);
@@ -585,6 +586,7 @@
     setText("#shortcutNetworkNote", profile.shortcuts?.network || (missingNetwork ? `${missingNetwork} escola(s) ainda sem rede` : `${networkCount} rede(s) mapeada(s)`));
     setText("#shortcutInventoryNote", profile.shortcuts?.inventory || (inventoryAlerts ? `${inventoryAlerts} unidade(s) em manutencao/defeito` : `${data.schoolAssets.length} linha(s) consolidadas`));
     setText("#shortcutSupervisionNote", profile.shortcuts?.supervision || (pendingVisits ? `${pendingVisits} visita(s) pendente(s)` : `${data.supervisors.length} responsavel(is) ativos`));
+    setText("#shortcutCarsNote", carCount ? `${carCount} reserva(s) no recorte` : "Agenda de carros pronta");
 
     const decisions = [
       missingNetwork
@@ -607,7 +609,10 @@
         : { icon: "&#128736;&#65039;", title: "Agenda CTC pronta", note: "Area preparada para rotas e compromissos tecnicos.", label: "CTC", tone: "info", page: "ctc" },
       openCalls
         ? { icon: "&#128229;", title: "Chamados em acompanhamento", note: `${openCalls} chamado(s) ainda nao resolvido(s).`, label: "Fila", tone: "warn", page: "calls" }
-        : { icon: "&#128229;", title: "Fila de chamados estavel", note: "Sem pendencia aberta na base atual.", label: "OK", tone: "ok", page: "calls" }
+        : { icon: "&#128229;", title: "Fila de chamados estavel", note: "Sem pendencia aberta na base atual.", label: "OK", tone: "ok", page: "calls" },
+      carCount
+        ? { icon: "&#128663;", title: "Carros agendados", note: `${carCount} reserva(s) de carro oficial no recorte.`, label: "Carros", tone: "info", page: "cars" }
+        : { icon: "&#128663;", title: "Agenda de carros pronta", note: "Area pronta para puxar reservas de carros oficiais.", label: "Carros", tone: "info", page: "cars" }
     ];
 
     const profileDecision = {
@@ -1367,6 +1372,148 @@
       : `<div class="empty-state">Nenhum contato cadastrado para ${sector} ainda.</div>`;
   }
 
+  function carStatusTone(status) {
+    const key = P.normalize(status || "");
+    if (["cancelado", "cancelada", "bloqueado", "indisponivel"].some(item => key.includes(item))) return "danger";
+    if (["pendente", "aguardando", "solicitado"].some(item => key.includes(item))) return "warn";
+    if (["uso", "rota", "andamento"].some(item => key.includes(item))) return "info";
+    return "ok";
+  }
+
+  function isCarCalendarItem(item) {
+    const text = P.normalize([item.label, item.value, item.note, item.type, item.scope, item.category].join(" "));
+    return ["carro", "veiculo", "veiculo oficial", "motorista", "deslocamento"].some(term => text.includes(term));
+  }
+
+  function carBookings(data = P.getAppData()) {
+    const direct = (data.cars || []).map(item => ({
+      vehicle: item.vehicle || item.car || item.recurso || "Carro oficial",
+      date: item.date || item.value || "",
+      time: item.time || item.hora || "",
+      requester: item.requester || item.owner || item.responsavel || "",
+      destination: item.destination || item.place || item.local || "",
+      driver: item.driver || item.motorista || "",
+      status: item.status || "pendente",
+      note: item.note || item.description || item.motivo || "",
+      source: "cars"
+    }));
+    const fromCalendar = (data.calendar || []).filter(isCarCalendarItem).map(item => ({
+      vehicle: item.vehicle || "Carro oficial",
+      date: item.date || item.value || "",
+      time: item.time || "",
+      requester: item.owner || item.assignee || item.responsible || "",
+      destination: item.place || item.local || item.note || "",
+      driver: item.driver || "",
+      status: item.tone || item.status || "agenda",
+      note: item.note || item.label || "",
+      source: "calendar"
+    }));
+    const seen = new Set();
+    return [...direct, ...fromCalendar]
+      .filter(item => item.vehicle || item.date || item.destination || item.requester)
+      .filter(item => {
+        const key = P.searchText([item.vehicle, item.date, item.time, item.destination, item.requester, item.source]);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a, b) => {
+        const dateA = calendarDate({ value: a.date })?.getTime() || Number.MAX_SAFE_INTEGER;
+        const dateB = calendarDate({ value: b.date })?.getTime() || Number.MAX_SAFE_INTEGER;
+        return dateA - dateB || String(a.time || "").localeCompare(String(b.time || ""));
+      });
+  }
+
+  function focusCarBooking(key) {
+    P.setPage?.("cars");
+    requestAnimationFrame(() => {
+      const target = P.$(`[data-car-key="${key}"]`);
+      if (!target) return;
+      target.scrollIntoView({ behavior: "smooth", block: "center" });
+      target.classList.add("focused");
+      window.setTimeout(() => target.classList.remove("focused"), 1800);
+    });
+  }
+
+  function renderCars(data) {
+    const grid = P.$("#carGrid");
+    if (!grid) return;
+    const month = P.selectedMonth?.();
+    const allBookings = carBookings(data);
+    const bookings = allBookings.filter(item => {
+      const date = calendarDate({ value: item.date });
+      if (!month || !date) return true;
+      return date.getFullYear() === month.year && date.getMonth() === month.month - 1;
+    });
+    const vehicleFilter = P.$("#carVehicleFilter");
+    const statusFilter = P.$("#carStatusFilter");
+    const vehicles = [...new Set(bookings.map(item => item.vehicle).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    const statuses = [...new Set(bookings.map(item => item.status || "pendente"))].sort((a, b) => a.localeCompare(b));
+    setSelectOptions(vehicleFilter, [{ value: "all", label: "Todos" }, ...vehicles.map(item => ({ value: P.searchText([item]), label: item }))], vehicleFilter?.value || "all");
+    setSelectOptions(statusFilter, [{ value: "all", label: "Todos" }, ...statuses.map(item => ({ value: P.searchText([item]), label: item }))], statusFilter?.value || "all");
+    bindSimpleSelect(vehicleFilter, () => renderCars(P.scopedData?.(P.getAppData()) || P.getAppData()));
+    bindSimpleSelect(statusFilter, () => renderCars(P.scopedData?.(P.getAppData()) || P.getAppData()));
+    bindResetButton(P.$("#carFilterReset"), () => {
+      if (vehicleFilter) vehicleFilter.value = "all";
+      if (statusFilter) statusFilter.value = "all";
+      renderCars(P.scopedData?.(P.getAppData()) || P.getAppData());
+    });
+    const vehicleValue = vehicleFilter?.value || "all";
+    const statusValue = statusFilter?.value || "all";
+    const visible = bookings.filter(item => {
+      const vehicleOk = vehicleValue === "all" || P.searchText([item.vehicle]) === vehicleValue;
+      const statusOk = statusValue === "all" || P.searchText([item.status || "pendente"]) === statusValue;
+      return vehicleOk && statusOk;
+    });
+    const reserved = visible.filter(item => carStatusTone(item.status) === "ok").length;
+    const pending = visible.filter(item => carStatusTone(item.status) === "warn").length;
+    const calendarLinked = visible.filter(item => item.source === "calendar").length;
+    const summary = P.$("#carFilterSummary");
+    if (summary) summary.textContent = `${visible.length}/${bookings.length} agendamento(s) visiveis no mes.`;
+    renderSummaryRows("#carSummaryRows", [
+      { icon: "&#128663;", title: "Agendamentos", note: `${visible.length} reserva(s) no filtro atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
+      { icon: "&#9989;", title: "Reservados", note: `${reserved} carro(s) confirmado(s) ou reservado(s).`, label: `${reserved}`, tone: reserved ? "ok" : "info" },
+      { icon: "&#9203;", title: "Pendentes", note: `${pending} solicitacao(oes) aguardando confirmacao.`, label: `${pending}`, tone: pending ? "warn" : "ok" },
+      { icon: "&#128197;", title: "Calendario", note: `${calendarLinked} item(ns) vieram da agenda oficial.`, label: `${calendarLinked}`, tone: calendarLinked ? "info" : "warn" }
+    ]);
+    if (!visible.length) {
+      grid.innerHTML = `<div class="empty-state">Nenhum agendamento de carro encontrado neste filtro.</div>`;
+      return;
+    }
+    grid.innerHTML = `
+      <article class="cars-hero">
+        <div>
+          <span class="eyebrow">&#128663; Carros oficiais</span>
+          <strong>${visible.length} agendamento(s)</strong>
+          <p>Reservas, destinos, solicitantes e motoristas no mesmo painel.</p>
+        </div>
+        <div class="cars-hero-score">
+          <span><strong>${vehicles.length}</strong><small>carros</small></span>
+          <span><strong>${pending}</strong><small>pendentes</small></span>
+          <span><strong>${calendarLinked}</strong><small>agenda</small></span>
+        </div>
+      </article>
+      ${visible.map(item => {
+        const tone = carStatusTone(item.status);
+        const key = P.searchText([item.vehicle, item.date, item.time, item.destination, item.requester]);
+        return `<article class="car-booking-card car-booking-${tone}" data-car-key="${key}" data-search="${P.searchText([item.vehicle, item.date, item.time, item.destination, item.requester, item.driver, item.status, item.note])}">
+          <div class="car-booking-top">
+            <span class="row-icon">&#128663;</span>
+            <div><small>${item.date || "Sem data"} ${item.time || ""}</small><strong>${item.vehicle}</strong></div>
+            <em class="status-pill ${tone}">${item.status || "pendente"}</em>
+          </div>
+          <div class="car-booking-grid">
+            <span><small>Destino</small><strong>${item.destination || "Nao informado"}</strong></span>
+            <span><small>Solicitante</small><strong>${item.requester || "Nao informado"}</strong></span>
+            <span><small>Motorista</small><strong>${item.driver || "A definir"}</strong></span>
+            <span><small>Fonte</small><strong>${item.source === "calendar" ? "Calendario" : "Base carros"}</strong></span>
+          </div>
+          <p>${item.note || "Sem observacao."}</p>
+        </article>`;
+      }).join("")}
+    `;
+  }
+
   function renderCalendar(calendar) {
     const grid = P.$("#calendarGrid");
     if (!grid) return;
@@ -1689,12 +1836,14 @@
     const networkCount = Object.keys(data.networkData || {}).length;
     const pendingVisits = (data.supervisors || []).reduce((sum, item) => sum + Number(item.pending || 0), 0);
     const linkedUsers = (data.users || []).filter(user => user.contactSync === "linked").length;
+    const cars = carBookings(data).length;
     const metrics = [
       { icon: "🏫", label: "Escolas", value: String(data.schools.length), note: "base regional", tone: "glow-lime" },
       { icon: "💻", label: "Inventario", value: String(data.schoolAssets.length), note: "linhas por escola", tone: "glow-teal" },
       { icon: "⚠️", label: "Alertas", value: String(alerts), note: "manutencao/defeito", tone: "glow-amber" },
       { icon: "🌐", label: "Redes", value: String(networkCount), note: "escolas mapeadas", tone: "glow-teal" },
       { icon: "🧭", label: "Pendencias", value: String(pendingVisits), note: "visitas faltantes", tone: "glow-purple" },
+      { icon: "&#128663;", label: "Carros", value: String(cars), note: "agendamentos", tone: "glow-teal" },
       { icon: "👤", label: "Usuarios", value: `${linkedUsers}/${data.users.length}`, note: "vinculados a contatos", tone: "glow-lime" }
     ];
     grid.innerHTML = metrics.map(item => `
@@ -1709,6 +1858,7 @@
       ["Supervisao", `${data.supervisors.length} supervisores com planilha oficial de abril conectada.`, "ok"],
       ["Inventario", `${data.schoolAssets.length} linhas sanitizadas, sem previews brutos da 1.0.`, "ok"],
       ["Redes e cameras", `${networkCount}/${data.schools.length} escola(s) com infraestrutura mapeada.`, networkCount === data.schools.length ? "ok" : "warn"],
+      ["Carros", `${cars} agendamento(s) de carro oficial no recorte atual.`, cars ? "ok" : "info"],
       ["Chamados", `${data.calls.length} chamado(s) operacionais em acompanhamento.`, data.calls.some(call => call.status !== "resolvido") ? "warn" : "ok"],
       ["Calendario", "Estrutura pronta para a agenda institucional.", "info"],
       ["Publicacao", "2.0 publicado em repositorio proprio e GitHub Pages.", "ok"]
@@ -1789,12 +1939,15 @@
   P.focusInventoryAsset = focusInventoryAsset;
   P.focusCtcVisit = focusCtcVisit;
   P.focusCalendarItem = focusCalendarItem;
+  P.focusCarBooking = focusCarBooking;
+  P.carBookings = carBookings;
   P.renderSchools = renderSchools;
   P.renderNetworkOptions = renderNetworkOptions;
   P.renderInventory = renderInventory;
   P.renderSupervisors = renderSupervisors;
   P.renderContacts = renderContacts;
   P.renderCalendar = renderCalendar;
+  P.renderCars = renderCars;
   P.renderProfiles = renderProfiles;
   P.renderQuality = renderQuality;
   P.renderCtc = renderCtc;

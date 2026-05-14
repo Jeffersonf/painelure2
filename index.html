@@ -80,6 +80,7 @@
       <button class="nav-item active" type="button" data-page="dashboard"><span>📊</span>Painel</button>
       <button class="nav-item" type="button" data-page="schools"><span>🏫</span>Escolas</button>
       <button class="nav-item" type="button" data-page="supervision"><span>🧭</span>Supervisao</button>
+      <button class="nav-item" type="button" data-page="cars"><span>&#128663;</span>Carros</button>
       <button class="nav-item" type="button" data-page="contacts"><span>☎️</span>Contatos</button>
     </nav>
 
@@ -92,6 +93,7 @@
         <button type="button" data-jump="inventory"><span>💻 Invent.</span></button>
         <button type="button" data-jump="ctc"><span>🛠️ CTC</span></button>
         <button type="button" data-jump="calls"><span>📥 Cham.</span></button>
+        <button type="button" data-jump="cars"><span>&#128663; Carros</span></button>
         <button type="button" data-jump="calendar"><span>📅 Agenda</span></button>
         <button type="button" data-jump="reports"><span>📈 Relat.</span></button>
       </div>
@@ -172,6 +174,11 @@
             <span>🧭</span>
             <strong>Supervisao</strong>
             <small id="shortcutSupervisionNote">Metas, visitas e escolas vinculadas</small>
+          </button>
+          <button class="shortcut-card" type="button" data-jump="cars">
+            <span>&#128663;</span>
+            <strong>Carros</strong>
+            <small id="shortcutCarsNote">Agendamentos e motoristas</small>
           </button>
         </div>
       </section>
@@ -396,6 +403,29 @@
       <div class="calendar-grid" id="callsGrid"></div>
     </section>
 
+    <section class="page" id="page-cars">
+      <header class="page-header compact">
+        <div><h1>Carros</h1><p>Agendamento de carros oficiais, destinos e motoristas.</p></div>
+      </header>
+      <div class="selector-panel operation-filters">
+        <label>
+          <span>Carro</span>
+          <select id="carVehicleFilter"></select>
+        </label>
+        <label>
+          <span>Status</span>
+          <select id="carStatusFilter"></select>
+        </label>
+        <button class="ghost-btn filter-reset" type="button" id="carFilterReset">Limpar</button>
+        <p id="carFilterSummary">Agendamentos de carros carregados.</p>
+      </div>
+      <article class="box summary-box">
+        <div class="box-head"><div><strong>Resumo dos carros</strong><small>Agenda puxada da base de carros e do calendario</small></div></div>
+        <div class="row-list compact" id="carSummaryRows"></div>
+      </article>
+      <div class="calendar-grid car-grid" id="carGrid"></div>
+    </section>
+
     <section class="page" id="page-contacts">
       <header class="page-header compact">
         <div><h1>Contatos</h1><p>Nomes, cargos, setores e canais da URE.</p></div>
@@ -580,6 +610,7 @@
                 <option value="schools">Escolas</option>
                 <option value="contacts">Contatos</option>
                 <option value="network">Redes e cameras</option>
+                <option value="cars">Carros</option>
                 <option value="calendar">Calendario</option>
                 <option value="supervision">Supervisao</option>
               </select>
@@ -609,6 +640,7 @@
             <label class="check-row"><input type="checkbox" data-pref-shortcut="inventory" checked><span>Inventario</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="ctc" checked><span>CTC</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="calls" checked><span>Chamados</span></label>
+            <label class="check-row"><input type="checkbox" data-pref-shortcut="cars" checked><span>Carros</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="calendar" checked><span>Calendario</span></label>
             <label class="check-row"><input type="checkbox" data-pref-shortcut="reports" checked><span>Relatorios</span></label>
             <button class="ghost-btn" type="button" id="savePrefsBtn">Salvar preferencias</button>
