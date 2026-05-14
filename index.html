@@ -166,7 +166,7 @@
           <button class="shortcut-card" type="button" data-jump="inventory">
             <span>IN</span>
             <strong>Inventario</strong>
-            <small id="shortcutInventoryNote">Equipamentos, status e alertas</small>
+            <small id="shortcutInventoryNote">Equipamentos e status por escola</small>
           </button>
           <button class="shortcut-card" type="button" data-jump="supervision">
             <span>SV</span>
@@ -214,16 +214,16 @@
           <select id="schoolProfileFilter">
             <option value="all">Todas</option>
             <option value="ok">Mais completas</option>
-            <option value="warn">Em revisao</option>
-            <option value="danger">Criticas</option>
+            <option value="warn">Ficha parcial</option>
+            <option value="danger">Ficha baixa</option>
           </select>
         </label>
         <label>
           <span>Inventario</span>
           <select id="schoolInventoryFilter">
             <option value="all">Todas</option>
-            <option value="alerts">Com alerta</option>
-            <option value="ok">Sem alerta</option>
+            <option value="alerts">Manutencao/defeito</option>
+            <option value="ok">Somente OK</option>
           </select>
         </label>
         <label>
@@ -271,7 +271,7 @@
 
     <section class="page" id="page-inventory">
       <header class="page-header compact">
-        <div><h1>Inventario</h1><p>Equipamentos, status e alertas por escola.</p></div>
+        <div><h1>Inventario</h1><p>Equipamentos e status por escola.</p></div>
       </header>
       <div class="selector-panel">
         <label>
@@ -314,7 +314,6 @@
             <option value="all">Todos</option>
             <option value="ok">Meta ok</option>
             <option value="warn">Com pendencia</option>
-            <option value="danger">Critico</option>
           </select>
         </label>
         <label>

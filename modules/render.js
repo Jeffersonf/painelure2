@@ -113,15 +113,15 @@
 
   function schoolMissingProfileFields(name) {
     const labels = {
-      director: "direÃ§Ã£o",
-      viceDirector: "vice-direÃ§Ã£o",
+      director: "direcao",
+      viceDirector: "vice-direcao",
       proati: "PROATI",
       goe: "GOE",
       phone: "telefone",
       mobile: "celular",
       email: "email",
-      address: "endereÃ§o",
-      notes: "observaÃ§Ãµes"
+      address: "endereco",
+      notes: "observacoes"
     };
     const profile = schoolProfile(name);
     if (!profile) return Object.values(labels);
@@ -174,18 +174,23 @@
     });
 
     const summary = P.$("#schoolFilterSummary");
-    if (summary) summary.textContent = `${visibleCount}/${cards.length} escola(s) visÃ­veis.`;
+    if (summary) summary.textContent = `${visibleCount}/${cards.length} escola(s) visiveis.`;
   }
 
   function supervisorTone(item) {
-    return item.pending > 6 ? "danger" : item.pending > 0 ? "warn" : "ok";
+    return item.pending > 0 ? "warn" : "ok";
   }
 
   function supervisorStatusMeta(item) {
-    const tone = supervisorTone(item);
-    if (tone === "danger") return { tone, label: "critico", title: "Intervencao", action: "Priorizar contato hoje" };
-    if (tone === "warn") return { tone, label: `${item.pending} faltam`, title: "Acompanhar", action: "Checar visitas pendentes" };
-    return { tone, label: "verde", title: "Em dia", action: "Manter rotina" };
+    const { week, month } = supervisorProgress(item);
+    const pending = Number(item.pending || month.missing || 0);
+    const tone = pending > 0 ? "warn" : "ok";
+    return {
+      tone,
+      label: pending ? `${pending} faltam` : "em dia",
+      title: pending ? "Meta pendente" : "Meta concluida",
+      action: `Semana ${week.done}/${week.total || 0} | Mes ${month.done}/${month.total || 0}`
+    };
   }
 
   function supervisorProgress(item) {
@@ -209,7 +214,7 @@
       if (visible) visibleCount++;
     });
     const summary = P.$("#supervisorFilterSummary");
-    if (summary) summary.textContent = `${visibleCount}/${rows.length} supervisor(es) visÃ­veis.`;
+    if (summary) summary.textContent = `${visibleCount}/${rows.length} supervisor(es) visiveis.`;
   }
 
   function bindSupervisorFilters() {
@@ -277,10 +282,10 @@
     const networkMapped = schools.filter(school => data.networkData?.[school.name]).length;
     const linkedSupervision = schools.filter(school => supervisorForSchool(school.name)).length;
     const rows = [
-      { icon: "ðŸ«", title: "Base escolar", note: `${total} escola(s) em ${cities || 0} municipio(s).`, label: `${total}`, tone: "info" },
-      { icon: "ðŸ“‹", title: "Fichas escolares", note: `${completeProfiles}/${total} ficha(s) com dados principais preenchidos.`, label: total && completeProfiles === total ? "ok" : "revisar", tone: total && completeProfiles === total ? "ok" : "warn" },
-      { icon: "ðŸ’»", title: "Inventario", note: inventoryAlerts ? `${inventoryAlerts} unidade(s) em manutencao ou defeito.` : "Sem alerta de inventario neste recorte.", label: inventoryAlerts ? "atencao" : "ok", tone: inventoryAlerts ? "warn" : "ok" },
-      { icon: "ðŸŒ", title: "Redes e supervisao", note: `${networkMapped}/${total} rede(s) mapeada(s) e ${linkedSupervision}/${total} escola(s) com supervisor.`, label: networkMapped === total && linkedSupervision === total ? "ok" : "base", tone: networkMapped === total && linkedSupervision === total ? "ok" : "info" }
+      { icon: "ES", title: "Base escolar", note: `${total} escola(s) em ${cities || 0} municipio(s).`, label: `${total}`, tone: "info" },
+      { icon: "FI", title: "Fichas escolares", note: `${completeProfiles}/${total} ficha(s) com dados principais preenchidos.`, label: total && completeProfiles === total ? "ok" : "revisar", tone: total && completeProfiles === total ? "ok" : "warn" },
+      { icon: "IN", title: "Inventario", note: inventoryAlerts ? `${inventoryAlerts} unidade(s) fora de OK.` : "Inventario sem manutencao/defeito neste recorte.", label: inventoryAlerts ? "atencao" : "ok", tone: inventoryAlerts ? "warn" : "ok" },
+      { icon: "RE", title: "Redes e supervisao", note: `${networkMapped}/${total} rede(s) mapeada(s) e ${linkedSupervision}/${total} escola(s) com supervisor.`, label: networkMapped === total && linkedSupervision === total ? "ok" : "base", tone: networkMapped === total && linkedSupervision === total ? "ok" : "info" }
     ];
     renderSummaryRows("#schoolSummaryRows", rows);
   }
@@ -308,15 +313,15 @@
 
   function assetStatusLabel(status) {
     if (status === "defeito") return "defeito";
-    if (status === "manutencao") return "manutenÃ§Ã£o";
+    if (status === "manutencao") return "manutencao";
     return "ok";
   }
 
   function assetPriority(asset) {
     const units = assetUnits(asset);
-    if (asset.status === "defeito") return { tone: "danger", label: "critico", note: `${units} unidade(s) com defeito.` };
+    if (asset.status === "defeito") return { tone: "warn", label: "defeito", note: `${units} unidade(s) com defeito.` };
     if (asset.status === "manutencao") return { tone: "warn", label: "manutencao", note: `${units} unidade(s) em manutencao.` };
-    return { tone: "ok", label: "ok", note: `${units} unidade(s) sem alerta.` };
+    return { tone: "ok", label: "ok", note: `${units} unidade(s) OK.` };
   }
 
   function assetCategory(asset) {
@@ -327,7 +332,7 @@
     if (text.includes("recarga") || text.includes("plataforma")) return "Recarga";
     if (text.includes("smartphone") || text.includes("celular")) return "Smartphones";
     if (text.includes("adm") || text.includes("administrativo")) return "PC adm";
-    if (text.includes("pc") || text.includes("desktop") || text.includes("pedagogico")) return "PC pedagÃ³gico";
+    if (text.includes("pc") || text.includes("desktop") || text.includes("pedagogico")) return "PC pedagogico";
     return "Outros";
   }
 
@@ -410,7 +415,7 @@
     const title = P.$("#supervisorDetailTitle");
     const subtitle = P.$("#supervisorDetailSubtitle");
     if (title) title.textContent = supervisor.name;
-    if (subtitle) subtitle.textContent = supervisor.email || supervisor.phone || "Acompanhamento de metas e vÃ­nculos.";
+    if (subtitle) subtitle.textContent = supervisor.email || supervisor.phone || "Acompanhamento de metas e vinculos.";
     renderSupervisorDetail(supervisor, "#supervisorDetailPageBody");
     P.setPage?.("supervisor-detail");
   }
@@ -573,35 +578,35 @@
     setText("#dashboardNoticeNote", [profile.noticeNote, supervisionMonthNote()].filter(Boolean).join(" "));
     setText("#shortcutSchoolsNote", profile.shortcuts?.schools || `${data.schools.length} unidade(s) na base regional`);
     setText("#shortcutNetworkNote", profile.shortcuts?.network || (missingNetwork ? `${missingNetwork} escola(s) ainda sem rede` : `${networkCount} rede(s) mapeada(s)`));
-    setText("#shortcutInventoryNote", profile.shortcuts?.inventory || (inventoryAlerts ? `${inventoryAlerts} alerta(s) para triagem` : `${data.schoolAssets.length} linha(s) consolidadas`));
+    setText("#shortcutInventoryNote", profile.shortcuts?.inventory || (inventoryAlerts ? `${inventoryAlerts} unidade(s) em manutencao/defeito` : `${data.schoolAssets.length} linha(s) consolidadas`));
     setText("#shortcutSupervisionNote", profile.shortcuts?.supervision || (pendingVisits ? `${pendingVisits} visita(s) pendente(s)` : `${data.supervisors.length} responsavel(is) ativos`));
 
     const decisions = [
       missingNetwork
-        ? { icon: "ðŸŒ", title: "Completar dados de rede", note: `${missingNetwork} escola(s) sem infraestrutura mapeada.`, label: "Rede", tone: "warn", page: "network" }
-        : { icon: "ðŸŒ", title: "Redes mapeadas", note: `${networkCount} escola(s) com dados tÃ©cnicos disponÃ­veis.`, label: "OK", tone: "ok", page: "network" },
+        ? { icon: "RE", title: "Completar dados de rede", note: `${missingNetwork} escola(s) sem infraestrutura mapeada.`, label: "Rede", tone: "warn", page: "network" }
+        : { icon: "RE", title: "Redes mapeadas", note: `${networkCount} escola(s) com dados tecnicos disponiveis.`, label: "OK", tone: "ok", page: "network" },
       inventoryAlerts
-        ? { icon: "ðŸ’»", title: "Conferir inventÃ¡rio em alerta", note: `${inventoryAlerts} unidade(s) em manutenÃ§Ã£o ou defeito.`, label: "Invent.", tone: "danger", page: "inventory" }
-        : { icon: "ðŸ’»", title: "InventÃ¡rio consolidado", note: `${data.schoolAssets.length} linha(s) carregada(s) sem alerta resumido.`, label: "OK", tone: "ok", page: "inventory" },
+        ? { icon: "IN", title: "Inventario com manutencao/defeito", note: `${inventoryAlerts} unidade(s) fora de OK.`, label: "Invent.", tone: "warn", page: "inventory" }
+        : { icon: "IN", title: "Inventario consolidado", note: `${data.schoolAssets.length} linha(s) carregada(s).`, label: "OK", tone: "ok", page: "inventory" },
       pendingVisits
-        ? { icon: "ðŸ§­", title: "Acompanhar visitas pendentes", note: `${pendingVisits} visita(s) faltando nas metas atuais.`, label: "Meta", tone: "warn", page: "supervision" }
-        : { icon: "ðŸ§­", title: "SupervisÃ£o sem pendÃªncia crÃ­tica", note: `${data.supervisors.length} responsÃ¡vel(is) ativos no painel.`, label: "OK", tone: "ok", page: "supervision" }
+        ? { icon: "SV", title: "Acompanhar visitas pendentes", note: `${pendingVisits} visita(s) faltando nas metas atuais.`, label: "Meta", tone: "warn", page: "supervision" }
+        : { icon: "SV", title: "Supervisao em dia", note: `${data.supervisors.length} responsavel(is) ativos no painel.`, label: "OK", tone: "ok", page: "supervision" }
     ];
 
     const agenda = [
       calendarCount
-        ? { icon: "ðŸ“…", title: "Agenda com eventos", note: `${calendarCount} evento(s) carregado(s) para consulta.`, label: "Agenda", tone: "info", page: "calendar" }
-        : { icon: "ðŸ“…", title: "CalendÃ¡rio preparado", note: "Ãrea pronta para a agenda institucional da URE.", label: "Agenda", tone: "info", page: "calendar" },
+        ? { icon: "AG", title: "Agenda com eventos", note: `${calendarCount} evento(s) carregado(s) para consulta.`, label: "Agenda", tone: "info", page: "calendar" }
+        : { icon: "AG", title: "Calendario preparado", note: "Area pronta para a agenda institucional da URE.", label: "Agenda", tone: "info", page: "calendar" },
       ctcVisits
-        ? { icon: "ðŸ› ï¸", title: "Visitas tÃ©cnicas previstas", note: `${ctcVisits} compromisso(s) tÃ©cnico(s) na base atual.`, label: "CTC", tone: "info", page: "ctc" }
-        : { icon: "ðŸ› ï¸", title: "Agenda CTC pronta", note: "Ãrea preparada para rotas e compromissos tÃ©cnicos.", label: "CTC", tone: "info", page: "ctc" },
+        ? { icon: "CT", title: "Visitas tecnicas previstas", note: `${ctcVisits} compromisso(s) tecnico(s) na base atual.`, label: "CTC", tone: "info", page: "ctc" }
+        : { icon: "AG", title: "Agenda CTC pronta", note: "Area preparada para rotas e compromissos tecnicos.", label: "CTC", tone: "info", page: "ctc" },
       openCalls
-        ? { icon: "ðŸ“¥", title: "Chamados em acompanhamento", note: `${openCalls} chamado(s) ainda nÃ£o resolvido(s).`, label: "Fila", tone: "warn", page: "calls" }
-        : { icon: "ðŸ“¥", title: "Fila de chamados estÃ¡vel", note: "Sem pendÃªncia aberta na base atual.", label: "OK", tone: "ok", page: "calls" }
+        ? { icon: "CH", title: "Chamados em acompanhamento", note: `${openCalls} chamado(s) ainda nao resolvido(s).`, label: "Fila", tone: "warn", page: "calls" }
+        : { icon: "CH", title: "Fila de chamados estavel", note: "Sem pendencia aberta na base atual.", label: "OK", tone: "ok", page: "calls" }
     ];
 
     const profileDecision = {
-      icon: "\u{1F9ED}",
+      icon: "PF",
       title: profile.title,
       note: profile.note,
       label: "Perfil",
@@ -621,12 +626,12 @@
     const profile = (data.profiles || []).find(item => P.normalize(item.name) === P.normalize(role));
     setText("#userNameLabel", display.name);
     setText("#accountNameLabel", display.shortName || display.name);
-    setText("#userIdentitySource", display.linked ? "UsuÃ¡rio vinculado ao contato" : "UsuÃ¡rio importado da v1");
+    setText("#userIdentitySource", display.linked ? "Usuario vinculado ao contato" : "Usuario importado da v1");
     setText("#userRoleSummary", role);
     setText("#userAccessSummary", profile?.note || "Perfil local de acesso ao painel.");
     setText("#userContactSummary", display.linked
-      ? `${display.contactRole || "Contato"} â€¢ ${display.sector || "Setor"} â€¢ ${display.email || display.phone || "sem canal"}`
-      : "Sem contato vinculado. Ajuste o mapeamento em usuÃ¡rios."
+      ? `${display.contactRole || "Contato"} | ${display.sector || "Setor"} | ${display.email || display.phone || "sem canal"}`
+      : "Sem contato vinculado. Ajuste o mapeamento em usuarios."
     );
     setText("#userContactStatus", display.linked ? "Vinculado" : "Pendente");
     P.$("#userContactStatus")?.classList.toggle("warn", !display.linked);
@@ -634,7 +639,7 @@
     const online = P.onlineUser?.();
     setText("#onlineSessionSummary", online
       ? `${online.username || online.login || online.name} conectado ao backend.`
-      : "SessÃ£o local ativa. Entre quando a API estiver disponÃ­vel."
+      : "Sessao local ativa. Entre quando a API estiver disponivel."
     );
     const logoutButton = P.$("#onlineLogoutBtn");
     if (logoutButton) logoutButton.hidden = !online;
@@ -705,7 +710,7 @@
           <div class="school-scoreboard">
             <span><strong>${profilePct}%</strong><small>ficha</small></span>
             <span><strong>${metrics.items || 0}</strong><small>itens</small></span>
-            <span><strong>${alertCount || 0}</strong><small>alertas</small></span>
+            <span><strong>${alertCount || 0}</strong><small>manut./defeito</small></span>
           </div>
           <p class="school-note">${note}</p>
           <div class="school-foot">
@@ -738,22 +743,22 @@
     const network = data.networkData?.[school.name];
     const supervisor = supervisorForSchool(school.name);
     const calls = (data.calls || []).filter(call => P.normalize(call.school) === P.normalize(school.name));
-    const contacts = (data.contacts || []).filter(contact => ["Tecnologia", "SupervisÃ£o", "Gabinete"].includes(contact.sector)).slice(0, 3);
+    const contacts = (data.contacts || []).filter(contact => ["tecnologia", "supervisao", "gabinete"].includes(P.normalize(contact.sector))).slice(0, 3);
     const networkStatus = network ? "Mapeada" : "Pendente";
-    const profileNote = missingProfile.length ? `PendÃªncias: ${missingProfile.slice(0, 4).join(", ")}.` : firstNote(profile?.notes) || "Dados principais da escola preenchidos.";
+    const profileNote = missingProfile.length ? `Pendencias: ${missingProfile.slice(0, 4).join(", ")}.` : firstNote(profile?.notes) || "Dados principais da escola preenchidos.";
     const hasAttention = missingProfile.length || totals.alertUnits || metrics.alerts || !network || calls.length;
     const mainAction = followUpText(missingProfile, totals.alertUnits || metrics.alerts, network, calls.length);
     const schoolTone = totals.alertUnits || metrics.alerts ? "warn" : (!network || profilePct < 65 || calls.length ? "info" : "ok");
     const decisionRows = [
       { icon: "\u{1F4CC}", title: "Proxima acao", note: mainAction, label: hasAttention ? "revisar" : "ok", tone: hasAttention ? "warn" : "ok" },
       { icon: "\u{1F3AF}", title: "Responsavel direto", note: supervisor ? `${supervisor.name} acompanha ${supervisor.schools || supervisor.assignedSchools?.length || 0} escola(s).` : "Escola ainda sem supervisor vinculado.", label: supervisor ? "supervisao" : "pendente", tone: supervisor ? "info" : "warn" },
-      { icon: "\u{1F4BB}", title: "Risco operacional", note: totals.alertUnits || metrics.alerts ? `${totals.alertUnits || metrics.alerts} item(ns) em manutencao/defeito.` : "Inventario sem alerta resumido.", label: totals.alertUnits || metrics.alerts ? "atencao" : "ok", tone: totals.alertUnits || metrics.alerts ? "warn" : "ok" }
+      { icon: "\u{1F4BB}", title: "Inventario", note: totals.alertUnits || metrics.alerts ? `${totals.alertUnits || metrics.alerts} item(ns) em manutencao/defeito.` : "Inventario sem manutencao/defeito.", label: totals.alertUnits || metrics.alerts ? "atencao" : "ok", tone: totals.alertUnits || metrics.alerts ? "warn" : "ok" }
     ];
     const quickFacts = [
       { icon: "\u{1F3EB}", title: "Ficha e contato", note: `${profilePct}% preenchida | ${profile?.phone || "telefone pendente"} | ${profile?.email || "email pendente"}`, label: profilePct >= 65 ? "OK" : "Ficha", tone: profileStatusFromPct(profilePct), page: "schools" },
       supervisor ? { icon: "\u{1F3AF}", title: "Supervisao", note: `${supervisor.name} | semana ${supervisor.week} | mes ${supervisor.month}`, label: supervisor.pending ? "Meta" : "OK", tone: supervisor.pending ? "warn" : "ok", page: "supervision" } : null,
       network ? { icon: "\u{1F310}", title: "Rede e cameras", note: [network.network?.[0], network.ips?.[0], network.cameras?.[0]].filter(Boolean).join(" | "), label: "Rede", tone: "info", page: "network" } : { icon: "\u{1F310}", title: "Rede e cameras", note: "Sem dados tecnicos vinculados.", label: "Pendente", tone: "warn", page: "network" },
-      { icon: "\u{1F4BB}", title: "Inventario", note: `${totals.lines || metrics.items || 0} linha(s) | ${totals.alertUnits || metrics.alerts || 0} alerta(s)`, label: totals.alertUnits || metrics.alerts ? "Revisar" : "OK", tone: totals.alertUnits || metrics.alerts ? "warn" : "ok", page: "inventory" },
+      { icon: "\u{1F4BB}", title: "Inventario", note: `${totals.lines || metrics.items || 0} linha(s) | ${totals.alertUnits || metrics.alerts || 0} manut./defeito`, label: totals.alertUnits || metrics.alerts ? "Revisar" : "OK", tone: totals.alertUnits || metrics.alerts ? "warn" : "ok", page: "inventory" },
       calls.length ? { icon: "\u{1F4E5}", title: "Chamados", note: calls.map(call => call.title).slice(0, 3).join(" | "), label: "Fila", tone: "warn", page: "calls" } : null
     ].filter(Boolean).filter(item => !P.canAccess || P.canAccess(item.page));
     const followUps = [
@@ -768,7 +773,7 @@
           <div class="school-avatar large">${school.initials}</div>
           <div>
             <strong>${school.name}</strong>
-            <small>${school.city} â€¢ CIE ${school.cie}</small>
+            <small>${school.city} | CIE ${school.cie}</small>
           </div>
           <span class="status-pill ${profileStatusFromPct(profilePct)}">${profilePct}% ficha</span>
         </div>
@@ -781,7 +786,7 @@
           <div class="school-operational-score">
             <span><strong>${profilePct}%</strong><small>ficha</small></span>
             <span><strong>${totals.lines || metrics.items || 0}</strong><small>inventario</small></span>
-            <span><strong>${totals.alertUnits || metrics.alerts || 0}</strong><small>alertas</small></span>
+            <span><strong>${totals.alertUnits || metrics.alerts || 0}</strong><small>manut./defeito</small></span>
             <span><strong>${calls.length}</strong><small>chamados</small></span>
           </div>
         </section>
@@ -799,41 +804,41 @@
           </article>
           <article class="detail-widget">
             <div>
-              <small>DireÃ§Ã£o</small>
-              <strong>${profile?.director || "NÃ£o informada"}</strong>
-              <p>${[profile?.viceDirector && `Vice: ${profile.viceDirector}`, profile?.goe && `GOE: ${profile.goe}`].filter(Boolean).join(" â€¢ ") || "Equipe gestora pendente na ficha."}</p>
+              <small>Direcao</small>
+              <strong>${profile?.director || "Nao informada"}</strong>
+              <p>${[profile?.viceDirector && `Vice: ${profile.viceDirector}`, profile?.goe && `GOE: ${profile.goe}`].filter(Boolean).join(" | ") || "Equipe gestora pendente na ficha."}</p>
             </div>
-            <span class="status-pill ${profile?.director ? "ok" : "warn"}">gestÃ£o</span>
+            <span class="status-pill ${profile?.director ? "ok" : "warn"}">gestao</span>
           </article>
           <article class="detail-widget">
             <div>
               <small>Contato da escola</small>
               <strong>${profile?.phone || "Telefone pendente"}</strong>
-              <p>${[profile?.email, profile?.address].filter(Boolean).join(" â€¢ ") || "Email e endereÃ§o ainda nÃ£o informados."}</p>
+              <p>${[profile?.email, profile?.address].filter(Boolean).join(" | ") || "Email e endereco ainda nao informados."}</p>
             </div>
             <span class="status-pill ${profile?.phone || profile?.email ? "info" : "warn"}">contato</span>
           </article>
           <article class="detail-widget">
             <div>
-              <small>InventÃ¡rio</small>
+              <small>Inventario</small>
               <strong>${totals.lines || metrics.items} linha(s)</strong>
-              <p>${totals.alertUnits || metrics.alerts ? `${totals.alertUnits || metrics.alerts} unidade(s) em manutenÃ§Ã£o ou defeito.` : "Sem alerta operacional registrado."}</p>
+              <p>${totals.alertUnits || metrics.alerts ? `${totals.alertUnits || metrics.alerts} unidade(s) em manutencao ou defeito.` : "Sem manutencao/defeito registrado."}</p>
             </div>
             <span class="status-pill ${totals.alertUnits || metrics.alerts ? "warn" : "ok"}">${totals.alertUnits || metrics.alerts ? "revisar" : "ok"}</span>
           </article>
           <article class="detail-widget">
             <div>
-              <small>Redes e cÃ¢meras</small>
+              <small>Redes e cameras</small>
               <strong>${networkStatus}</strong>
-              <p>${network ? [network.network?.[0], network.cameras?.[0]].filter(Boolean).join(" â€¢ ") : "Sem dados tÃ©cnicos vinculados."}</p>
+              <p>${network ? [network.network?.[0], network.cameras?.[0]].filter(Boolean).join(" | ") : "Sem dados tecnicos vinculados."}</p>
             </div>
             <span class="status-pill ${network ? "info" : "warn"}">${network ? "CTC" : "pendente"}</span>
           </article>
           <article class="detail-widget">
             <div>
-              <small>SupervisÃ£o</small>
-              <strong>${supervisor?.name || "NÃ£o vinculada"}</strong>
-              <p>${supervisor ? `${supervisor.week} na semana â€¢ ${supervisor.month} no mÃªs.` : "Aguardando vÃ­nculo oficial."}</p>
+              <small>Supervisao</small>
+              <strong>${supervisor?.name || "Nao vinculada"}</strong>
+              <p>${supervisor ? `${supervisor.week} na semana | ${supervisor.month} no mes.` : "Aguardando v?nculo oficial."}</p>
             </div>
             <span class="status-pill info">oficial</span>
           </article>
@@ -841,15 +846,15 @@
             <div>
               <small>Chamados</small>
               <strong>${calls.length}</strong>
-              <p>${calls.length ? calls.map(call => call.title).slice(0, 2).join(" â€¢ ") : "Sem chamado vinculado na base atual."}</p>
+              <p>${calls.length ? calls.map(call => call.title).slice(0, 2).join(" | ") : "Sem chamado vinculado na base atual."}</p>
             </div>
             <span class="status-pill ${calls.length ? "warn" : "ok"}">${calls.length ? "fila" : "ok"}</span>
           </article>
           <article class="detail-widget">
             <div>
-              <small>Contatos Ãºteis</small>
+              <small>Contatos uteis</small>
               <strong>${contacts.length}</strong>
-              <p>${contacts.map(contact => `${contact.sector}: ${contact.name}`).join(" â€¢ ")}</p>
+              <p>${contacts.map(contact => `${contact.sector}: ${contact.name}`).join(" | ")}</p>
             </div>
             <span class="status-pill info">URE</span>
           </article>
@@ -877,7 +882,7 @@
           ${profile?.email ? `<a class="ghost-btn" href="mailto:${profile.email}">Enviar email</a>` : ""}
           ${profile?.phone ? `<a class="ghost-btn" href="tel:${profile.phone.replace(/[^0-9+]/g, "")}">Ligar</a>` : ""}
           ${!P.canAccess || P.canAccess("network") ? `<button class="ghost-btn" type="button" data-open-network="${school.name}" ${network ? "" : "disabled"}>Abrir redes</button>` : ""}
-          ${!P.canAccess || P.canAccess("inventory") ? `<button class="ghost-btn" type="button" data-open-inventory="${school.name}">Abrir inventÃ¡rio</button>` : ""}
+          ${!P.canAccess || P.canAccess("inventory") ? `<button class="ghost-btn" type="button" data-open-inventory="${school.name}">Abrir inventario</button>` : ""}
           <button class="ghost-btn" type="button" data-open-supervisor="${supervisor?.name || ""}" ${supervisor ? "" : "disabled"}>Abrir supervisor</button>
         </div>
       </article>
@@ -894,7 +899,7 @@
   }
 
   function followUpText(missingProfile, alertCount, network, callCount) {
-    if (alertCount) return "Prioridade: conferir inventario com manutencao ou defeito.";
+    if (alertCount) return "Conferir inventario com manutencao ou defeito.";
     if (callCount) return "Acompanhar chamados vinculados antes de encerrar a escola.";
     if (missingProfile.length) return `Completar ficha: ${missingProfile.slice(0, 3).join(", ")}.`;
     if (!network) return "Mapear rede e cameras para completar a base tecnica.";
@@ -928,10 +933,10 @@
   function renderNetworkOperationalSummary(networkData, selectedName, selectedData) {
     const names = Object.keys(networkData || {});
     const rows = [
-      { icon: "ðŸŒ", title: "Escolas mapeadas", note: `${names.length} escola(s) com dados de infraestrutura.`, label: `${names.length}`, tone: names.length ? "info" : "warn" },
-      { icon: "ðŸ”¢", title: "IPs", note: `${selectedData?.ips?.length || 0} registro(s) de IP para ${selectedName || "a escola selecionada"}.`, label: selectedData?.ips?.length ? "ok" : "pendente", tone: selectedData?.ips?.length ? "ok" : "warn" },
-      { icon: "ðŸ“¹", title: "Cameras", note: `${selectedData?.cameras?.length || 0} informacao(oes) de cameras disponiveis.`, label: selectedData?.cameras?.length ? "ok" : "base", tone: selectedData?.cameras?.length ? "ok" : "info" },
-      { icon: "ðŸ”", title: "Credenciais", note: canViewCredentials() ? "Perfil autorizado a consultar credenciais tecnicas." : "Credenciais ficam protegidas para este perfil.", label: canViewCredentials() ? "liberado" : "restrito", tone: canViewCredentials() ? "ok" : "warn" }
+      { icon: "RE", title: "Escolas mapeadas", note: `${names.length} escola(s) com dados de infraestrutura.`, label: `${names.length}`, tone: names.length ? "info" : "warn" },
+      { icon: "IP", title: "IPs", note: `${selectedData?.ips?.length || 0} registro(s) de IP para ${selectedName || "a escola selecionada"}.`, label: selectedData?.ips?.length ? "ok" : "pendente", tone: selectedData?.ips?.length ? "ok" : "warn" },
+      { icon: "CM", title: "Cameras", note: `${selectedData?.cameras?.length || 0} informacao(oes) de cameras disponiveis.`, label: selectedData?.cameras?.length ? "ok" : "base", tone: selectedData?.cameras?.length ? "ok" : "info" },
+      { icon: "AD", title: "Credenciais", note: canViewCredentials() ? "Perfil autorizado a consultar credenciais tecnicas." : "Credenciais ficam protegidas para este perfil.", label: canViewCredentials() ? "liberado" : "restrito", tone: canViewCredentials() ? "ok" : "warn" }
     ];
     renderSummaryRows("#networkSummaryRows", rows);
   }
@@ -952,10 +957,10 @@
     const supervisor = supervisorForSchool(selectedName);
     const credentialItems = data.credentials || [];
     const widgets = [
-      ["InformaÃ§Ãµes sobre redes", data.network || [], "ðŸŒ", "info", "PÃºblico CTC"],
-      ["InformaÃ§Ãµes sobre IPs", data.ips || [], "ðŸ”¢", "info", "PÃºblico CTC"],
-      ["InformaÃ§Ãµes sobre cÃ¢meras", data.cameras || [], "ðŸ“¹", "info", "PÃºblico CTC"],
-      ["Credenciais", data.credentials || [], "ðŸ”", "warn", "Restrito"]
+      ["Informacoes sobre redes", data.network || [], "RE", "info", "Publico CTC"],
+      ["Informacoes sobre IPs", data.ips || [], "IP", "info", "Publico CTC"],
+      ["Informacoes sobre cameras", data.cameras || [], "CM", "info", "Publico CTC"],
+      ["Credenciais", data.credentials || [], "AD", "warn", "Restrito"]
     ].filter(([, items]) => items.length);
     if (credentialItems.length && !canViewCredentials()) {
       const credentialIndex = widgets.findIndex(([title]) => title === "Credenciais");
@@ -969,11 +974,11 @@
         <div>
           <small>Escola selecionada</small>
           <strong>${selectedName}</strong>
-          <p>${school ? `${school.city} â€¢ CIE ${school.cie}` : "Escola fora da lista mestre."}</p>
+          <p>${school ? `${school.city} | CIE ${school.cie}` : "Escola fora da lista mestre."}</p>
         </div>
         <div class="detail-actions">
           <button class="ghost-btn" type="button" data-open-school="${selectedName}">Abrir escola</button>
-          <button class="ghost-btn" type="button" data-open-inventory="${selectedName}">Abrir inventÃ¡rio</button>
+          <button class="ghost-btn" type="button" data-open-inventory="${selectedName}">Abrir inventario</button>
           <button class="ghost-btn" type="button" data-open-supervisor="${supervisor?.name || ""}" ${supervisor ? "" : "disabled"}>Abrir supervisor</button>
         </div>
       </article>
@@ -982,7 +987,7 @@
         <div>
           <small>${title}</small>
           <strong>${icon} ${items[0]}</strong>
-          <p>${items.slice(1).join(" â€¢ ")}</p>
+          <p>${items.slice(1).join(" | ")}</p>
         </div>
         <span class="status-pill ${tone}">${label}</span>
       </article>
@@ -1003,10 +1008,10 @@
     const schools = new Set(assets.map(asset => asset.school).filter(Boolean)).size;
     const categoryCount = new Set(selectedAssets.map(asset => assetCategory(asset))).size;
     const rows = [
-      { icon: "ðŸ’»", title: "Inventario da escola", note: `${totals.lines} linha(s), ${totals.units} unidade(s) e ${categoryCount} categoria(s).`, label: `${totals.units}`, tone: "info" },
-      { icon: "âš ï¸", title: "Alertas", note: totals.alertUnits ? `${totals.alertUnits} unidade(s) em manutencao ou defeito em ${selectedSchool}.` : "Sem alerta na escola selecionada.", label: totals.alertUnits ? "revisar" : "ok", tone: totals.alertUnits ? "warn" : "ok" },
-      { icon: "ðŸ«", title: "Base carregada", note: `${schools} escola(s) com inventario e ${globalTotals.lines} linha(s) totais.`, label: `${schools}`, tone: "info" },
-      { icon: "âœ…", title: "Conferencia", note: globalTotals.alertUnits ? `${globalTotals.alertUnits} alerta(s) na base completa.` : "Base completa sem alerta resumido.", label: globalTotals.alertUnits ? "atencao" : "ok", tone: globalTotals.alertUnits ? "warn" : "ok" }
+      { icon: "IN", title: "Inventario da escola", note: `${totals.lines} linha(s), ${totals.units} unidade(s) e ${categoryCount} categoria(s).`, label: `${totals.units}`, tone: "info" },
+      { icon: "ST", title: "Manutencao/defeito", note: totals.alertUnits ? `${totals.alertUnits} unidade(s) fora de OK em ${selectedSchool}.` : "Todos os itens filtrados estao OK.", label: `${totals.alertUnits}`, tone: totals.alertUnits ? "warn" : "ok" },
+      { icon: "ES", title: "Base carregada", note: `${schools} escola(s) com inventario e ${globalTotals.lines} linha(s) totais.`, label: `${schools}`, tone: "info" },
+      { icon: "OK", title: "Conferencia", note: `${globalTotals.alertUnits} unidade(s) fora de OK na base completa.`, label: globalTotals.alertUnits ? "acompanhar" : "ok", tone: globalTotals.alertUnits ? "warn" : "ok" }
     ];
     renderSummaryRows("#inventorySummaryRows", rows);
   }
@@ -1018,9 +1023,9 @@
     const assets = data.schoolAssets || [];
     if (!assets.length) {
       renderSummaryRows("#inventorySummaryRows", [
-        { icon: "ðŸ’»", title: "Inventario", note: "Nenhuma linha carregada para o perfil atual.", label: "vazio", tone: "warn" }
+        { icon: "IN", title: "Inventario", note: "Nenhuma linha carregada para o perfil atual.", label: "vazio", tone: "warn" }
       ]);
-      grid.innerHTML = `<div class="empty-state">Nenhum dado de inventÃ¡rio carregado ainda.</div>`;
+      grid.innerHTML = `<div class="empty-state">Nenhum dado de inventario carregado ainda.</div>`;
       return;
     }
     if (select && !select.options.length) {
@@ -1076,10 +1081,10 @@
         <div class="inventory-hero-main">
           <small>Escola selecionada</small>
           <strong>${selectedSchool}</strong>
-          <p>${totals.lines} linha(s) â€¢ ${totals.units} unidade(s) â€¢ ${totals.alertUnits} alerta(s)</p>
+          <p>${totals.lines} linha(s) | ${totals.units} unidade(s) | ${totals.alertUnits} manutencao/defeito</p>
         </div>
         <div class="inventory-hero-score">
-          <span><strong>${alertAssets.length}</strong><small>prioridade</small></span>
+          <span><strong>${alertAssets.length}</strong><small>fora de OK</small></span>
           <span><strong>${okLines}</strong><small>ok</small></span>
           <span><strong>${categories.length}</strong><small>categorias</small></span>
         </div>
@@ -1090,18 +1095,18 @@
         </div>
       </article>
       <article class="inventory-list box inventory-priority">
-        <div class="box-head"><div><strong>Triagem da escola</strong><small>${alertAssets.length ? "Itens que pedem acao" : "Sem alerta no filtro atual"}</small></div></div>
+        <div class="box-head"><div><strong>Status da escola</strong><small>${alertAssets.length ? "Itens em manutencao ou defeito" : "Sem manutencao/defeito no filtro atual"}</small></div></div>
         <div class="row-list compact">
           ${alertAssets.length ? alertAssets.map(asset => `
             <div class="data-row compact" data-inventory-key="${P.searchText([asset.school, asset.sourceName || asset.name, asset.notes])}" data-search="${P.searchText([asset.school, asset.name, asset.sourceName, asset.notes, asset.status])}">
-              <span class="row-icon">âš ï¸</span>
+              <span class="row-icon">!</span>
               <span><strong>${asset.sourceName || asset.name}</strong><small>${asset.notes || asset.name}</small></span>
-              <em class="status-pill ${assetTone(asset.status)}">${assetUnits(asset)} â€¢ ${assetStatusLabel(asset.status)}</em>
+              <em class="status-pill ${assetTone(asset.status)}">${assetUnits(asset)} | ${assetStatusLabel(asset.status)}</em>
             </div>
           `).join("") : `
             <div class="data-row compact">
-              <span class="row-icon">âœ…</span>
-              <span><strong>Sem alerta resumido</strong><small>A escola selecionada nao possui item em manutencao ou defeito neste filtro.</small></span>
+              <span class="row-icon">OK</span>
+              <span><strong>Todos OK</strong><small>A escola selecionada nao possui item em manutencao ou defeito neste filtro.</small></span>
               <em class="status-pill ok">ok</em>
             </div>
           `}
@@ -1112,19 +1117,19 @@
           <div>
             <small>${item.category}</small>
             <strong>${item.units} unidade(s)</strong>
-            <p>${item.lines} linha(s) consolidada(s) â€¢ ${item.alerts} em manutenÃ§Ã£o/defeito.</p>
+            <p>${item.lines} linha(s) consolidada(s) | ${item.alerts} em manutencao/defeito.</p>
           </div>
-          <span class="status-pill ${item.alerts ? "warn" : "ok"}">${item.alerts ? "revisar" : "ok"}</span>
+          <span class="status-pill ${item.alerts ? "warn" : "ok"}">${item.alerts ? "acompanhar" : "ok"}</span>
         </article>
       `).join("")}
       <article class="inventory-list box">
-        <div class="box-head"><div><strong>Itens da escola</strong><small>${selectedAssets.length} linha(s) do inventÃ¡rio</small></div></div>
+        <div class="box-head"><div><strong>Itens da escola</strong><small>${selectedAssets.length} linha(s) do inventario</small></div></div>
         <div class="row-list">
           ${selectedAssets.map(asset => `
             <div class="data-row" data-inventory-key="${P.searchText([asset.school, asset.sourceName || asset.name, asset.notes])}" data-search="${P.searchText([asset.school, asset.name, asset.sourceName, asset.notes, asset.status])}">
-              <span class="row-icon">ðŸ’»</span>
+              <span class="row-icon">IN</span>
               <span><strong>${asset.sourceName || asset.name}</strong><small>${asset.notes || asset.name}</small></span>
-              <em class="status-pill ${assetTone(asset.status)}">${assetUnits(asset)} â€¢ ${assetStatusLabel(asset.status)}</em>
+              <em class="status-pill ${assetTone(asset.status)}">${assetUnits(asset)} | ${assetStatusLabel(asset.status)}</em>
             </div>
           `).join("")}
         </div>
@@ -1159,23 +1164,21 @@
   function renderSupervisionOperationalSummary(supervisors) {
     const totals = supervisors.reduce((acc, item) => {
       const { week, month, pending, schools } = supervisorProgress(item);
-      const tone = supervisorTone(item);
       acc.weekDone += week.done;
       acc.weekTotal += week.total;
       acc.monthDone += month.done;
       acc.monthTotal += month.total;
       acc.pending += pending;
       acc.schools += schools;
-      if (tone === "ok") acc.ok += 1;
-      if (tone === "danger") acc.critical += 1;
+      if (!pending) acc.ok += 1;
       return acc;
-    }, { weekDone: 0, weekTotal: 0, monthDone: 0, monthTotal: 0, pending: 0, schools: 0, ok: 0, critical: 0 });
+    }, { weekDone: 0, weekTotal: 0, monthDone: 0, monthTotal: 0, pending: 0, schools: 0, ok: 0 });
     const sourceNote = supervisionMonthNote();
     const rows = [
-      { icon: "🎯", title: "Semana", note: `${totals.weekDone}/${totals.weekTotal || 0} visita(s) registradas no recorte atual.`, label: totals.weekTotal && totals.weekDone >= totals.weekTotal ? "verde" : "meta", tone: totals.weekTotal && totals.weekDone >= totals.weekTotal ? "ok" : "warn" },
-      { icon: "📅", title: "Mes", note: `${totals.monthDone}/${totals.monthTotal || 0} visita(s) no mes oficial.`, label: totals.pending ? `${totals.pending} faltam` : "verde", tone: totals.pending ? "warn" : "ok" },
-      { icon: "🏫", title: "Carteira", note: `${totals.schools} escola(s) vinculada(s) a ${supervisors.length} supervisor(es).`, label: `${supervisors.length}`, tone: "info" },
-      { icon: "⚠️", title: "Acompanhamento", note: sourceNote || `${totals.critical} critico(s), ${totals.ok}/${supervisors.length} em dia.`, label: totals.critical ? "critico" : "status", tone: totals.critical ? "danger" : (totals.ok === supervisors.length ? "ok" : "warn") }
+      { icon: "SM", title: "Semana", note: `${totals.weekDone}/${totals.weekTotal || 0} visita(s) registradas no recorte atual.`, label: `${totals.weekDone}/${totals.weekTotal || 0}`, tone: totals.weekTotal && totals.weekDone >= totals.weekTotal ? "ok" : "warn" },
+      { icon: "MS", title: "Mes", note: `${totals.monthDone}/${totals.monthTotal || 0} visita(s) no mes oficial.`, label: `${totals.monthDone}/${totals.monthTotal || 0}`, tone: totals.pending ? "warn" : "ok" },
+      { icon: "ES", title: "Carteira", note: `${totals.schools} escola(s) vinculada(s) a ${supervisors.length} supervisor(es).`, label: `${supervisors.length}`, tone: "info" },
+      { icon: "FT", title: "Faltantes", note: sourceNote || `${totals.pending} visita(s) faltam no recorte atual.`, label: `${totals.pending}`, tone: totals.pending ? "warn" : "ok" }
     ];
     renderSummaryRows("#supervisionSummaryRows", rows);
   }
@@ -1195,23 +1198,8 @@
       if (sortMode === "schools") return Number(b.schools || 0) - Number(a.schools || 0) || a.name.localeCompare(b.name);
       return a.name.localeCompare(b.name);
     });
-    const attention = sorted.filter(item => supervisorTone(item) !== "ok").slice(0, 3);
     host.innerHTML = `
-      ${sourceNote ? `<div class="supervision-source"><span>📅</span><strong>Fonte de supervisao</strong><small>${sourceNote}</small></div>` : ""}
-      ${attention.length ? `
-        <div class="supervision-focus">
-          <div>
-            <strong>Prioridade do dia</strong>
-            <small>${attention.length} supervisor(es) com meta pendente no recorte atual.</small>
-          </div>
-          <div class="supervision-focus-list">
-            ${attention.map(item => {
-              const meta = supervisorStatusMeta(item);
-              return `<button type="button" data-supervisor-focus="${item.name}"><span>${initials(item.name)}</span><strong>${item.name}</strong><em class="status-pill ${meta.tone}">${meta.label}</em></button>`;
-            }).join("")}
-          </div>
-        </div>
-      ` : ""}
+      ${sourceNote ? `<div class="supervision-source"><span>Fonte</span><strong>Supervisao</strong><small>${sourceNote}</small></div>` : ""}
       ${sorted.map((item, index) => {
         const { week, month, schools } = supervisorProgress(item);
         const meta = supervisorStatusMeta(item);
@@ -1221,7 +1209,7 @@
             <div class="school-avatar">${initials(item.name)}</div>
             <span>
               <strong>${item.name}</strong>
-              <small>${schools} escola(s) • ${item.email || item.phone || "contato pendente"}</small>
+              <small>${schools} escola(s) | ${item.email || item.phone || "contato pendente"}</small>
             </span>
           </div>
           <div class="supervisor-row-summary">
@@ -1244,9 +1232,6 @@
         </button>
       `; }).join("")}`;
     applySupervisorFilters();
-    host.querySelectorAll("[data-supervisor-focus]").forEach(button => {
-      button.addEventListener("click", () => openSupervisorPage(button.dataset.supervisorFocus));
-    });
     host.querySelectorAll("[data-supervisor-index]").forEach(button => {
       button.addEventListener("click", () => {
         openSupervisorPage(sorted[Number(button.dataset.supervisorIndex)].name);
@@ -1275,12 +1260,6 @@
     });
     const { week, month, pending, schools: schoolCount } = supervisorProgress(supervisor);
     const meta = supervisorStatusMeta(supervisor);
-    const alertSchools = schoolCards.filter(school => school.alerts).length;
-    const incompleteProfiles = schoolCards.filter(school => school.profilePct < 65).length;
-    const attentionCards = schoolCards
-      .filter(school => school.alerts || school.profilePct < 65)
-      .sort((a, b) => b.alerts - a.alerts || a.profilePct - b.profilePct)
-      .slice(0, 6);
     const completedMessage = pending ? `${pending} visita(s) ainda faltam no mes.` : "Meta mensal concluida.";
     detail.innerHTML = `
       <article class="supervisor-hero supervisor-hero-${meta.tone}">
@@ -1289,7 +1268,7 @@
           <div>
             <span class="eyebrow">Supervisor</span>
             <strong>${supervisor.name}</strong>
-            <p>${supervisor.email || "email nao informado"} ${supervisor.phone ? `• ${supervisor.phone}` : ""}</p>
+            <p>${supervisor.email || "email nao informado"} ${supervisor.phone ? ` | ${supervisor.phone}` : ""}</p>
           </div>
         </div>
         <div class="supervisor-hero-status">
@@ -1317,34 +1296,15 @@
           <i style="--pct:${schoolCards.length ? 100 : 0}%"></i>
           <p>${schoolCards.length} escola(s) vinculada(s) na base oficial.</p>
         </article>
-        <article class="supervisor-score-card ${alertSchools || incompleteProfiles ? "warn" : "ok"}">
-          <div class="score-card-head"><small>Avisos</small><span>${alertSchools + incompleteProfiles}</span></div>
-          <strong>${alertSchools + incompleteProfiles}</strong>
-          <i style="--pct:${alertSchools || incompleteProfiles ? 66 : 100}%"></i>
-          <p>${alertSchools} inventario(s) e ${incompleteProfiles} ficha(s) para revisar.</p>
+        <article class="supervisor-score-card info">
+          <div class="score-card-head"><small>Contato</small><span>URE</span></div>
+          <strong>${supervisor.phone ? "Ramal" : "Email"}</strong>
+          <i style="--pct:100%"></i>
+          <p>${supervisor.phone || supervisor.email || "Contato nao informado na base."}</p>
         </article>
       </section>
 
       <section class="supervisor-workbench">
-        <article class="box supervisor-attention-box">
-          <div class="box-head"><div><strong>O que precisa de acao</strong><small>Prioridade para corrigir visita errada, faltante ou dado incompleto.</small></div></div>
-          <div class="row-list compact">
-            ${attentionCards.length ? attentionCards.map(school => `
-              <button class="data-row compact" type="button" data-school-jump="${school.name}" data-search="${P.searchText([school.name, school.city])}">
-                <span class="row-icon">📌</span>
-                <span><strong>${school.name}</strong><small>${school.alerts ? `${school.alerts} alerta(s) de inventario` : `ficha ${school.profilePct}%`}</small></span>
-                <em class="status-pill warn">acompanhar</em>
-              </button>
-            `).join("") : `
-              <div class="data-row compact">
-                <span class="row-icon">✅</span>
-                <span><strong>Sem alerta resumido</strong><small>Se houver visita errada ou faltando, entrar em contato com o gabinete.</small></span>
-                <em class="status-pill ok">ok</em>
-              </div>
-            `}
-          </div>
-        </article>
-
         <article class="box supervisor-school-box">
           <div class="box-head"><div><strong>Escolas da carteira</strong><small>Clique para abrir a unidade e conferir ficha, inventario e rede.</small></div></div>
           <div class="linked-school-grid supervisor-linked-grid">
@@ -1352,9 +1312,9 @@
               <button class="linked-school" type="button" data-school-jump="${school.name}" data-search="${P.searchText([school.name, school.city, school.cie])}">
                 <span>
                   <strong>${school.name}</strong>
-                  <small>${school.city} • ${school.cie} • ficha ${school.profilePct}%</small>
+                  <small>${school.city} | ${school.cie} | ficha ${school.profilePct}%</small>
                 </span>
-                <em class="status-pill ${statusClass(school.status)}">${school.alerts ? `${school.alerts} alerta(s)` : `${school.items} item(ns)`}</em>
+                <em class="status-pill ${statusClass(school.status)}">${school.alerts ? `${school.alerts} manut./defeito` : `${school.items} item(ns)`}</em>
               </button>
             `).join("") : `<div class="empty-state">Nenhuma escola vinculada a este supervisor.</div>`}
           </div>
@@ -1378,10 +1338,10 @@
     const phoneCount = visible.filter(contact => contact.phone).length;
     const photoCount = visible.filter(contact => contact.photo).length;
     const rows = [
-      { icon: "â˜Žï¸", title: "Contatos visiveis", note: sector === "Todos" ? `${visible.length} contato(s) em ${sectors} setor(es).` : `${visible.length} contato(s) em ${sector}.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
-      { icon: "âœ‰ï¸", title: "Email", note: `${emailCount}/${visible.length || 0} contato(s) com email disponivel.`, label: emailCount === visible.length && visible.length ? "ok" : "base", tone: emailCount === visible.length && visible.length ? "ok" : "info" },
-      { icon: "ðŸ“ž", title: "Telefone e ramal", note: `${phoneCount}/${visible.length || 0} contato(s) com canal telefonico.`, label: phoneCount === visible.length && visible.length ? "ok" : "revisar", tone: phoneCount === visible.length && visible.length ? "ok" : "warn" },
-      { icon: "ðŸ‘¤", title: "Perfis vinculados", note: `${photoCount} contato(s) ja usam foto enviada pelo usuario.`, label: photoCount ? "foto" : "local", tone: photoCount ? "ok" : "info" }
+      { icon: "CO", title: "Contatos visiveis", note: sector === "Todos" ? `${visible.length} contato(s) em ${sectors} setor(es).` : `${visible.length} contato(s) em ${sector}.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
+      { icon: "EM", title: "Email", note: `${emailCount}/${visible.length || 0} contato(s) com email disponivel.`, label: emailCount === visible.length && visible.length ? "ok" : "base", tone: emailCount === visible.length && visible.length ? "ok" : "info" },
+      { icon: "TE", title: "Telefone e ramal", note: `${phoneCount}/${visible.length || 0} contato(s) com canal telefonico.`, label: phoneCount === visible.length && visible.length ? "ok" : "revisar", tone: phoneCount === visible.length && visible.length ? "ok" : "warn" },
+      { icon: "US", title: "Perfis vinculados", note: `${photoCount} contato(s) ja usam foto enviada pelo usuario.`, label: photoCount ? "foto" : "local", tone: photoCount ? "ok" : "info" }
     ];
     renderSummaryRows("#contactSummaryRows", rows);
   }
@@ -1536,7 +1496,7 @@
     ];
     return `
       <article class="box calendar-board">
-        <div class="box-head"><div><strong>${P.selectedMonthLabel?.() || "MÃªs atual"}</strong><small>Calendario visual do recorte selecionado</small></div></div>
+        <div class="box-head"><div><strong>${P.selectedMonthLabel?.() || "Mes atual"}</strong><small>Calendario visual do recorte selecionado</small></div></div>
         <div class="calendar-weekdays"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sab</span></div>
         <div class="calendar-days">${cells.join("")}</div>
       </article>
@@ -1555,10 +1515,10 @@
 
   function renderCalendarOperationalSummary(calendar, mode = "shared") {
     const rows = [
-      { icon: "ðŸ—“ï¸", title: mode === "personal" ? "Agenda pessoal" : "Agenda compartilhada", note: `${calendar.length} evento(s) ou prazo(s) disponiveis.`, label: `${calendar.length}`, tone: calendar.length ? "info" : "warn" },
-      { icon: "ðŸš—", title: "Recursos compartilhados", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("carro")).length} item(ns) relacionados a carro oficial.`, label: "recurso", tone: "info" },
-      { icon: "ðŸ“Œ", title: "Prazos", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("prazo")).length} item(ns) com sinal de prazo institucional.`, label: "prazo", tone: "warn" },
-      { icon: "âœ…", title: "Fonte", note: calendar.length ? "Agenda pronta para consulta no recorte atual." : "Aguardando fonte oficial do calendario URE.", label: calendar.length ? "ok" : "pendente", tone: calendar.length ? "ok" : "warn" }
+      { icon: "AG", title: mode === "personal" ? "Agenda pessoal" : "Agenda compartilhada", note: `${calendar.length} evento(s) ou prazo(s) disponiveis.`, label: `${calendar.length}`, tone: calendar.length ? "info" : "warn" },
+      { icon: "CR", title: "Recursos compartilhados", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("carro")).length} item(ns) relacionados a carro oficial.`, label: "recurso", tone: "info" },
+      { icon: "PZ", title: "Prazos", note: `${calendar.filter(item => P.normalize([item.label, item.note].join(" ")).includes("prazo")).length} item(ns) com sinal de prazo institucional.`, label: "prazo", tone: "warn" },
+      { icon: "OK", title: "Fonte", note: calendar.length ? "Agenda pronta para consulta no recorte atual." : "Aguardando fonte oficial do calendario URE.", label: calendar.length ? "ok" : "pendente", tone: calendar.length ? "ok" : "warn" }
     ];
     renderSummaryRows("#calendarSummaryRows", rows);
   }
@@ -1584,13 +1544,13 @@
     grid.innerHTML = items.length ? items.map(item => `
       <article class="detail-widget" data-search="${P.searchText([item.label, item.status, item.note])}">
         <div>
-          <small>${item.status === "ok" ? "concluÃ­do" : "atenÃ§Ã£o"}</small>
+          <small>${item.status === "ok" ? "concluido" : "atencao"}</small>
           <strong>${item.label}</strong>
           <p>${item.note}</p>
         </div>
         <span class="status-pill ${statusClass(item.status)}">${item.status === "ok" ? "ok" : "revisar"}</span>
       </article>
-    `).join("") : `<div class="empty-state">Checklist de qualidade nÃ£o carregado.</div>`;
+    `).join("") : `<div class="empty-state">Checklist de qualidade nao carregado.</div>`;
   }
 
   function renderCtc(visits) {
@@ -1619,14 +1579,14 @@
     });
     renderCtcOperationalSummary(visits, visible);
     const summary = P.$("#ctcFilterSummary");
-    if (summary) summary.textContent = `${visible.length}/${visits.length} visita(s) visÃ­veis.`;
+    if (summary) summary.textContent = `${visible.length}/${visits.length} visita(s) visiveis.`;
 
     grid.innerHTML = visible.length ? visible.map(visit => `
       <article class="detail-widget" data-ctc-key="${P.searchText([visit.owner, visit.date, visit.time, visit.place])}" data-search="${P.searchText([visit.owner, visit.date, visit.time, visit.place, visit.objective])}">
         <div>
-          <small>${visit.date} â€¢ ${visit.time}</small>
-          <strong>ðŸ› ï¸ ${visit.owner}</strong>
-          <p>${visit.place} â€¢ ${visit.objective}</p>
+          <small>${visit.date} | ${visit.time}</small>
+          <strong>CT ${visit.owner}</strong>
+          <p>${visit.place} | ${visit.objective}</p>
         </div>
         <div class="detail-actions">
           <button class="ghost-btn" type="button" data-open-school="${visit.place}">Abrir escola</button>
@@ -1643,10 +1603,10 @@
     const schools = new Set(visible.map(visit => visit.place).filter(Boolean)).size;
     const dates = new Set(visible.map(visit => visit.date).filter(Boolean)).size;
     const rows = [
-      { icon: "ðŸ› ï¸", title: "Visitas tecnicas", note: `${visible.length}/${visits.length} visita(s) no recorte atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
-      { icon: "ðŸ‘¤", title: "Tecnicos", note: `${owners} tecnico(s) com agenda visivel.`, label: `${owners}`, tone: owners ? "ok" : "warn" },
-      { icon: "ðŸ«", title: "Escolas atendidas", note: `${schools} escola(s) aparecem nas visitas filtradas.`, label: `${schools}`, tone: schools ? "info" : "warn" },
-      { icon: "ðŸ“…", title: "Dias de agenda", note: `${dates} dia(s) distintos no recorte.`, label: `${dates}`, tone: dates ? "info" : "warn" }
+      { icon: "CT", title: "Visitas tecnicas", note: `${visible.length}/${visits.length} visita(s) no recorte atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "warn" },
+      { icon: "US", title: "Tecnicos", note: `${owners} tecnico(s) com agenda visivel.`, label: `${owners}`, tone: owners ? "ok" : "warn" },
+      { icon: "ES", title: "Escolas atendidas", note: `${schools} escola(s) aparecem nas visitas filtradas.`, label: `${schools}`, tone: schools ? "info" : "warn" },
+      { icon: "AG", title: "Dias de agenda", note: `${dates} dia(s) distintos no recorte.`, label: `${dates}`, tone: dates ? "info" : "warn" }
     ];
     renderSummaryRows("#ctcSummaryRows", rows);
   }
@@ -1676,7 +1636,7 @@
     });
     renderCallOperationalSummary(calls, visible);
     const summary = P.$("#callFilterSummary");
-    if (summary) summary.textContent = `${visible.length}/${calls.length} chamado(s) visÃ­veis.`;
+    if (summary) summary.textContent = `${visible.length}/${calls.length} chamado(s) visiveis.`;
 
     grid.innerHTML = visible.length ? visible.map(call => `
       <article class="detail-widget" data-call-key="${P.searchText([call.title])}" data-search="${P.searchText([call.title, call.school, call.status, call.note])}">
@@ -1702,10 +1662,10 @@
     const resolved = visible.filter(call => call.status === "resolvido").length;
     const schools = new Set(visible.map(call => call.school).filter(Boolean)).size;
     const rows = [
-      { icon: "ðŸ“¥", title: "Fila visivel", note: `${visible.length}/${calls.length} chamado(s) no recorte atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "ok" },
-      { icon: "âš ï¸", title: "Abertos", note: `${open} chamado(s) aguardando encaminhamento.`, label: `${open}`, tone: open ? "warn" : "ok" },
-      { icon: "ðŸ§­", title: "Em rota", note: `${route} chamado(s) em atendimento.`, label: `${route}`, tone: route ? "info" : "ok" },
-      { icon: "ðŸ«", title: "Escolas envolvidas", note: `${schools} escola(s) com chamado no filtro. Resolvidos: ${resolved}.`, label: `${schools}`, tone: schools ? "info" : "ok" }
+      { icon: "CH", title: "Fila visivel", note: `${visible.length}/${calls.length} chamado(s) no recorte atual.`, label: `${visible.length}`, tone: visible.length ? "info" : "ok" },
+      { icon: "!", title: "Abertos", note: `${open} chamado(s) aguardando encaminhamento.`, label: `${open}`, tone: open ? "warn" : "ok" },
+      { icon: "SV", title: "Em rota", note: `${route} chamado(s) em atendimento.`, label: `${route}`, tone: route ? "info" : "ok" },
+      { icon: "ES", title: "Escolas envolvidas", note: `${schools} escola(s) com chamado no filtro. Resolvidos: ${resolved}.`, label: `${schools}`, tone: schools ? "info" : "ok" }
     ];
     renderSummaryRows("#callSummaryRows", rows);
   }
@@ -1719,12 +1679,12 @@
     const pendingVisits = (data.supervisors || []).reduce((sum, item) => sum + Number(item.pending || 0), 0);
     const linkedUsers = (data.users || []).filter(user => user.contactSync === "linked").length;
     const metrics = [
-      { icon: "ðŸ«", label: "Escolas", value: String(data.schools.length), note: "base regional", tone: "glow-lime" },
-      { icon: "ðŸ’»", label: "InventÃ¡rio", value: String(data.schoolAssets.length), note: "linhas por escola", tone: "glow-teal" },
-      { icon: "âš ï¸", label: "Alertas", value: String(alerts), note: "manutenÃ§Ã£o/defeito", tone: "glow-amber" },
-      { icon: "ðŸŒ", label: "Redes", value: String(networkCount), note: "escolas mapeadas", tone: "glow-teal" },
-      { icon: "ðŸ§­", label: "PendÃªncias", value: String(pendingVisits), note: "visitas faltantes", tone: "glow-purple" },
-      { icon: "ðŸ‘¤", label: "UsuÃ¡rios", value: `${linkedUsers}/${data.users.length}`, note: "vinculados a contatos", tone: "glow-lime" }
+      { icon: "ES", label: "Escolas", value: String(data.schools.length), note: "base regional", tone: "glow-lime" },
+      { icon: "IN", label: "Inventario", value: String(data.schoolAssets.length), note: "linhas por escola", tone: "glow-teal" },
+      { icon: "!", label: "Alertas", value: String(alerts), note: "manutencao/defeito", tone: "glow-amber" },
+      { icon: "RE", label: "Redes", value: String(networkCount), note: "escolas mapeadas", tone: "glow-teal" },
+      { icon: "SV", label: "Pendencias", value: String(pendingVisits), note: "visitas faltantes", tone: "glow-purple" },
+      { icon: "US", label: "Usuarios", value: `${linkedUsers}/${data.users.length}`, note: "vinculados a contatos", tone: "glow-lime" }
     ];
     grid.innerHTML = metrics.map(item => `
       <article class="metric-card ${item.tone}">
@@ -1735,15 +1695,15 @@
       </article>
     `).join("");
     list.innerHTML = [
-      ["SupervisÃ£o", `${data.supervisors.length} supervisores com planilha oficial de abril conectada.`, "ok"],
-      ["InventÃ¡rio", `${data.schoolAssets.length} linhas sanitizadas, sem previews brutos da 1.0.`, "ok"],
-      ["Redes e cÃ¢meras", `${networkCount}/${data.schools.length} escola(s) com infraestrutura mapeada.`, networkCount === data.schools.length ? "ok" : "warn"],
+      ["Supervisao", `${data.supervisors.length} supervisores com planilha oficial de abril conectada.`, "ok"],
+      ["Inventario", `${data.schoolAssets.length} linhas sanitizadas, sem previews brutos da 1.0.`, "ok"],
+      ["Redes e cameras", `${networkCount}/${data.schools.length} escola(s) com infraestrutura mapeada.`, networkCount === data.schools.length ? "ok" : "warn"],
       ["Chamados", `${data.calls.length} chamado(s) operacionais em acompanhamento.`, data.calls.some(call => call.status !== "resolvido") ? "warn" : "ok"],
-      ["CalendÃ¡rio", "Estrutura pronta para a agenda institucional.", "info"],
-      ["PublicaÃ§Ã£o", "2.0 publicado em repositÃ³rio prÃ³prio e GitHub Pages.", "ok"]
+      ["Calendario", "Estrutura pronta para a agenda institucional.", "info"],
+      ["Publicacao", "2.0 publicado em repositorio proprio e GitHub Pages.", "ok"]
     ].map(([title, note, status]) => `
       <div class="data-row" data-search="${P.searchText([title, note, status])}">
-        <span class="row-icon">ðŸ“ˆ</span>
+        <span class="row-icon">RL</span>
         <span><strong>${title}</strong><small>${note}</small></span>
         <em class="status-pill ${status}">${status === "ok" ? "ok" : "revisar"}</em>
       </div>
@@ -1762,8 +1722,8 @@
     const currentRole = P.currentRole?.() || "Administrador";
     const systemChecks = [
       { label: "Escolas carregadas", status: data.schools.length === 21 ? "ok" : "warn", note: `${data.schools.length}/21 escola(s)` },
-      { label: "InventÃ¡rio carregado", status: data.schoolAssets.length ? "ok" : "warn", note: `${data.schoolAssets.length} linha(s)` },
-      { label: "SupervisÃ£o carregada", status: data.supervisors.length === 6 ? "ok" : "warn", note: `${data.supervisors.length}/6 supervisor(es)` },
+      { label: "Inventario carregado", status: data.schoolAssets.length ? "ok" : "warn", note: `${data.schoolAssets.length} linha(s)` },
+      { label: "Supervisao carregada", status: data.supervisors.length === 6 ? "ok" : "warn", note: `${data.supervisors.length}/6 supervisor(es)` },
       { label: "Contatos carregados", status: data.contacts.length ? "ok" : "warn", note: `${data.contacts.length} contato(s)` },
       {
         label: "Backend online",
@@ -1773,12 +1733,12 @@
       {
         label: "Fontes oficiais",
         status: configuredSources || officialSources ? "ok" : "warn",
-        note: `${configuredSources}/${sources.length} configurada(s), ${officialSources} oficial(is), ${sensitiveSources} sensÃ­vel(is)`
+        note: `${configuredSources}/${sources.length} configurada(s), ${officialSources} oficial(is), ${sensitiveSources} sensivel(is)`
       },
       {
         label: "Escopo ativo",
         status: P.canAccessData ? "ok" : "danger",
-        note: `${currentRole} com ${P.roleAccess?.(currentRole)?.length || 0} pÃ¡gina(s) liberada(s). Teste automÃ¡tico cobre os perfis atuais.`
+        note: `${currentRole} com ${P.roleAccess?.(currentRole)?.length || 0} pagina(s) liberada(s). Teste automatico cobre os perfis atuais.`
       },
       {
         label: "Fichas escolares",
@@ -1786,23 +1746,23 @@
         note: `${data.schoolProfiles.length}/${data.schools.length || 21} ficha(s) herdada(s) da v1`
       },
       {
-        label: "UsuÃ¡rios importados da v1",
+        label: "Usuarios importados da v1",
         status: data.users.length ? "ok" : "warn",
-        note: `${data.users.length} usuÃ¡rio(s), ${data.users.filter(user => user.contactSync === "linked").length} vinculado(s) a contatos`
+        note: `${data.users.length} usu?rio(s), ${data.users.filter(user => user.contactSync === "linked").length} vinculado(s) a contatos`
       },
-      { label: "Perfis ativos", status: P.ROLE_ACCESS ? "ok" : "danger", note: P.ROLE_ACCESS ? `${Object.keys(P.ROLE_ACCESS).length} perfil(is)` : "matriz indisponÃ­vel" }
+      { label: "Perfis ativos", status: P.ROLE_ACCESS ? "ok" : "danger", note: P.ROLE_ACCESS ? `${Object.keys(P.ROLE_ACCESS).length} perfil(is)` : "matriz indisponivel" }
     ];
     const rows = [...systemChecks, ...items];
     grid.innerHTML = rows.length ? rows.map(item => `
       <article class="detail-widget" data-search="${P.searchText([item.label, item.status, item.note])}">
         <div>
-          <small>${item.status === "ok" ? "estÃ¡vel" : "decisÃ£o pendente"}</small>
-          <strong>âš™ï¸ ${item.label}</strong>
+          <small>${item.status === "ok" ? "estavel" : "decisao pendente"}</small>
+          <strong>AD ${item.label}</strong>
           <p>${item.note}</p>
         </div>
         <span class="status-pill ${statusClass(item.status)}">${item.status}</span>
       </article>
-    `).join("") : `<div class="empty-state">Nenhum diagnÃ³stico administrativo carregado.</div>`;
+    `).join("") : `<div class="empty-state">Nenhum diagnostico administrativo carregado.</div>`;
   }
 
   P.renderDashboard = renderDashboard;
