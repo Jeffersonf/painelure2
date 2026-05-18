@@ -9,7 +9,9 @@
       return { key, status: "skipped", rows: [], data: null };
     }
 
-    const rows = await P.fetchCsv(source.url);
+    const rows = source.type === "sharepoint-list"
+      ? await P.fetchSharePointList(source.url)
+      : await P.fetchCsv(source.url);
     return {
       key,
       status: "loaded",

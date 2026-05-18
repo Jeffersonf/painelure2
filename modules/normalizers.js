@@ -191,14 +191,14 @@
 
   function normalizeCarRows(rows) {
     return rows.map(row => ({
-      vehicle: firstValue(row, ["carro", "veiculo", "vehicle", "recurso"], "Carro oficial"),
-      date: firstValue(row, ["data", "date", "quando"], ""),
-      time: firstValue(row, ["hora", "horario", "time"], ""),
-      requester: firstValue(row, ["solicitante", "responsavel", "requester", "owner"], ""),
-      destination: firstValue(row, ["destino", "local", "destination", "place"], ""),
+      vehicle: firstValue(row, ["carro", "veiculo", "ve_x00ed_culo", "vehicle", "recurso", "title"], "Carro oficial"),
+      date: firstValue(row, ["data", "data_da_reserva", "data_x0020_da_x0020_reserva", "data_reserva", "date", "quando"], ""),
+      time: firstValue(row, ["hora", "horario", "horario_da_reserva", "horario_x0020_da_x0020_reserva", "time"], ""),
+      requester: firstValue(row, ["solicitante", "responsavel", "responsavel_pela_reserva", "requester", "owner", "author"], ""),
+      destination: firstValue(row, ["destino", "local", "destination", "place", "local_destino"], ""),
       driver: firstValue(row, ["motorista", "driver"], ""),
-      status: firstValue(row, ["status", "situacao", "tone"], "pendente"),
-      note: firstValue(row, ["observacao", "descricao", "note", "motivo"], "")
+      status: firstValue(row, ["status", "situacao", "situa_x00e7__x00e3_o", "tone"], "pendente"),
+      note: firstValue(row, ["observacao", "observacoes", "descri_x00e7__x00e3_o", "descricao", "note", "motivo"], "")
     }));
   }
 

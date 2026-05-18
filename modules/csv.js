@@ -47,6 +47,14 @@
       .replace(/^_+|_+$/g, "");
   }
 
+  function normalizeRowKeys(row) {
+    return Object.entries(row || {}).reduce((acc, [key, value]) => {
+      const normalized = normalizeHeader(key);
+      if (normalized) acc[normalized] = value;
+      return acc;
+    }, {});
+  }
+
   function parseCsv(text, options = {}) {
     const delimiter = options.delimiter || detectDelimiter(text);
     const lines = String(text || "")
@@ -86,6 +94,47 @@
     return parseCsv(await response.text());
   }
 
+  function sharePointApiUrl(url) {
+    const parsed = new URL(url, window.location.href);
+    const match = parsed.pathname.match(/^(.*)\/Lists\/([^/]+)\/AllItems\.aspx$/i);
+    if (!match) return url;
+    const sitePath = match[1];
+    const listName = decodeURIComponent(match[2]);
+    const listPath = `${decodeURIComponent(sitePath)}/Lists/${listName}`.replace(/'/g, "''");
+    const query = new URLSearchParams({
+      "$top": "5000"
+    });
+    return `${parsed.origin}${sitePath}/_api/web/GetList('${listPath}')/items?${query}`;
+  }
+
+  function unwrapSharePointItems(payload) {
+    if (Array.isArray(payload?.value)) return payload.value;
+    if (Array.isArray(payload?.d?.results)) return payload.d.results;
+    if (Array.isArray(payload?.d)) return payload.d;
+    return [];
+  }
+
+  async function fetchSharePointList(url, options = {}) {
+    if (!url) throw new Error("Fonte SharePoint nao configurada.");
+    const timeoutMs = options.timeoutMs || 9000;
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+    let response;
+    try {
+      response = await fetch(sharePointApiUrl(url), {
+        cache: "no-store",
+        credentials: "include",
+        headers: { Accept: "application/json;odata=nometadata" },
+        signal: controller.signal
+      });
+    } finally {
+      window.clearTimeout(timeout);
+    }
+    if (!response.ok) throw new Error(`Erro ao carregar SharePoint: ${response.status}`);
+    return unwrapSharePointItems(await response.json()).map(normalizeRowKeys);
+  }
+
   P.parseCsv = parseCsv;
   P.fetchCsv = fetchCsv;
+  P.fetchSharePointList = fetchSharePointList;
 })();
